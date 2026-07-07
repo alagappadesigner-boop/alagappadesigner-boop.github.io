@@ -165,27 +165,32 @@
         }
 
         .receipt-number {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--primary-blue);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 45px; 
+            background: transparent;
+        }
+
+        .receipt-number span {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            line-height: 1.2;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .receipt-number input {
             width: 160px;
-            padding: 5px 12px;
-            border: 2px solid var(--primary-blue);
-            border-radius: 30px;
-            font-weight: 700;
-            color: #ef4444;
-            text-align: center;
-            background: #ffffff;
+            padding: 0;
+            border: none !important;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-align: left;
             outline: none;
-            font-size: 13px;
             letter-spacing: 0.5px;
         }
 
@@ -256,6 +261,11 @@
             font-weight: 600;
             color: var(--text-dark);
             outline: none;
+        }
+
+        /* Adds custom appearance styling to blank select element state */
+        select:invalid, select option[value=""] {
+            color: #94a3b8;
         }
 
         .section-title {
@@ -571,7 +581,7 @@
         <div class="receipt-heading">
             <h2>FEE RECEIPT</h2>
             <div class="receipt-number">
-                <span>Receipt No.</span>
+                <span>RECEIPT<br>NO.</span>
                 <input type="text" id="receiptNo" value="APA-2026-0001">
             </div>
         </div>
@@ -597,7 +607,9 @@
                 
                 <div class="field full">
                     <label>Course</label>
-                    <select id="course">
+                    <!-- Initializing select setup as required by HTML5 empty states -->
+                    <select id="course" required>
+                        <option value="" disabled selected hidden>Select Course</option>
                         <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
                         <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
                         <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
@@ -657,7 +669,7 @@
         <div class="declaration">
             <p>
                 Received with thanks from <strong id="studentNamePreview">______________________</strong> 
-                towards the course fee for <strong id="coursePreview">Diploma in Bharatanatyam</strong> 
+                towards the course fee for <strong id="coursePreview">______________________</strong> 
                 at Alagappa Performing Arts Academy.
             </p>
         </div>
@@ -716,7 +728,7 @@
         document.getElementById('studentNamePreview').innerText = e.target.value || "______________________";
     });
     document.getElementById('course').addEventListener('change', (e) => {
-        document.getElementById('coursePreview').innerText = e.target.value;
+        document.getElementById('coursePreview').innerText = e.target.value || "______________________";
     });
 
     // Native Browser Printer Router Control
@@ -730,14 +742,14 @@
         if(confirm("Are you sure you want to clear the entire form inputs?")) {
             document.getElementById('name').value = '';
             document.getElementById('phone').value = '';
-            document.getElementById('course').value = 'Diploma in Bharatanatyam';
+            document.getElementById('course').value = '';
             document.getElementById('batch').value = '';
             document.getElementById('paidAmount').value = '';
             document.getElementById('words').value = '';
             document.getElementById('transactionId').value = '';
             document.getElementById('remarks').value = '';
             document.getElementById('studentNamePreview').innerText = "______________________";
-            document.getElementById('coursePreview').innerText = "Diploma in Bharatanatyam";
+            document.getElementById('coursePreview').innerText = "______________________";
         }
     });
 
@@ -782,7 +794,6 @@
             studentName: document.getElementById('name').value || 'N/A',
             phone: document.getElementById('phone').value || 'N/A',
             course: document.getElementById('course').value || 'N/A',
-            totalFee: document.getElementById('paidAmount').value || '0',
             paidAmount: document.getElementById('paidAmount').value || '0',
             paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
         };
