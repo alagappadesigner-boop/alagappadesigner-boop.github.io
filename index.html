@@ -164,28 +164,34 @@
             letter-spacing: 1px;
         }
 
+        /* EXACT MATCH FOR THE IMAGE SNIPPET Styling */
         .receipt-number {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--primary-blue);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 45px; 
+            background: transparent;
+        }
+
+        .receipt-number span {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            line-height: 1.2;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .receipt-number input {
             width: 160px;
-            padding: 5px 12px;
-            border: 2px solid var(--primary-blue);
-            border-radius: 30px;
-            font-weight: 700;
-            color: #ef4444;
-            text-align: center;
-            background: #ffffff;
+            padding: 0;
+            border: none !important;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-align: left;
             outline: none;
-            font-size: 13px;
             letter-spacing: 0.5px;
         }
 
@@ -570,8 +576,9 @@
 
         <div class="receipt-heading">
             <h2>FEE RECEIPT</h2>
+            <!-- Fixed Layout Elements to match your snippet image perfectly -->
             <div class="receipt-number">
-                <span>Receipt No.</span>
+                <span>RECEIPT<br>NO.</span>
                 <input type="text" id="receiptNo" value="APA-2026-0001">
             </div>
         </div>
@@ -782,7 +789,6 @@
             studentName: document.getElementById('name').value || 'N/A',
             phone: document.getElementById('phone').value || 'N/A',
             course: document.getElementById('course').value || 'N/A',
-            totalFee: document.getElementById('paidAmount').value || '0',
             paidAmount: document.getElementById('paidAmount').value || '0',
             paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
         };
