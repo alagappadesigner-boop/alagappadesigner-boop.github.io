@@ -316,7 +316,7 @@
         }
 
         /* ==========================================================================
-           8. LEGAL TEXT & SIGNATURE TRACKS
+           8. LEGAL TEXT & CENTERED SIGNATURE TRACK
            ========================================================================== */
         .declaration {
             background: #f0f7ff;
@@ -340,9 +340,8 @@
         .signature-section {
             display: flex;
             justify-content: center;
-            align-items: flex-end;
-            margin-top: 15px;
-            padding: 0 10px;
+            align-items: center;
+            margin: 20px 0 10px 0;
             width: 100%;
         }
 
@@ -352,21 +351,20 @@
             align-items: center;
             justify-content: flex-end;
             text-align: center;
-            position: relative;
-            width: 240px;
+            width: 280px;
         }
 
         .signature-img-container {
-            height: 50px;
+            height: 55px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: -2px;
+            margin-bottom: 2px;
         }
 
         .signature img {
             max-height: 100%;
-            max-width: 200px;
+            max-width: 220px;
             object-fit: contain;
         }
 
@@ -375,10 +373,10 @@
             font-weight: 700;
             color: var(--primary-blue);
             border-top: 2px solid var(--primary-blue);
-            padding-top: 4px;
+            padding-top: 5px;
             width: 100%;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         /* ==========================================================================
@@ -386,7 +384,7 @@
            ========================================================================== */
         footer {
             text-align: center;
-            margin-top: 12px;
+            margin-top: 10px;
             border-top: 2px dashed #e2e8f0;
             padding-top: 6px;
             width: 100%;
@@ -574,10 +572,8 @@
             </div>
         </div>
 
-        <!-- TWO COLUMN LANDSCAPE GRID START -->
         <div class="landscape-grid">
             
-            <!-- LEFT COLUMN -->
             <div class="grid-column">
                 <div class="field full">
                     <label>Name</label>
@@ -624,7 +620,6 @@
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN -->
             <div class="grid-column">
                 <div class="section-title" style="margin-top: 0;">Payment Details</div>
                 
@@ -672,8 +667,6 @@
             </div>
 
         </div>
-        <!-- TWO COLUMN LANDSCAPE GRID END -->
-
         <div class="declaration">
             <p>
                 Received with thanks from <strong id="studentNamePreview">______________________</strong> 
@@ -697,7 +690,6 @@
         </footer>
     </div>
 
-    <!-- CONTROL PANEL USER BUTTONS -->
     <div class="buttons">
         <button id="download"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
         <button id="printBtn"><i class="fa-solid fa-print"></i> Print Receipt</button>
@@ -705,7 +697,6 @@
         <button id="clearForm"><i class="fa-solid fa-trash"></i> Clear Form</button>
     </div>
 
-    <!-- LIVE ADVANCED VIEW LEDGER PANEL -->
     <div class="live-ledger-container">
         <div class="ledger-header">
             <h3>Current Batch Records Ledger (Live View)</h3>
@@ -723,8 +714,7 @@
                     </tr>
                 </thead>
                 <tbody id="ledgerBody">
-                    <!-- Dynamic Rows Insertion Target -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
