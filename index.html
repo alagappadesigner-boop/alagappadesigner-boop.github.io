@@ -23,22 +23,12 @@
                 <h2>PERFORMING ARTS ACADEMY</h2>
                 <p>MUSIC | DANCE | YOGA | KARATE | ART | CHESS</p>
             </div>
+            <div class="contact-box">
+                <div><i class="fa-solid fa-location-dot"></i> 49, Gangadeeshwar Koil St, Purasaiwalkam, Chennai - 600084</div>
+                <div><i class="fa-solid fa-phone"></i> +91 99419 25769</div>
+                <div><i class="fa-solid fa-envelope"></i> info@alagappaacademy.com</div>
+            </div>
         </header>
-
-        <div class="contact-box">
-            <div>
-                <i class="fa-solid fa-location-dot"></i>
-                49, Gangadeeshwar Koil St, Purasaiwalkam, Chennai - 600084
-            </div>
-            <div>
-                <i class="fa-solid fa-phone"></i>
-                +91 99419 25769
-            </div>
-            <div>
-                <i class="fa-solid fa-envelope"></i>
-                info@alagappaacademy.com
-            </div>
-        </div>
 
         <div class="receipt-heading">
             <h2>FEE RECEIPT</h2>
@@ -48,118 +38,105 @@
             </div>
         </div>
 
-        <div class="details">
-            <div class="field">
-                <label>Name</label>
-                <input type="text" id="name" placeholder="Enter Student Name">
+        <div class="landscape-grid">
+            
+            <div class="grid-column">
+                <div class="field full" style="margin-bottom: 12px;">
+                    <label>Name</label>
+                    <input type="text" id="name" placeholder="Enter Student Name">
+                </div>
+                
+                <div class="field full" style="margin-bottom: 12px;">
+                    <label>Phone</label>
+                    <input type="text" id="phone" placeholder="Phone Number">
+                </div>
+
+                <div class="field full" style="margin-bottom: 12px;">
+                    <label>Email ID</label>
+                    <input type="email" id="email" placeholder="Email Address">
+                </div>
+
+                <div class="field full" style="margin-bottom: 12px;">
+                    <label>Address</label>
+                    <input type="text" id="address" placeholder="Address">
+                </div>
+
+                <div class="section-title">Course Details</div>
+                
+                <div class="details">
+                    <div class="field">
+                        <label>Course</label>
+                        <input type="text" id="course" placeholder="Course">
+                    </div>
+                    <div class="field">
+                        <label>Batch</label>
+                        <input type="text" id="batch" placeholder="Batch">
+                    </div>
+                </div>
+
+                <div class="details">
+                    <div class="field">
+                        <label>Joining</label>
+                        <input type="date" id="joiningDate">
+                    </div>
+                    <div class="field">
+                        <label>Duration</label>
+                        <input type="text" id="duration" placeholder="Duration">
+                    </div>
+                </div>
             </div>
-            <div class="field">
-                <label>Date</label>
-                <input type="date" id="date">
+
+            <div class="grid-column">
+                <div class="section-title" style="margin-top: 0;">Payment Details</div>
+                
+                <div class="details">
+                    <div class="field">
+                        <label>Total Fee</label>
+                        <input type="number" id="amount" placeholder="₹">
+                    </div>
+                    <div class="field">
+                        <label>Paid</label>
+                        <input type="number" id="paidAmount" placeholder="₹">
+                    </div>
+                </div>
+
+                <div class="field full" style="margin-bottom: 15px;">
+                    <label>In Words</label>
+                    <input type="text" id="words" readonly placeholder="Amount in words">
+                </div>
+
+                <div class="payment-grid">
+                    <div class="payment-box">
+                        <h3>Payment Mode</h3>
+                        <label><input type="radio" name="payment" value="Cash" checked> Cash</label><br>
+                        <label><input type="radio" name="payment" value="UPI"> UPI</label><br>
+                        <label><input type="radio" name="payment" value="Card"> Card</label><br>
+                        <label><input type="radio" name="payment" value="Bank Transfer"> Bank</label>
+                    </div>
+
+                    <div class="payment-box">
+                        <label style="font-weight:700; margin-bottom:4px;">Transaction / UPI ID</label>
+                        <input type="text" id="transactionId" placeholder="Transaction ID" style="border:1px solid #cbd5e1; padding:4px 8px; border-radius:4px; background:#fff; margin-bottom:8px;">
+
+                        <label style="font-weight:700; margin-bottom:4px;">Installment</label>
+                        <select id="installment" style="border:1px solid #cbd5e1; padding:4px 8px; border-radius:4px; background:#fff;">
+                            <option>First Installment</option>
+                            <option>Second Installment</option>
+                            <option>Final Installment</option>
+                            <option>Full Payment</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Remarks</div>
+                <textarea id="remarks" rows="2" placeholder="Remarks (Optional)"></textarea>
             </div>
+
         </div>
-
-        <div class="details">
-            <div class="field">
-                <label>Phone Number</label>
-                <input type="text" id="phone">
-            </div>
-            <div class="field">
-                <label>Email ID</label>
-                <input type="email" id="email">
-            </div>
-        </div>
-
-        <div class="details">
-            <div class="field) full">
-                <label>Address</label>
-                <input type="text" id="address">
-            </div>
-        </div>
-
-        <div class="section-title">Course Details</div>
-        <div class="details">
-            <div class="field">
-                <label>Course</label>
-                <input type="text" id="course">
-            </div>
-            <div class="field">
-                <label>Batch</label>
-                <input type="text" id="batch">
-            </div>
-        </div>
-
-        <div class="details">
-            <div class="field">
-                <label>Joining Date</label>
-                <input type="date" id="joiningDate">
-            </div>
-            <div class="field">
-                <label>Duration</label>
-                <input type="text" id="duration">
-            </div>
-        </div>
-
-        <div class="section-title">Payment Details</div>
-        <div class="details">
-            <div class="field">
-                <label>Total Fee (₹)</label>
-                <input type="number" id="amount">
-            </div>
-            <div class="field">
-                <label>Amount Paid (₹)</label>
-                <input type="number" id="paidAmount">
-            </div>
-        </div>
-
-        <div class="details">
-            <div class="field full">
-                <label>Amount in Words</label>
-                <input type="text" id="words" readonly>
-            </div>
-        </div>
-
-        <div class="section-title">Payment Information</div>
-        <div class="payment-grid">
-            <div class="payment-box">
-                <h3>Payment Mode</h3>
-                <label>
-                    <input type="radio" name="payment" value="Cash" checked> Cash
-                </label>
-                <label>
-                    <input type="radio" name="payment" value="UPI"> UPI
-                </label>
-                <label>
-                    <input type="radio" name="payment" value="Card"> Card
-                </label>
-                <label>
-                    <input type="radio" name="payment" value="Bank Transfer"> Bank Transfer
-                </label>
-            </div>
-
-            <div class="payment-box">
-                <label>Transaction / UPI ID</label>
-                <input type="text" id="transactionId" placeholder="Transaction ID">
-
-                <label style="margin-top:15px;">Installment</label>
-                <select id="installment">
-                    <option>First Installment</option>
-                    <option>Second Installment</option>
-                    <option>Final Installment</option>
-                    <option>Full Payment</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="section-title">Remarks</div>
-        <textarea id="remarks" rows="4" placeholder="Remarks (Optional)"></textarea>
-
         <div class="declaration">
             <p>
-                Received with thanks from 
-                <strong id="studentNamePreview">______________________</strong> 
-                towards the course fee for 
-                <strong id="coursePreview">______________________</strong> 
+                Received with thanks from <strong id="studentNamePreview">______________________</strong> 
+                towards the course fee for <strong id="coursePreview">______________________</strong> 
                 at Alagappa Performing Arts Academy.
             </p>
         </div>
@@ -170,7 +147,7 @@
                 <div class="seal-box"></div>
             </div>
             <div class="signature">
-                <p style="margin-top: 40px;">Authorized Signature</p>
+                <p style="margin-top: 45px;">Authorized Signature</p>
             </div>
         </div>
 
@@ -181,15 +158,9 @@
     </div>
 
     <div class="buttons">
-        <button id="download">
-            <i class="fa-solid fa-file-pdf"></i> Download PDF
-        </button>
-        <button id="printBtn">
-            <i class="fa-solid fa-print"></i> Print Receipt
-        </button>
-        <button id="clearForm">
-            <i class="fa-solid fa-trash"></i> Clear Form
-        </button>
+        <button id="download"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+        <button id="printBtn"><i class="fa-solid fa-print"></i> Print Receipt</button>
+        <button id="clearForm"><i class="fa-solid fa-trash"></i> Clear Form</button>
     </div>
 </div>
 
