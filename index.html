@@ -362,7 +362,27 @@
         }
 
         .signature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
             text-align: center;
+            position: relative;
+            width: 200px;
+        }
+
+        .signature-img-container {
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: -2px;
+        }
+
+        .signature img {
+            max-height: 100%;
+            max-width: 160px;
+            object-fit: contain;
         }
 
         .signature p {
@@ -371,7 +391,7 @@
             color: var(--primary-blue);
             border-top: 2px solid var(--primary-blue);
             padding-top: 4px;
-            width: 170px;
+            width: 100%;
         }
 
         /* ==========================================================================
@@ -426,7 +446,7 @@
         #clearForm { background-color: #ef4444; }
 
         /* ==========================================================================
-           11. NEW: ADVANCED LIVE TRACKING LEDGER PANEL (SCREEN ONLY)
+           11. ADVANCED LIVE TRACKING LEDGER PANEL (SCREEN ONLY)
            ========================================================================== */
         .live-ledger-container {
             width: 100%;
@@ -681,7 +701,10 @@
                 <div class="seal-box"></div>
             </div>
             <div class="signature">
-                <p style="margin-top: 35px;">Authorized Signature</p>
+                <div class="signature-img-container">
+                    <img src="signature.png" alt="Signature">
+                </div>
+                <p>Authorized Signature</p>
             </div>
         </div>
 
