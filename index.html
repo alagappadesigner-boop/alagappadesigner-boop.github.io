@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alagappa Performing Arts Academy Receipt (Widescreen)</title>
+    <title>Alagappa Performing Arts Academy Receipt (Premium Widescreen)</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -15,10 +15,19 @@
            ========================================================================== */
         :root {
             --primary-blue: #0b407b;
+            --primary-dark: #072b54;
             --accent-gold: #cca43b;
+            --accent-gold-light: #f4ebd1;
             --text-dark: #1e293b;
+            --text-muted: #64748b;
             --border-color: #cbd5e1;
             --bg-light: #f8fafc;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 12px rgba(11, 64, 123, 0.05);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.06);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
         }
 
         * {
@@ -29,22 +38,23 @@
         }
 
         body {
-            background-color: #f0f4f8;
+            background-color: #f1f5f9;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 24px;
+            padding: 30px;
+            color: var(--text-dark);
         }
 
         /* ==========================================================================
-           2. MAIN RECEIPT WINDOW CONTAINER (WIDESCREEN EXPANDED RATIO)
+           2. MAIN RECEIPT WINDOW CONTAINER
            ========================================================================== */
         .page {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
             width: 100%;
             max-width: 1400px;
         }
@@ -52,10 +62,10 @@
         #receipt {
             background: #ffffff;
             width: 100%;
-            padding: 30px 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-            border: 4px solid var(--primary-blue);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 3px solid var(--primary-blue);
             position: relative;
             overflow: hidden;
         }
@@ -67,24 +77,25 @@
             display: grid;
             grid-template-columns: 160px 1fr auto;
             align-items: center;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #06284f 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
             color: #ffffff;
-            padding: 16px 28px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 24px 32px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
             border-bottom: 5px solid var(--accent-gold);
-            gap: 30px;
+            gap: 32px;
+            box-shadow: var(--shadow-md);
         }
 
         .logo-area {
             background: #ffffff !important;
-            padding: 8px !important;
-            border-radius: 8px !important;
+            padding: 10px !important;
+            border-radius: var(--radius-sm) !important;
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-            height: 80px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+            height: 85px !important;
             width: 160px !important;
         }
 
@@ -95,48 +106,53 @@
         }
 
         .title-area h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
             color: #ffffff;
-            letter-spacing: 1.5px;
-            line-height: 1.1;
+            letter-spacing: 2px;
+            line-height: 1;
         }
 
         .title-area h2 {
             font-size: 16px;
             font-weight: 600;
             color: var(--accent-gold);
-            letter-spacing: 2px;
-            margin-top: 2px;
+            letter-spacing: 3px;
+            margin-top: 4px;
         }
 
         .title-area p {
             font-size: 11px;
-            font-weight: 400;
-            color: #e2e8f0;
-            margin-top: 4px;
+            font-weight: 500;
+            color: #cbd5e1;
+            margin-top: 6px;
+            letter-spacing: 1px;
         }
 
         .contact-box {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             gap: 6px;
             font-size: 12px;
-            color: #f8fafc;
+            color: #f1f5f9;
             border-left: 3px solid var(--accent-gold);
-            padding-left: 20px;
-            max-width: 360px;
+            padding: 4px 0 4px 20px;
+            max-width: 380px;
         }
 
         .contact-box div {
             display: flex;
             align-items: center;
             gap: 10px;
+            line-height: 1.4;
         }
 
         .contact-box i {
             color: var(--accent-gold);
-            font-size: 12px;
+            font-size: 13px;
+            width: 14px;
+            text-align: center;
         }
 
         /* ==========================================================================
@@ -146,56 +162,61 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             background: var(--bg-light);
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: var(--radius-sm);
             border-left: 6px solid var(--primary-blue);
+            box-shadow: var(--shadow-sm);
         }
 
         .receipt-heading h2 {
-            font-size: 20px;
+            font-size: 22px;
             color: var(--primary-blue);
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .receipt-number {
             display: flex;
             align-items: center;
-            gap: 20px;
-            background: transparent;
+            gap: 16px;
         }
 
         .receipt-number span {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             color: var(--primary-blue);
-            line-height: 1.2;
-            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .receipt-number input {
-            width: 180px;
-            padding: 4px 8px;
+            width: 190px;
+            padding: 6px 12px;
             border: 2px dashed var(--accent-gold) !important;
-            background: #fff;
-            border-radius: 4px;
-            font-size: 16px;
+            background: #ffffff;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
             font-weight: 800;
             color: var(--primary-blue);
             text-align: center;
             outline: none;
+            transition: all 0.2s;
+        }
+
+        .receipt-number input:focus {
+            border-style: solid !important;
+            background: var(--accent-gold-light);
         }
 
         /* ==========================================================================
-           5. THREE-COLUMN COMFORT GRID ENGINE (OPTIMIZED FOR WIDESCREEN DISPLAY)
+           5. COMFORT GRID ENGINE
            ========================================================================== */
         .landscape-grid {
             display: grid;
             grid-template-columns: 1fr 1fr; 
-            gap: 30px;
-            margin-bottom: 15px;
+            gap: 32px;
+            margin-bottom: 16px;
         }
 
         .grid-column {
@@ -210,14 +231,20 @@
         .field {
             display: flex;
             align-items: center;
-            border: 2px solid var(--primary-blue);
+            border: 2px solid var(--border-color);
             border-radius: 30px;
-            padding: 6px 20px;
+            padding: 6px 24px;
             background: #ffffff;
-            gap: 12px;
+            gap: 16px;
             width: 100%;
-            height: 44px;
-            margin-bottom: 10px;
+            height: 46px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .field:focus-within {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(11, 64, 123, 0.1);
         }
 
         label {
@@ -227,7 +254,7 @@
             text-transform: uppercase;
             white-space: nowrap;
             border-right: 2px solid #e2e8f0;
-            padding-right: 12px;
+            padding-right: 16px;
             min-width: 110px; 
         }
 
@@ -244,6 +271,15 @@
             outline: none;
         }
 
+        input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
         select:invalid, select option[value=""] {
             color: #94a3b8;
         }
@@ -254,12 +290,13 @@
             text-transform: uppercase;
             color: #ffffff;
             background: var(--primary-blue);
-            padding: 6px 16px;
-            margin-bottom: 12px;
-            margin-top: 10px;
-            border-radius: 6px;
-            letter-spacing: 0.5px;
+            padding: 8px 18px;
+            margin-bottom: 14px;
+            margin-top: 12px;
+            border-radius: var(--radius-sm);
+            letter-spacing: 1px;
             width: 100%;
+            box-shadow: var(--shadow-sm);
         }
 
         /* ==========================================================================
@@ -273,42 +310,109 @@
         }
 
         .payment-box {
-            border: 2px solid var(--primary-blue);
-            padding: 12px;
-            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            padding: 16px;
+            border-radius: var(--radius-md);
             background: var(--bg-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .payment-box:focus-within {
+            border-color: var(--primary-blue);
         }
 
         .payment-box h3 {
             font-size: 12px;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             color: var(--primary-blue);
-            font-weight: 700;
+            font-weight: 800;
             border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
+            letter-spacing: 0.5px;
         }
 
         .payment-box label {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
+            gap: 10px;
+            margin-bottom: 6px;
             margin-right: 12px;
             cursor: pointer;
             font-weight: 600;
             border: none;
             padding: 0;
             min-width: auto;
+            color: var(--text-dark);
+            text-transform: none;
+        }
+
+        .payment-box label input[type="radio"] {
+            accent-color: var(--primary-blue);
+            transform: scale(1.1);
+        }
+
+        .inner-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .inner-row-field {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .inner-row-field span {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .inner-row-field input, 
+        .inner-row-field select {
+            width: 100%;
+            height: 40px;
+            padding: 8px 14px;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-sm);
+            background: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .inner-row-field input:focus, 
+        .inner-row-field select:focus {
+            border-color: var(--primary-blue) !important;
+            box-shadow: 0 0 0 3px rgba(11, 64, 123, 0.08);
         }
 
         textarea {
-            border: 2px solid var(--primary-blue) !important;
-            border-radius: 10px;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-md);
             background: #ffffff;
-            padding: 10px;
+            padding: 14px;
             resize: none;
             width: 100%;
             font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-blue) !important;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(11, 64, 123, 0.1);
         }
 
         /* ==========================================================================
@@ -316,28 +420,31 @@
            ========================================================================== */
         .declaration {
             background: #f0f7ff;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 16px 28px;
+            border-radius: var(--radius-md);
             font-size: 14px;
-            color: #1e293b;
+            color: var(--text-dark);
             text-align: center;
-            margin: 20px 0;
+            margin: 24px 0;
             border: 2px solid var(--accent-gold);
             font-weight: 500;
-            line-height: 1.5;
+            line-height: 1.6;
             width: 100%;
+            box-shadow: var(--shadow-sm);
         }
 
         .declaration strong {
             color: var(--primary-blue);
             font-weight: 700;
+            border-bottom: 1px dashed var(--primary-blue);
+            padding-bottom: 1px;
         }
 
         .signature-section {
             display: flex;
             justify-content: flex-end; 
             align-items: center;
-            margin: 20px 40px 10px 0;
+            margin: 24px 40px 16px 0;
             width: 100%;
         }
 
@@ -346,44 +453,44 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            width: 300px;
+            width: 280px;
         }
 
         .signature-img-container {
-            height: 60px;
+            height: 65px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .signature img {
             max-height: 100%;
-            max-width: 240px;
+            max-width: 220px;
             object-fit: contain;
         }
 
         .signature p {
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: 800;
             color: var(--primary-blue);
             border-top: 2px solid var(--primary-blue);
-            padding-top: 6px;
+            padding-top: 8px;
             width: 100%;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         footer {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 24px;
             border-top: 2px dashed #e2e8f0;
-            padding-top: 10px;
+            padding-top: 14px;
             width: 100%;
         }
 
         footer h2 {
-            font-size: 15px;
+            font-size: 16px;
             color: var(--accent-gold);
             letter-spacing: 2px;
             font-weight: 700;
@@ -391,8 +498,9 @@
 
         footer p {
             font-size: 11px;
-            color: #64748b;
-            margin-top: 2px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
         }
 
         /* ==========================================================================
@@ -401,33 +509,41 @@
         .buttons {
             display: flex;
             gap: 16px;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .buttons button {
-            padding: 12px 28px;
+            padding: 12px 30px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 14px;
             font-weight: 700;
-            color: #fff;
+            color: #ffffff;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .buttons button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
 
-        #download { background-color: #0b407b; }
-        #printBtn { background-color: #cca43b; color: #000; }
+        .buttons button:active {
+            transform: translateY(0);
+        }
+
+        #download { background-color: var(--primary-blue); }
+        #download:hover { background-color: var(--primary-dark); }
+        #printBtn { background-color: var(--accent-gold); color: #1e293b; }
+        #printBtn:hover { background-color: #b59030; }
         #exportExcel { background-color: #107c41; }
+        #exportExcel:hover { background-color: #0b592e; }
         #clearForm { background-color: #ef4444; }
+        #clearForm:hover { background-color: #dc2626; }
 
         /* ==========================================================================
            10. ADVANCED LEDGER PANEL
@@ -435,11 +551,11 @@
         .live-ledger-container {
             width: 100%;
             background: #ffffff;
-            margin-top: 25px;
-            border-radius: 12px;
-            border: 2px solid #cbd5e1;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
         }
 
         .ledger-header {
@@ -447,14 +563,15 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--primary-blue);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .ledger-header h3 {
             color: var(--primary-blue);
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .ledger-table-wrapper {
@@ -472,28 +589,41 @@
         .ledger-table th {
             background: var(--primary-blue);
             color: #ffffff;
-            padding: 10px 12px;
+            padding: 12px 16px;
+            font-weight: 600;
             position: sticky;
             top: 0;
+            letter-spacing: 0.5px;
         }
 
         .ledger-table td {
-            padding: 10px 12px;
+            padding: 12px 16px;
             border-bottom: 1px solid #e2e8f0;
             font-weight: 500;
+            color: #334155;
         }
 
         .ledger-table tr:nth-child(even) {
             background: var(--bg-light);
         }
 
+        .ledger-table tr:hover {
+            background: #f1f5f9;
+        }
+
         .delete-btn {
-            background: #ef4444;
-            color: white;
+            background: #fee2e2;
+            color: #ef4444;
             border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            color: #ffffff;
         }
 
         /* ==========================================================================
@@ -527,7 +657,7 @@
             #receipt {
                 box-shadow: none !important;
                 border: 4px solid var(--primary-blue) !important;
-                padding: 20px 30px !important;
+                padding: 24px 40px !important;
                 width: 98vw !important;
                 max-height: 96vh !important;
                 overflow: hidden !important;
@@ -611,7 +741,7 @@
 
                 <div class="field">
                     <label>In Words</label>
-                    <input type="text" id="words" placeholder="Amount in words" readonly style="color: #0b407b; font-weight: 700;">
+                    <input type="text" id="words" placeholder="Amount in words" readonly style="color: var(--primary-blue); font-weight: 700;">
                 </div>
 
                 <div class="payment-grid">
@@ -624,17 +754,23 @@
                     </div>
 
                     <div class="payment-box">
-                        <label style="font-weight:700; margin-bottom:4px; border:none; padding:0;">Transaction / UPI ID</label>
-                        <input type="text" id="transactionId" placeholder="Transaction ID" style="border:1px solid #cbd5e1 !important; padding:4px 8px; border-radius:4px; background:#fff; margin-bottom:8px;">
+                        <div class="inner-field-group">
+                            <div class="inner-row-field">
+                                <span>Transaction / UPI ID</span>
+                                <input type="text" id="transactionId" placeholder="Transaction ID">
+                            </div>
 
-                        <label style="font-weight:700; margin-bottom:4px; border:none; padding:0;">Installment</label>
-                        <select id="installment" style="border:1px solid #cbd5e1 !important; padding:4px 8px; border-radius:4px; background:#fff;">
-                            <option value="" disabled selected hidden></option>
-                            <option value="First Installment">First Installment</option>
-                            <option value="Second Installment">Second Installment</option>
-                            <option value="Final Installment">Final Installment</option>
-                            <option value="Full Payment">Full Payment</option>
-                        </select>
+                            <div class="inner-row-field">
+                                <span>Installment</span>
+                                <select id="installment">
+                                    <option value="" disabled selected hidden></option>
+                                    <option value="First Installment">First Installment</option>
+                                    <option value="Second Installment">Second Installment</option>
+                                    <option value="Final Installment">Final Installment</option>
+                                    <option value="Full Payment">Full Payment</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
