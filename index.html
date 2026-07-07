@@ -238,6 +238,7 @@
             width: 100%;
             height: 46px;
             margin-bottom: 12px;
+            position: relative;
             transition: all 0.2s ease;
         }
 
@@ -273,6 +274,13 @@
         input::placeholder {
             color: #94a3b8;
             font-weight: 400;
+        }
+
+        .print-text-preview {
+            display: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
         }
 
         select {
@@ -364,6 +372,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
+            position: relative;
         }
 
         .inner-row-field span {
@@ -626,18 +635,18 @@
         }
 
         /* ==========================================================================
-           11. DYNAMIC COMPRESSION PRINT CONFIGURATION
+           11. ABSOLUTE COMPRESSION ENGINE FOR PRINT PREVIEWS
            ========================================================================== */
         @media print {
             @page {
                 size: landscape; 
-                margin: 0;
+                margin: 0mm; /* Completely strip out native margins */
             }
             
             html, body {
                 background-color: #ffffff !important;
-                width: 100% !important;
-                height: 100% !important;
+                width: 297mm !important;
+                height: 210mm !important;
                 overflow: hidden !important;
                 padding: 0 !important;
                 margin: 0 !important;
@@ -653,35 +662,44 @@
                 display: none !important;
             }
 
+            /* Strip form field lines for structural printing clarity */
+            input[type="text"], input[type="number"], select, .inner-row-field input, .inner-row-field select {
+                display: none !important;
+            }
+            
+            .print-text-preview {
+                display: block !important;
+            }
+
             #receipt {
                 box-shadow: none !important;
                 border: 3px solid var(--primary-blue) !important;
                 border-radius: 0 !important;
-                width: 297mm !important;   /* Hard scale bounds to match clean A4 */
+                width: 297mm !important;   
                 height: 210mm !important;  
-                padding: 24px !important;  /* Compressed padding */
-                position: relative !important;
+                padding: 24px 32px !important;  
+                position: absolute !important;
                 top: 0 !important;
                 left: 0 !important;
-                transform: scale(0.88) !important; /* Scale optimization to prevent spill-over */
-                transform-origin: center center !important;
+                /* Dynamic uniform safe scale to instantly lock the entire element inside view */
+                transform: scale(0.72) !important; 
+                transform-origin: top left !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
                 box-sizing: border-box !important;
             }
 
-            /* Compress gaps to save critical vertical room */
-            .header { margin-bottom: 12px !important; padding: 16px 24px !important; gap: 20px !important; }
-            .receipt-heading { margin-bottom: 12px !important; padding: 8px 20px !important; }
-            .landscape-grid { gap: 20px !important; margin-bottom: 8px !important; }
-            .section-title { padding: 4px 12px !important; margin-bottom: 8px !important; margin-top: 6px !important; }
-            .field { height: 38px !important; padding: 4px 16px !important; margin-bottom: 8px !important; }
-            .payment-box { padding: 10px !important; }
-            .inner-row-field input, .inner-row-field select { height: 34px !important; padding: 6px 12px !important; }
-            textarea { padding: 8px !important; }
-            .declaration { margin: 12px 0 !important; padding: 10px 20px !important; font-size: 13px !important; }
-            .signature-section { margin: 12px 20px 8px 0 !important; }
-            footer { margin-top: 12px !important; padding-top: 8px !important; }
+            /* Micro-spacing compressions */
+            .header { margin-bottom: 12px !important; padding: 14px 24px !important; gap: 20px !important; }
+            .receipt-heading { margin-bottom: 12px !important; padding: 6px 20px !important; }
+            .landscape-grid { gap: 20px !important; margin-bottom: 4px !important; }
+            .section-title { padding: 4px 12px !important; margin-bottom: 8px !important; margin-top: 4px !important; }
+            .field { height: 36px !important; padding: 4px 16px !important; margin-bottom: 8px !important; }
+            .payment-box { padding: 8px !important; }
+            textarea { padding: 8px !important; height: 50px !important; border: 1px solid var(--border-color) !important; }
+            .declaration { margin: 10px 0 !important; padding: 10px 20px !important; font-size: 13px !important; }
+            .signature-section { margin: 10px 20px 4px 0 !important; }
+            footer { margin-top: 10px !important; padding-top: 6px !important; }
         }
     </style>
 </head>
@@ -710,22 +728,24 @@
             <div class="receipt-number">
                 <span>RECEIPT NO.</span>
                 <input type="text" id="receiptNo" value="APA-2026-0001">
+                <span class="print-text-preview" id="print_receiptNo" style="font-size:16px; font-weight:800; color:var(--primary-blue);">APA-2026-0001</span>
             </div>
         </div>
 
         <div class="landscape-grid">
-            <!-- LEFT COLUMN: STUDENT & COURSE -->
             <div class="grid-column">
                 <div class="section-title" style="margin-top: 0;">Student Information</div>
                 
                 <div class="field">
                     <label>Name</label>
                     <input type="text" id="name" placeholder="Enter Student Name">
+                    <span class="print-text-preview" id="print_name"></span>
                 </div>
 
                 <div class="field">
                     <label>Phone</label>
                     <input type="text" id="phone" placeholder="Phone Number">
+                    <span class="print-text-preview" id="print_phone"></span>
                 </div>
 
                 <div class="section-title">Course Details</div>
@@ -738,26 +758,29 @@
                         <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
                         <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
                     </select>
+                    <span class="print-text-preview" id="print_course"></span>
                 </div>
                 
                 <div class="field">
                     <label>Batch</label>
                     <input type="text" id="batch" placeholder="Batch Details">
+                    <span class="print-text-preview" id="print_batch"></span>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: FINANCIAL DATA -->
             <div class="grid-column">
                 <div class="section-title" style="margin-top: 0;">Payment Details</div>
                 
                 <div class="field">
                     <label>Amount Paid</label>
                     <input type="number" id="paidAmount" placeholder="₹">
+                    <span class="print-text-preview" id="print_paidAmount" style="font-weight:700;"></span>
                 </div>
 
                 <div class="field">
                     <label>In Words</label>
                     <input type="text" id="words" placeholder="Amount in words" readonly style="color: var(--primary-blue); font-weight: 700;">
+                    <span class="print-text-preview" id="print_words" style="color: var(--primary-blue); font-weight: 700;"></span>
                 </div>
 
                 <div class="payment-grid">
@@ -774,6 +797,7 @@
                             <div class="inner-row-field">
                                 <span>Transaction / UPI ID</span>
                                 <input type="text" id="transactionId" placeholder="Transaction ID">
+                                <span class="print-text-preview" id="print_transactionId"></span>
                             </div>
 
                             <div class="inner-row-field">
@@ -785,6 +809,7 @@
                                     <option value="Final Installment">Final Installment</option>
                                     <option value="Full Payment">Full Payment</option>
                                 </select>
+                                <span class="print-text-preview" id="print_installment"></span>
                             </div>
                         </div>
                     </div>
@@ -818,7 +843,6 @@
         </footer>
     </div>
 
-    <!-- CONTROL PANEL USER BUTTONS -->
     <div class="buttons">
         <button id="download"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
         <button id="printBtn"><i class="fa-solid fa-print"></i> Print Receipt</button>
@@ -826,7 +850,6 @@
         <button id="clearForm"><i class="fa-solid fa-trash"></i> Clear Form</button>
     </div>
 
-    <!-- LIVE ADVANCED VIEW LEDGER PANEL -->
     <div class="live-ledger-container">
         <div class="ledger-header">
             <h3>Current Batch Records Ledger (Live View)</h3>
@@ -844,8 +867,7 @@
                     </tr>
                 </thead>
                 <tbody id="ledgerBody">
-                    <!-- Dynamic Rows -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
@@ -871,6 +893,19 @@
         return str.trim() + ' Only';
     }
 
+    // --- STREAMLINED SYNC MECHANISMS FOR PRINT COPIES ---
+    function syncPrintPreviews() {
+        document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
+        document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
+        document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
+        document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
+        document.getElementById('print_batch').innerText = document.getElementById('batch').value || 'N/A';
+        document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
+        document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
+        document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
+        document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
+    }
+
     document.getElementById('paidAmount').addEventListener('input', (e) => {
         const val = parseInt(e.target.value, 10);
         if (!isNaN(val) && val >= 0) {
@@ -889,6 +924,7 @@
 
     document.getElementById('printBtn').addEventListener('click', () => {
         logReceiptData();
+        syncPrintPreviews();
         window.print();
     });
 
