@@ -91,9 +91,14 @@ function downloadPDF() {
         return;
     }
 
+    // Temporarily hide buttons array explicitly before drawing image frame 
+    const buttonsDiv = document.querySelector(".buttons");
+    if (buttonsDiv) buttonsDiv.style.display = "none";
+
     html2canvas(receipt, {
-        scale: 3,
-        useCORS: true
+        scale: 2, // Standard distribution clear value scale
+        useCORS: true,
+        logging: false
     }).then(canvas => {
         const imgData = canvas.toDataURL("image/png");
         const { jsPDF } = window.jspdf;
@@ -104,6 +109,12 @@ function downloadPDF() {
 
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
         pdf.save("Receipt.pdf");
+
+        // Restore interactive utilities block onto display view hierarchy
+        if (buttonsDiv) buttonsDiv.style.display = "flex";
+    }).catch(err => {
+        console.error("PDF generation error: ", err);
+        if (buttonsDiv) buttonsDiv.style.display = "flex";
     });
 }
 
