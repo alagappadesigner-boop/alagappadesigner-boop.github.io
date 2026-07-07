@@ -67,7 +67,6 @@
             box-shadow: var(--shadow-lg);
             border: 3px solid var(--primary-blue);
             position: relative;
-            overflow: hidden;
         }
 
         /* ==========================================================================
@@ -627,27 +626,27 @@
         }
 
         /* ==========================================================================
-           11. FIXED LANDSCAPE PRINT CONFIGURATION
+           11. DYNAMIC COMPRESSION PRINT CONFIGURATION
            ========================================================================== */
         @media print {
             @page {
                 size: landscape; 
-                margin: 0; /* Clear edge limits */
+                margin: 0;
             }
             
             html, body {
-                background-color: #ffffff;
-                width: 100%;
-                height: 100%;
-                overflow: visible !important;
+                background-color: #ffffff !important;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
                 padding: 0 !important;
                 margin: 0 !important;
             }
 
             body {
                 display: flex !important;
-                justify-content: center;
-                align-items: flex-start; /* Prevent pulling it up if long */
+                justify-content: center !important;
+                align-items: center !important;
             }
 
             .buttons, .live-ledger-container {
@@ -657,19 +656,32 @@
             #receipt {
                 box-shadow: none !important;
                 border: 3px solid var(--primary-blue) !important;
-                padding: 30px !important;
-                width: 297mm !important;   /* Force perfect A4 Landscape Width */
-                height: 210mm !important;  /* Force perfect A4 Landscape Height */
                 border-radius: 0 !important;
-                position: absolute;
-                top: 0;
-                left: 0;
-                overflow: hidden !important; 
-                transform: scale(0.95);    /* Safely micro-scale to fit all margins perfectly */
-                transform-origin: top left;
+                width: 297mm !important;   /* Hard scale bounds to match clean A4 */
+                height: 210mm !important;  
+                padding: 24px !important;  /* Compressed padding */
+                position: relative !important;
+                top: 0 !important;
+                left: 0 !important;
+                transform: scale(0.88) !important; /* Scale optimization to prevent spill-over */
+                transform-origin: center center !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                box-sizing: border-box !important;
             }
+
+            /* Compress gaps to save critical vertical room */
+            .header { margin-bottom: 12px !important; padding: 16px 24px !important; gap: 20px !important; }
+            .receipt-heading { margin-bottom: 12px !important; padding: 8px 20px !important; }
+            .landscape-grid { gap: 20px !important; margin-bottom: 8px !important; }
+            .section-title { padding: 4px 12px !important; margin-bottom: 8px !important; margin-top: 6px !important; }
+            .field { height: 38px !important; padding: 4px 16px !important; margin-bottom: 8px !important; }
+            .payment-box { padding: 10px !important; }
+            .inner-row-field input, .inner-row-field select { height: 34px !important; padding: 6px 12px !important; }
+            textarea { padding: 8px !important; }
+            .declaration { margin: 12px 0 !important; padding: 10px 20px !important; font-size: 13px !important; }
+            .signature-section { margin: 12px 20px 8px 0 !important; }
+            footer { margin-top: 12px !important; padding-top: 8px !important; }
         }
     </style>
 </head>
@@ -701,9 +713,7 @@
             </div>
         </div>
 
-        <!-- TWO COLUMN EXPANDED LANDSCAPE GRID -->
         <div class="landscape-grid">
-            
             <!-- LEFT COLUMN: STUDENT & COURSE -->
             <div class="grid-column">
                 <div class="section-title" style="margin-top: 0;">Student Information</div>
@@ -783,7 +793,6 @@
                 <div class="section-title">Remarks</div>
                 <textarea id="remarks" rows="2" placeholder="Remarks (Optional)"></textarea>
             </div>
-
         </div>
 
         <div class="declaration">
@@ -843,10 +852,8 @@
 </div>
 
 <script>
-    // --- AUTOMATIC NUMBER TO WORDS ALGORITHM ---
     function convertNumberToWords(amount) {
         if (amount === 0) return 'Zero';
-        
         const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
         const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
