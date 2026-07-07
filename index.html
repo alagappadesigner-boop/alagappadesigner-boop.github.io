@@ -144,7 +144,7 @@
         }
 
         /* ==========================================================================
-           4. RECEIPT METRICS & HEADINGS (OPTIMIZED & ALIGNED)
+           4. RECEIPT METRICS & HEADINGS
            ========================================================================== */
         .receipt-heading {
             display: flex;
@@ -225,6 +225,7 @@
             background: #ffffff;
             gap: 10px;
             width: 100%;
+            height: 38px;
         }
 
         .field.full {
@@ -245,9 +246,7 @@
         }
 
         input[type="text"],
-        input[type="date"],
         input[type="number"],
-        input[type="email"],
         select,
         textarea {
             width: 100%;
@@ -582,6 +581,8 @@
             
             <!-- LEFT COLUMN -->
             <div class="grid-column">
+                <div class="section-title" style="margin-top: 0;">Student Information</div>
+                
                 <div class="field full">
                     <label>Name</label>
                     <input type="text" id="name" placeholder="Enter Student Name">
@@ -592,38 +593,20 @@
                     <input type="text" id="phone" placeholder="Phone Number">
                 </div>
 
-                <div class="field full">
-                    <label>Email ID</label>
-                    <input type="email" id="email" placeholder="Email Address">
-                </div>
-
-                <div class="field full">
-                    <label>Address</label>
-                    <input type="text" id="address" placeholder="Address">
-                </div>
-
                 <div class="section-title">Course Details</div>
                 
-                <div class="details">
-                    <div class="field">
-                        <label>Course</label>
-                        <input type="text" id="course" placeholder="Course">
-                    </div>
-                    <div class="field">
-                        <label>Batch</label>
-                        <input type="text" id="batch" placeholder="Batch">
-                    </div>
+                <div class="field full">
+                    <label>Course</label>
+                    <select id="course">
+                        <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
+                        <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
+                        <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
+                    </select>
                 </div>
-
-                <div class="details">
-                    <div class="field">
-                        <label>Joining</label>
-                        <input type="date" id="joiningDate">
-                    </div>
-                    <div class="field">
-                        <label>Duration</label>
-                        <input type="text" id="duration" placeholder="Duration">
-                    </div>
+                
+                <div class="field full">
+                    <label>Batch</label>
+                    <input type="text" id="batch" placeholder="Batch Details">
                 </div>
             </div>
 
@@ -631,15 +614,9 @@
             <div class="grid-column">
                 <div class="section-title" style="margin-top: 0;">Payment Details</div>
                 
-                <div class="details">
-                    <div class="field">
-                        <label>Total Fee</label>
-                        <input type="number" id="amount" placeholder="₹">
-                    </div>
-                    <div class="field">
-                        <label>Paid</label>
-                        <input type="number" id="paidAmount" placeholder="₹">
-                    </div>
+                <div class="field full">
+                    <label>Amount Paid</label>
+                    <input type="number" id="paidAmount" placeholder="₹">
                 </div>
 
                 <div class="field full">
@@ -680,7 +657,7 @@
         <div class="declaration">
             <p>
                 Received with thanks from <strong id="studentNamePreview">______________________</strong> 
-                towards the course fee for <strong id="coursePreview">______________________</strong> 
+                towards the course fee for <strong id="coursePreview">Diploma in Bharatanatyam</strong> 
                 at Alagappa Performing Arts Academy.
             </p>
         </div>
@@ -738,8 +715,8 @@
     document.getElementById('name').addEventListener('input', (e) => {
         document.getElementById('studentNamePreview').innerText = e.target.value || "______________________";
     });
-    document.getElementById('course').addEventListener('input', (e) => {
-        document.getElementById('coursePreview').innerText = e.target.value || "______________________";
+    document.getElementById('course').addEventListener('change', (e) => {
+        document.getElementById('coursePreview').innerText = e.target.value;
     });
 
     // Native Browser Printer Router Control
@@ -753,19 +730,14 @@
         if(confirm("Are you sure you want to clear the entire form inputs?")) {
             document.getElementById('name').value = '';
             document.getElementById('phone').value = '';
-            document.getElementById('email').value = '';
-            document.getElementById('address').value = '';
-            document.getElementById('course').value = '';
+            document.getElementById('course').value = 'Diploma in Bharatanatyam';
             document.getElementById('batch').value = '';
-            document.getElementById('joiningDate').value = '';
-            document.getElementById('duration').value = '';
-            document.getElementById('amount').value = '';
             document.getElementById('paidAmount').value = '';
             document.getElementById('words').value = '';
             document.getElementById('transactionId').value = '';
             document.getElementById('remarks').value = '';
             document.getElementById('studentNamePreview').innerText = "______________________";
-            document.getElementById('coursePreview').innerText = "______________________";
+            document.getElementById('coursePreview').innerText = "Diploma in Bharatanatyam";
         }
     });
 
@@ -806,11 +778,11 @@
     function logReceiptData() {
         const record = {
             receiptNo: document.getElementById('receiptNo').value || 'N/A',
-            date: document.getElementById('joiningDate').value || new Date().toLocaleDateString(),
+            date: new Date().toLocaleDateString(),
             studentName: document.getElementById('name').value || 'N/A',
             phone: document.getElementById('phone').value || 'N/A',
             course: document.getElementById('course').value || 'N/A',
-            totalFee: document.getElementById('amount').value || '0',
+            totalFee: document.getElementById('paidAmount').value || '0',
             paidAmount: document.getElementById('paidAmount').value || '0',
             paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
         };
@@ -852,7 +824,7 @@
         }
 
         let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-        csvContent += "Receipt No,Date,Student Name,Phone,Course,Total Fee,Amount Paid,Payment Mode\n";
+        csvContent += "Receipt No,Date,Student Name,Phone,Course,Amount Paid,Payment Mode\n";
 
         currentRecords.forEach(rec => {
             let row = [
@@ -861,7 +833,6 @@
                 `"${rec.studentName.replace(/"/g, '""')}"`,
                 `"${rec.phone.replace(/"/g, '""')}"`,
                 `"${rec.course.replace(/"/g, '""')}"`,
-                `"${rec.totalFee}"`,
                 `"${rec.paidAmount}"`,
                 `"${rec.paymentMode}"`
             ].join(",");
