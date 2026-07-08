@@ -39,7 +39,7 @@
         }
 
         /* ==========================================================================
-           2. MAIN RECEIPT WINDOW CONTAINER (FLUID LANDSCAPE RATIO)
+           2. MAIN RECEIPT WINDOW CONTAINER
            ========================================================================== */
         .page {
             display: flex;
@@ -62,7 +62,7 @@
         }
 
         /* ==========================================================================
-           3. BRAND BANNER HEADER & FIXED LOGO CONTRAST AREA
+           3. BRAND BANNER HEADER
            ========================================================================== */
         .header {
             display: grid;
@@ -77,7 +77,7 @@
             gap: 20px;
         }
 
-        .logo-area, [id="receipt"] .logo-area, .header .logo-area {
+        .logo-area {
             background: #ffffff !important;
             padding: 8px !important;
             border-radius: 8px !important;
@@ -93,7 +93,6 @@
             max-height: 100% !important;
             max-width: 100% !important;
             object-fit: contain !important;
-            filter: none !important;
         }
 
         .title-area {
@@ -184,6 +183,7 @@
             color: #ef4444;
             text-align: center;
             background: #ffffff;
+            outline: none;
         }
 
         .print-text-preview {
@@ -193,7 +193,7 @@
         }
 
         /* ==========================================================================
-           5. LANDSCAPE GRID ENGINE (FORCES SIDE-BY-SIDE EQUAL HALVES)
+           5. LANDSCAPE GRID ENGINE
            ========================================================================== */
         .landscape-grid {
             display: grid;
@@ -216,7 +216,7 @@
         }
 
         /* ==========================================================================
-           6. CAPSULE PILL INPUT STRUCTS (DYNAMIC ALIGNMENT)
+           6. CAPSULE INPUT ENGINE WITH CUSTOM DROPDOWNS
            ========================================================================== */
         .field {
             flex: 1;
@@ -224,9 +224,9 @@
             align-items: center;
             border: 2px solid var(--primary-blue);
             border-radius: 30px;
-            padding: 5px 15px;
+            height: 42px;
             background: #ffffff;
-            gap: 10px;
+            overflow: hidden;
             width: 100%;
         }
 
@@ -236,48 +236,88 @@
             margin-bottom: 8px;
         }
 
-        /* Inner multi-field split style matching the year layout design */
-        .field-split-container {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            gap: 10px;
-        }
-
-        .field-split-container select {
-            width: 45%;
-            border-right: 1px solid var(--border-color) !important;
-            padding-right: 5px;
-        }
-
-        .field-split-container input {
-            width: 55%;
-            padding-left: 5px;
-        }
-
-        label {
-            font-size: 11px;
-            font-weight: 800;
+        .field label {
+            width: 115px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--primary-blue);
+            border-right: 2px solid #E5E5E5;
             text-transform: uppercase;
             white-space: nowrap;
-            border-right: 2px solid #e2e8f0;
-            padding-right: 10px;
-            min-width: 75px; 
+            flex-shrink: 0;
+            line-height: 42px;
+            height: 100%;
         }
 
-        input[type="text"],
-        input[type="tel"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
+        /* Base input field adjustments */
+        .field input[type="text"],
+        .field input[type="tel"],
+        .field input[type="number"] {
+            flex: 1;
+            height: 100%;
             border: none !important;
-            background: transparent;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-dark);
             outline: none;
+            padding: 0 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            background: transparent;
+        }
+
+        /* Custom Dropdown Styling Matching User Pattern */
+        .field select {
+            flex: 1;
+            height: 100%;
+            border: none !important;
+            outline: none;
+            padding: 0 45px 0 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            background: transparent;
+            cursor: pointer;
+
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230b407b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            background-size: 16px;
+        }
+
+        /* Inner Wrapper Layout Engine for the Split Year Component */
+        .split-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .split-input-wrapper select {
+            flex: 0 0 45%;
+            border-right: 1px solid #e2e8f0 !important;
+            border-radius: 0;
+        }
+
+        .split-input-wrapper input[type="text"] {
+            flex: 1;
+            height: 100%;
+            border: none !important;
+            outline: none;
+            padding: 0 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            background: transparent;
+        }
+
+        .field select:focus, 
+        .field input:focus,
+        .split-input-wrapper input[type="text"]:focus {
+            background-color: #fafcff;
         }
 
         .section-title {
@@ -329,7 +369,8 @@
             font-weight: 600;
             border: none;
             padding: 0;
-            min-width: auto;
+            font-size: 12px;
+            color: var(--text-dark);
         }
 
         textarea {
@@ -339,10 +380,13 @@
             padding: 8px;
             resize: none;
             width: 100%;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
         }
 
         /* ==========================================================================
-           8. LEGAL TEXT & SIGNATURE TRACKS
+           8. LEGAL DECLARATION & SIGNATURE SEGMENTS
            ========================================================================== */
         .declaration {
             background: #f0f7ff;
@@ -364,9 +408,6 @@
             font-weight: 700;
         }
 
-        /* ==========================================================================
-           ELEGANT SIGNATURE ENGINE (PNG BRANDED)
-           ========================================================================== */
         .signature-section {
             display: flex;
             justify-content: flex-end;
@@ -419,9 +460,6 @@
             letter-spacing: 1px;
         }
 
-        /* ==========================================================================
-           9. BRAND FOOTER SIGN-OFF
-           ========================================================================== */
         footer {
             text-align: center;
             margin-top: 15px;
@@ -444,7 +482,7 @@
         }
 
         /* ==========================================================================
-           10. INTERACTION SYSTEM UTILITY BUTTONS & ADVANCED LEDGER
+           9. SYSTEM UTILITY TOOLBAR BUTTONS & DYNAMIC LEDGER DISPLAY
            ========================================================================== */
         .buttons {
             display: flex;
@@ -530,7 +568,7 @@
         .delete-btn:hover { background: #ef4444; color: #fff; }
 
         /* ==========================================================================
-           11. ABSOLUTE PRINT ORIENTATION ENGINE (FORCE EXACTLY 1 PAGE A4 LANDSCAPE)
+           10. COMPACT MEDIA PRINT ENGINE (SINGLE-PAGE HARD CEILING)
            ========================================================================== */
         @media print {
             @page {
@@ -558,7 +596,7 @@
                 display: none !important;
             }
 
-            input, select, textarea, .field-split-container {
+            input, select, textarea, .split-input-wrapper {
                 display: none !important;
             }
 
@@ -591,7 +629,7 @@
                 gap: 12px !important;
             }
 
-            .logo-area, [id="receipt"] .logo-area, .header .logo-area {
+            .logo-area {
                 height: 52px !important;
                 width: 110px !important;
                 padding: 4px !important;
@@ -620,19 +658,21 @@
             }
 
             .field {
-                padding: 2px 10px !important;
+                padding: 0 !important;
                 height: 28px !important; 
             }
             .field.full {
                 margin-bottom: 4px !important;
             }
-            label {
+            .field label {
                 font-size: 10px !important;
-                min-width: 65px !important;
-                padding-right: 6px !important;
+                width: 75px !important;
+                line-height: 28px !important;
+                border-right: 2px solid #E5E5E5 !important;
             }
             .print-text-preview {
                 font-size: 11px !important;
+                padding-left: 12px !important;
             }
 
             .section-title {
@@ -713,7 +753,7 @@
                 
                 <div class="details">
                     <div class="field">
-                        <label>Name</label>
+                        <label for="name">Name</label>
                         <input type="text" id="name" placeholder="Enter Student Name">
                         <span class="print-text-preview" id="print_name"></span>
                     </div>
@@ -721,7 +761,7 @@
 
                 <div class="details">
                     <div class="field">
-                        <label>Phone</label>
+                        <label id="lbl_phone">Phone</label>
                         <input type="tel" id="phone" placeholder="Phone Number" pattern="[0-9]*" inputmode="numeric">
                         <span class="print-text-preview" id="print_phone"></span>
                     </div>
@@ -731,13 +771,14 @@
                 
                 <div class="details">
                     <div class="field">
-                        <label>Course</label>
+                        <label for="course">Course</label>
                         <select id="course" required>
                             <option value="" disabled selected hidden>Select Course</option>
-                            <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
-                            <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
-                            <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
-                            <option value="Bachelor in Nattuvangam">Bachelor in Nattuvangam</option>
+                            <option value="Bharatanatyam">Bharatanatyam</option>
+                            <option value="Carnatic Vocal">Carnatic Vocal</option>
+                            <option value="Keyboard">Keyboard</option>
+                            <option value="Drawing">Drawing</option>
+                            <option value="Abacus">Abacus</option>
                         </select>
                         <span class="print-text-preview" id="print_course"></span>
                     </div>
@@ -745,14 +786,13 @@
 
                 <div class="details">
                     <div class="field">
-                        <label>Year</label>
-                        <div class="field-split-container">
+                        <label for="yearSelect">Year</label>
+                        <div class="split-input-wrapper">
                             <select id="yearSelect" required>
                                 <option value="" disabled selected hidden>Select Year</option>
-                                <option value="I Year">I Year</option>
-                                <option value="II Year">II Year</option>
-                                <option value="III Year">III Year</option>
-                                <option value="IV Year">IV Year</option>
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
                             </select>
                             <input type="text" id="yearDetails" placeholder="Year Details">
                         </div>
@@ -771,7 +811,7 @@
                 </div>
 
                 <div class="field full">
-                    <label>In Words</label>
+                    <label style="font-size: 11px;">In Words</label>
                     <input type="text" id="words" placeholder="Amount in words" readonly style="color: var(--primary-blue); font-weight: 700;">
                     <span class="print-text-preview" id="print_words" style="color: var(--primary-blue); font-weight: 700;"></span>
                 </div>
@@ -789,11 +829,11 @@
                     <div class="payment-box">
                         <div class="grid-column" style="gap: 4px;">
                             <div style="font-size: 10px; font-weight: 700; color: var(--primary-blue);">TXN / UPI ID</div>
-                            <input type="text" id="transactionId" placeholder="Transaction ID" style="border: 1px solid var(--border-color) !important; border-radius:4px; padding:2px 6px; background:#fff;">
+                            <input type="text" id="transactionId" placeholder="Transaction ID" style="border: 1px solid var(--border-color) !important; border-radius:4px; padding:2px 6px; background:#fff; font-size:12px; height:24px; font-weight:600;">
                             <span class="print-text-preview" id="print_transactionId"></span>
                             
                             <div style="font-size: 10px; font-weight: 700; color: var(--primary-blue); margin-top:2px;">INSTALLMENT</div>
-                            <select id="installment" style="border: 1px solid var(--border-color) !important; border-radius:4px; padding:2px 6px; background:#fff;">
+                            <select id="installment" style="border: 1px solid var(--border-color) !important; border-radius:4px; padding:2px 6px; background:#fff; font-size:12px; height:24px; font-weight:600; appearance:auto; -webkit-appearance:auto; background-image:none;">
                                 <option value="" disabled selected hidden></option>
                                 <option value="First Installment">First Installment</option>
                                 <option value="Second Installment">Second Installment</option>
@@ -901,4 +941,212 @@
         for (let field of fields) {
             const element = document.getElementById(field.id);
             if (!element || !element.value.trim()) {
-                alert("⚠️ Please
+                alert("⚠️ Please fill in all the required details to proceed.");
+                if(element) element.focus();
+                return false;
+            }
+        }
+
+        const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
+        if (paymentMode !== 'Cash') {
+            const txElement = document.getElementById('transactionId');
+            if (!txElement || !txElement.value.trim()) {
+                alert("⚠️ Please fill in all the required details to proceed.");
+                if(txElement) txElement.focus();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function syncPrintPreviews() {
+        document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
+        document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
+        document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
+        document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
+        
+        const ySel = document.getElementById('yearSelect').value || '';
+        const yDet = document.getElementById('yearDetails').value || '';
+        document.getElementById('print_yearCombined').innerText = ySel + (yDet ? ' - ' + yDet : '');
+
+        document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
+        document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
+        document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
+        document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
+        document.getElementById('print_remarks').innerText = document.getElementById('remarks').value ? 'Remarks: ' + document.getElementById('remarks').value : '';
+        
+        const checkedPayment = document.querySelector('input[name="payment"]:checked');
+        document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
+    }
+
+    const phoneInput = document.getElementById('phone');
+    const cleanNonNumeric = (e) => {
+        setTimeout(() => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        }, 0);
+    };
+    phoneInput.addEventListener('input', cleanNonNumeric);
+    phoneInput.addEventListener('paste', cleanNonNumeric);
+    phoneInput.addEventListener('drop', cleanNonNumeric);
+    phoneInput.addEventListener('keydown', (e) => {
+        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
+            return;
+        }
+        if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    document.getElementById('paidAmount').addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val) && val >= 0) {
+            document.getElementById('words').value = convertNumberToWords(val);
+        } else {
+            document.getElementById('words').value = '';
+        }
+    });
+
+    document.getElementById('name').addEventListener('input', (e) => {
+        document.getElementById('studentNamePreview').innerText = e.target.value || "______________________";
+    });
+    document.getElementById('course').addEventListener('change', (e) => {
+        document.getElementById('coursePreview').innerText = e.target.value || "______________________";
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; 
+        
+        logReceiptData();
+        syncPrintPreviews();
+        window.print();
+    });
+
+    document.getElementById('clearForm').addEventListener('click', () => {
+        if(confirm("Are you sure you want to reset the form ?")) {
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('course').value = '';
+            document.getElementById('yearSelect').value = '';
+            document.getElementById('yearDetails').value = '';
+            document.getElementById('paidAmount').value = '';
+            document.getElementById('words').value = '';
+            document.getElementById('transactionId').value = '';
+            document.getElementById('installment').value = '';
+            document.getElementById('remarks').value = '';
+            document.getElementById('studentNamePreview').innerText = "______________________";
+            document.getElementById('coursePreview').innerText = "______________________";
+        }
+    });
+
+    function updateLiveLedgerDisplay() {
+        const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        const tbody = document.getElementById('ledgerBody');
+        tbody.innerHTML = '';
+
+        if(currentRecords.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8;">No records captured yet.</td></tr>`;
+            return;
+        }
+
+        currentRecords.forEach((rec, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${rec.receiptNo}</td>
+                <td>${rec.studentName}</td>
+                <td>${rec.course}</td>
+                <td>${rec.yearInfo}</td>
+                <td>₹${rec.paidAmount}</td>
+                <td>${rec.paymentMode}</td>
+                <td><button class="delete-btn" onclick="deleteLedgerRow(${index})"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.deleteLedgerRow = function(index) {
+        let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        currentRecords.splice(index, 1);
+        localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
+        updateLiveLedgerDisplay();
+    };
+
+    function logReceiptData() {
+        const ySel = document.getElementById('yearSelect').value || '';
+        const yDet = document.getElementById('yearDetails').value || '';
+        
+        const record = {
+            receiptNo: document.getElementById('receiptNo').value || 'N/A',
+            studentName: document.getElementById('name').value || 'N/A',
+            course: document.getElementById('course').value || 'N/A',
+            yearInfo: ySel + (yDet ? ' (' + yDet + ')' : ''),
+            paidAmount: document.getElementById('paidAmount').value || '0',
+            paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
+        };
+
+        let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        currentRecords.push(record);
+        localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
+        updateLiveLedgerDisplay();
+    }
+
+    document.getElementById('download').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; 
+        
+        logReceiptData();
+        syncPrintPreviews();
+        const { jsPDF } = window.jspdf;
+        const receiptElement = document.getElementById('receipt');
+        
+        document.querySelectorAll('input, select, textarea, .split-input-wrapper').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
+        
+        html2canvas(receiptElement, { scale: 2, useCORS: true }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('l', 'mm', 'a4');
+            pdf.addImage(imgData, 'PNG', 5, 5, 287, 200);
+            pdf.save(`Receipt-${document.getElementById('receiptNo').value}.pdf`);
+            
+            document.querySelectorAll('input, select, textarea, .split-input-wrapper').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
+        });
+    });
+
+    document.getElementById('exportExcel').addEventListener('click', () => {
+        const records = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        
+        if (records.length === 0) {
+            alert("⚠️ There are no captured records to export yet!");
+            return;
+        }
+
+        const dynamicDataRows = records.map(item => ({
+            "Receipt Number": item.receiptNo,
+            "Student Name": item.studentName,
+            "Registered Course": item.course,
+            "Year Information": item.yearInfo,
+            "Amount Paid (INR)": Number(item.paidAmount),
+            "Payment Mode": item.paymentMode
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(dynamicDataRows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Batch Records Ledger");
+
+        const maxColumnsWidth = Object.keys(dynamicDataRows[0]).map(key => {
+            let maxLen = key.length;
+            dynamicDataRows.forEach(row => {
+                const valStr = row[key] ? row[key].toString() : '';
+                if(valStr.length > maxLen) maxLen = valStr.length;
+            });
+            return { wch: maxLen + 3 };
+        });
+        worksheet['!cols'] = maxColumnsWidth;
+
+        XLSX.writeFile(workbook, "Academy_Batch_Ledger_Records.xlsx");
+    });
+
+    updateLiveLedgerDisplay();
+</script>
+</body>
+</html>
