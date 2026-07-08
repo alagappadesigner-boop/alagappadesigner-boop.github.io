@@ -236,6 +236,25 @@
             margin-bottom: 8px;
         }
 
+        /* Inner multi-field split style matching the year layout design */
+        .field-split-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .field-split-container select {
+            width: 45%;
+            border-right: 1px solid var(--border-color) !important;
+            padding-right: 5px;
+        }
+
+        .field-split-container input {
+            width: 55%;
+            padding-left: 5px;
+        }
+
         label {
             font-size: 11px;
             font-weight: 800;
@@ -450,7 +469,7 @@
 
         #download { background-color: var(--primary-blue); }
         #printBtn { background-color: var(--accent-gold); color: #000; }
-        #exportExcel { background-color: #107c41; } /* Classic Excel Green */
+        #exportExcel { background-color: #107c41; }
         #clearForm { background-color: #ef4444; }
 
         .live-ledger-container {
@@ -539,7 +558,7 @@
                 display: none !important;
             }
 
-            input, select, textarea {
+            input, select, textarea, .field-split-container {
                 display: none !important;
             }
 
@@ -726,9 +745,18 @@
 
                 <div class="details">
                     <div class="field">
-                        <label>Batch</label>
-                        <input type="text" id="batch" placeholder="Batch Details">
-                        <span class="print-text-preview" id="print_batch"></span>
+                        <label>Year</label>
+                        <div class="field-split-container">
+                            <select id="yearSelect" required>
+                                <option value="" disabled selected hidden>Select Year</option>
+                                <option value="I Year">I Year</option>
+                                <option value="II Year">II Year</option>
+                                <option value="III Year">III Year</option>
+                                <option value="IV Year">IV Year</option>
+                            </select>
+                            <input type="text" id="yearDetails" placeholder="Year Details">
+                        </div>
+                        <span class="print-text-preview" id="print_yearCombined"></span>
                     </div>
                 </div>
             </div>
@@ -825,6 +853,7 @@
                         <th>Receipt No</th>
                         <th>Student Name</th>
                         <th>Course</th>
+                        <th>Year Info</th>
                         <th>Paid</th>
                         <th>Mode</th>
                         <th>Action</th>
@@ -863,7 +892,8 @@
             { id: 'name' },
             { id: 'phone' },
             { id: 'course' },
-            { id: 'batch' },
+            { id: 'yearSelect' },
+            { id: 'yearDetails' },
             { id: 'paidAmount' },
             { id: 'installment' }
         ];
@@ -871,204 +901,4 @@
         for (let field of fields) {
             const element = document.getElementById(field.id);
             if (!element || !element.value.trim()) {
-                alert("⚠️ Please fill in all the required details to proceed.");
-                if(element) element.focus();
-                return false;
-            }
-        }
-
-        const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
-        if (paymentMode !== 'Cash') {
-            const txElement = document.getElementById('transactionId');
-            if (!txElement || !txElement.value.trim()) {
-                alert("⚠️ Please fill in all the required details to proceed.");
-                if(txElement) txElement.focus();
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    function syncPrintPreviews() {
-        document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
-        document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
-        document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
-        document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
-        document.getElementById('print_batch').innerText = document.getElementById('batch').value || 'N/A';
-        document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
-        document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
-        document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
-        document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
-        document.getElementById('print_remarks').innerText = document.getElementById('remarks').value ? 'Remarks: ' + document.getElementById('remarks').value : '';
-        
-        const checkedPayment = document.querySelector('input[name="payment"]:checked');
-        document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
-    }
-
-    // ROBUST HIGH-SPEED FILTER FOR NUMERIC ENTRIES ONLY (HANDLES PASTE, DROP, & TYPING)
-    const phoneInput = document.getElementById('phone');
-    const cleanNonNumeric = (e) => {
-        setTimeout(() => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        }, 0);
-    };
-    phoneInput.addEventListener('input', cleanNonNumeric);
-    phoneInput.addEventListener('paste', cleanNonNumeric);
-    phoneInput.addEventListener('drop', cleanNonNumeric);
-    phoneInput.addEventListener('keydown', (e) => {
-        // Allow operational control keys (Backspace, Delete, Arrow keys, Tab)
-        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
-            return;
-        }
-        // Block text letters/symbols immediately on keydown
-        if (!/[0-9]/.test(e.key)) {
-            e.preventDefault();
-        }
-    });
-
-    document.getElementById('paidAmount').addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        if (!isNaN(val) && val >= 0) {
-            document.getElementById('words').value = convertNumberToWords(val);
-        } else {
-            document.getElementById('words').value = '';
-        }
-    });
-
-    document.getElementById('name').addEventListener('input', (e) => {
-        document.getElementById('studentNamePreview').innerText = e.target.value || "______________________";
-    });
-    document.getElementById('course').addEventListener('change', (e) => {
-        document.getElementById('coursePreview').innerText = e.target.value || "______________________";
-    });
-
-    document.getElementById('printBtn').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; 
-        
-        logReceiptData();
-        syncPrintPreviews();
-        window.print();
-    });
-
-    document.getElementById('clearForm').addEventListener('click', () => {
-        if(confirm("Are you sure you want to reset the form ?")) {
-            document.getElementById('name').value = '';
-            document.getElementById('phone').value = '';
-            document.getElementById('course').value = '';
-            document.getElementById('batch').value = '';
-            document.getElementById('paidAmount').value = '';
-            document.getElementById('words').value = '';
-            document.getElementById('transactionId').value = '';
-            document.getElementById('installment').value = '';
-            document.getElementById('remarks').value = '';
-            document.getElementById('studentNamePreview').innerText = "______________________";
-            document.getElementById('coursePreview').innerText = "______________________";
-        }
-    });
-
-    function updateLiveLedgerDisplay() {
-        const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-        const tbody = document.getElementById('ledgerBody');
-        tbody.innerHTML = '';
-
-        if(currentRecords.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No records captured yet.</td></tr>`;
-            return;
-        }
-
-        currentRecords.forEach((rec, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${rec.receiptNo}</td>
-                <td>${rec.studentName}</td>
-                <td>${rec.course}</td>
-                <td>₹${rec.paidAmount}</td>
-                <td>${rec.paymentMode}</td>
-                <td><button class="delete-btn" onclick="deleteLedgerRow(${index})"><i class="fa-solid fa-trash"></i></button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    window.deleteLedgerRow = function(index) {
-        let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-        currentRecords.splice(index, 1);
-        localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
-        updateLiveLedgerDisplay();
-    };
-
-    function logReceiptData() {
-        const record = {
-            receiptNo: document.getElementById('receiptNo').value || 'N/A',
-            studentName: document.getElementById('name').value || 'N/A',
-            course: document.getElementById('course').value || 'N/A',
-            paidAmount: document.getElementById('paidAmount').value || '0',
-            paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
-        };
-
-        let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-        currentRecords.push(record);
-        localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
-        updateLiveLedgerDisplay();
-    }
-
-    document.getElementById('download').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; 
-        
-        logReceiptData();
-        syncPrintPreviews();
-        const { jsPDF } = window.jspdf;
-        const receiptElement = document.getElementById('receipt');
-        
-        document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
-        
-        html2canvas(receiptElement, { scale: 2, useCORS: true }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('l', 'mm', 'a4');
-            pdf.addImage(imgData, 'PNG', 5, 5, 287, 200);
-            pdf.save(`Receipt-${document.getElementById('receiptNo').value}.pdf`);
-            
-            document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
-        });
-    });
-
-    document.getElementById('exportExcel').addEventListener('click', () => {
-        const records = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-        
-        if (records.length === 0) {
-            alert("⚠️ There are no captured records to export yet!");
-            return;
-        }
-
-        const dynamicDataRows = records.map(item => ({
-            "Receipt Number": item.receiptNo,
-            "Student Name": item.studentName,
-            "Registered Course": item.course,
-            "Amount Paid (INR)": Number(item.paidAmount),
-            "Payment Mode": item.paymentMode
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(dynamicDataRows);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Batch Records Ledger");
-
-        const maxColumnsWidth = Object.keys(dynamicDataRows[0]).map(key => {
-            let maxLen = key.length;
-            dynamicDataRows.forEach(row => {
-                const valStr = row[key] ? row[key].toString() : '';
-                if(valStr.length > maxLen) maxLen = valStr.length;
-            });
-            return { wch: maxLen + 3 };
-        });
-        worksheet['!cols'] = maxColumnsWidth;
-
-        XLSX.writeFile(workbook, "Academy_Batch_Ledger_Records.xlsx");
-    });
-
-    updateLiveLedgerDisplay();
-</script>
-</body>
-</html>
+                alert("⚠️ Please
