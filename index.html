@@ -853,7 +853,6 @@
         return str.trim() + ' Only';
     }
 
-    // UPDATED VALIDATION SYSTEM WITH SPECIFIC WARNING POP-UP
     function validateReceiptForm() {
         const fields = [
             { id: 'receiptNo' },
@@ -865,7 +864,6 @@
             { id: 'installment' }
         ];
 
-        // 1. Check all standard input fields
         for (let field of fields) {
             const element = document.getElementById(field.id);
             if (!element || !element.value.trim()) {
@@ -875,7 +873,6 @@
             }
         }
 
-        // 2. Check Transaction ID field if a payment mode other than Cash is selected
         const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
         if (paymentMode !== 'Cash') {
             const txElement = document.getElementById('transactionId');
@@ -922,15 +919,16 @@
     });
 
     document.getElementById('printBtn').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; // Blocks execution completely if empty fields are found
+        if (!validateReceiptForm()) return; 
         
         logReceiptData();
         syncPrintPreviews();
         window.print();
     });
 
+    // UPDATED RESET CONFIRMATION DIALOG TEXT
     document.getElementById('clearForm').addEventListener('click', () => {
-        if(confirm("Clear form inputs?")) {
+        if(confirm("Are you sure you want to reset the form ?")) {
             document.getElementById('name').value = '';
             document.getElementById('phone').value = '';
             document.getElementById('course').value = '';
@@ -992,7 +990,7 @@
     }
 
     document.getElementById('download').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; // Blocks execution completely if empty fields are found
+        if (!validateReceiptForm()) return; 
         
         logReceiptData();
         syncPrintPreviews();
