@@ -853,34 +853,34 @@
         return str.trim() + ' Only';
     }
 
-    // STRICT ALL-FIELDS FORM CHECKER ENGINE
+    // UPDATED VALIDATION SYSTEM WITH SPECIFIC WARNING POP-UP
     function validateReceiptForm() {
         const fields = [
-            { id: 'receiptNo', name: 'Receipt Number' },
-            { id: 'name', name: 'Student Name' },
-            { id: 'phone', name: 'Phone Number' },
-            { id: 'course', name: 'Course Selection' },
-            { id: 'batch', name: 'Batch Details' },
-            { id: 'paidAmount', name: 'Amount Paid' },
-            { id: 'installment', name: 'Installment Selection' }
+            { id: 'receiptNo' },
+            { id: 'name' },
+            { id: 'phone' },
+            { id: 'course' },
+            { id: 'batch' },
+            { id: 'paidAmount' },
+            { id: 'installment' }
         ];
 
         // 1. Check all standard input fields
         for (let field of fields) {
             const element = document.getElementById(field.id);
             if (!element || !element.value.trim()) {
-                alert(`Fill all the details: "${field.name}" is required.`);
+                alert("⚠️ Please fill in all the required details to proceed.");
                 if(element) element.focus();
                 return false;
             }
         }
 
-        // 2. Strict Check: Transaction ID field is mandatory for ALL non-cash payments
+        // 2. Check Transaction ID field if a payment mode other than Cash is selected
         const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
         if (paymentMode !== 'Cash') {
             const txElement = document.getElementById('transactionId');
             if (!txElement || !txElement.value.trim()) {
-                alert(`Fill all the details: "Transaction / UPI ID" is required for ${paymentMode} transactions.`);
+                alert("⚠️ Please fill in all the required details to proceed.");
                 if(txElement) txElement.focus();
                 return false;
             }
@@ -922,7 +922,7 @@
     });
 
     document.getElementById('printBtn').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; // Blocks execution completely
+        if (!validateReceiptForm()) return; // Blocks execution completely if empty fields are found
         
         logReceiptData();
         syncPrintPreviews();
@@ -992,7 +992,7 @@
     }
 
     document.getElementById('download').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; // Blocks execution completely
+        if (!validateReceiptForm()) return; // Blocks execution completely if empty fields are found
         
         logReceiptData();
         syncPrintPreviews();
