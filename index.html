@@ -376,11 +376,11 @@
         }
 
         .signature-image-wrapper img {
-            max-height: 75px; /* Allows slightly larger signature flow without overlapping elements */
+            max-height: 75px; 
             max-width: 180px;
             object-fit: contain;
             position: absolute;
-            bottom: -5px; /* Slightly offsets below the line for realistic overlapping look */
+            bottom: -5px; 
             pointer-events: none;
         }
 
@@ -853,6 +853,41 @@
         return str.trim() + ' Only';
     }
 
+    // Modern Form Field Checker Engine
+    function validateReceiptForm() {
+        const fields = [
+            { id: 'receiptNo', name: 'Receipt Number' },
+            { id: 'name', name: 'Student Name' },
+            { id: 'phone', name: 'Phone Number' },
+            { id: 'course', name: 'Course Selection' },
+            { id: 'batch', name: 'Batch Details' },
+            { id: 'paidAmount', name: 'Amount Paid' },
+            { id: 'installment', name: 'Installment Selection' }
+        ];
+
+        for (let field of fields) {
+            const element = document.getElementById(field.id);
+            if (!element || !element.value.trim()) {
+                alert(`Please fill in or select the required field: ${field.name}`);
+                if(element) element.focus();
+                return false;
+            }
+        }
+
+        // Require transaction ID if payment is online/digital (UPI, Card, Bank)
+        const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
+        if (paymentMode !== 'Cash') {
+            const txElement = document.getElementById('transactionId');
+            if (!txElement || !txElement.value.trim()) {
+                alert(`Please enter the Transaction ID for ${paymentMode} payment mode.`);
+                if(txElement) txElement.focus();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     function syncPrintPreviews() {
         document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
         document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
@@ -886,6 +921,8 @@
     });
 
     document.getElementById('printBtn').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; // Halts print if validation fails
+        
         logReceiptData();
         syncPrintPreviews();
         window.print();
@@ -954,12 +991,13 @@
     }
 
     document.getElementById('download').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; // Halts download loop if box data missing
+        
         logReceiptData();
         syncPrintPreviews();
         const { jsPDF } = window.jspdf;
         const receiptElement = document.getElementById('receipt');
         
-        // Temporary style shift to make sure canvas captures the neat printed look
         document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
         
@@ -969,7 +1007,6 @@
             pdf.addImage(imgData, 'PNG', 5, 5, 287, 200);
             pdf.save(`Receipt-${document.getElementById('receiptNo').value}.pdf`);
             
-            // Revert changes back to live form state
             document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'block');
             document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
         });
