@@ -347,26 +347,11 @@
 
         .signature-section {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: flex-end;
             margin-top: 15px;
             padding: 0 10px;
             width: 100%;
-        }
-
-        .office h4 {
-            font-size: 11px;
-            color: var(--primary-blue);
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .seal-box {
-            width: 110px;
-            height: 55px;
-            border: 2px dashed var(--accent-gold);
-            border-radius: 6px;
-            background: #fffdf6;
         }
 
         .signature {
@@ -604,7 +589,7 @@
             .payment-grid { gap: 8px !important; }
             .payment-box { padding: 4px 8px !important; }
             .payment-box h3 { font-size: 10px !important; margin-bottom: 4px !important; }
-            .payment-box label { display: none !important; } /* Radio targets are replaced by sync logic text */
+            .payment-box label { display: none !important; }
 
             textarea {
                 padding: 4px 8px !important;
@@ -620,7 +605,6 @@
             }
 
             .signature-section { margin-top: 4px !important; }
-            .seal-box { height: 40px !important; width: 90px !important; }
             .signature p { width: 140px !important; font-size: 10px !important; }
 
             footer { margin-top: 4px !important; padding-top: 4px !important; }
@@ -688,6 +672,7 @@
                             <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
                             <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
                             <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
+                            <option value="Bachelor in Nattuvangam">Bachelor in Nattuvangam</option>
                         </select>
                         <span class="print-text-preview" id="print_course"></span>
                     </div>
@@ -761,10 +746,6 @@
         </div>
 
         <div class="signature-section">
-            <div class="office">
-                <h4>Office Seal</h4>
-                <div class="seal-box"></div>
-            </div>
             <div class="signature">
                 <div style="height:40px;"></div> <p>Authorized Signature</p>
             </div>
@@ -799,7 +780,7 @@
                     </tr>
                 </thead>
                 <tbody id="ledgerBody">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
