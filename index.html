@@ -345,26 +345,59 @@
             font-weight: 700;
         }
 
+        /* ==========================================================================
+           ELEGANT SIGNATURE ENGINE (PNG BRANDED)
+           ========================================================================== */
         .signature-section {
             display: flex;
             justify-content: flex-end;
-            align-items: flex-end;
-            margin-top: 15px;
-            padding: 0 10px;
+            align-items: center;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding: 0 25px;
             width: 100%;
         }
 
-        .signature {
-            text-align: center;
+        .signature-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 220px;
+            position: relative;
         }
 
-        .signature p {
-            font-size: 11px;
+        .signature-image-wrapper {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            position: relative;
+        }
+
+        .signature-image-wrapper img {
+            max-height: 75px; 
+            max-width: 180px;
+            object-fit: contain;
+            position: absolute;
+            bottom: -5px; 
+            pointer-events: none;
+        }
+
+        .signature-line {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary-blue) 15%, var(--primary-blue) 85%, transparent);
+            margin-top: 5px;
+            margin-bottom: 8px;
+        }
+
+        .signature-title {
+            font-size: 12px;
             font-weight: 700;
             color: var(--primary-blue);
-            border-top: 2px solid var(--primary-blue);
-            padding-top: 4px;
-            width: 170px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* ==========================================================================
@@ -604,8 +637,18 @@
                 line-height: 1.3 !important;
             }
 
-            .signature-section { margin-top: 4px !important; }
-            .signature p { width: 140px !important; font-size: 10px !important; }
+            .signature-section { 
+                margin-top: 15px !important; 
+                margin-bottom: 5px !important;
+            }
+            .signature-image-wrapper {
+                height: 45px !important;
+            }
+            .signature-image-wrapper img {
+                max-height: 55px !important;
+                bottom: -3px !important;
+            }
+            .signature-title { font-size: 10px !important; }
 
             footer { margin-top: 4px !important; padding-top: 4px !important; }
             footer h2 { font-size: 12px !important; }
@@ -746,8 +789,12 @@
         </div>
 
         <div class="signature-section">
-            <div class="signature">
-                <div style="height:40px;"></div> <p>Authorized Signature</p>
+            <div class="signature-container">
+                <div class="signature-image-wrapper">
+                    <img src="signature.png" alt="Signature">
+                </div>
+                <div class="signature-line"></div>
+                <p class="signature-title">Authorized Signature</p>
             </div>
         </div>
 
@@ -806,7 +853,42 @@
         return str.trim() + ' Only';
     }
 
-    // Synchronize inputs into visible text tags before print engines spin up
+    // STRICT ALL-FIELDS FORM CHECKER ENGINE
+    function validateReceiptForm() {
+        const fields = [
+            { id: 'receiptNo', name: 'Receipt Number' },
+            { id: 'name', name: 'Student Name' },
+            { id: 'phone', name: 'Phone Number' },
+            { id: 'course', name: 'Course Selection' },
+            { id: 'batch', name: 'Batch Details' },
+            { id: 'paidAmount', name: 'Amount Paid' },
+            { id: 'installment', name: 'Installment Selection' }
+        ];
+
+        // 1. Check all standard input fields
+        for (let field of fields) {
+            const element = document.getElementById(field.id);
+            if (!element || !element.value.trim()) {
+                alert(`Fill all the details: "${field.name}" is required.`);
+                if(element) element.focus();
+                return false;
+            }
+        }
+
+        // 2. Strict Check: Transaction ID field is mandatory for ALL non-cash payments
+        const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
+        if (paymentMode !== 'Cash') {
+            const txElement = document.getElementById('transactionId');
+            if (!txElement || !txElement.value.trim()) {
+                alert(`Fill all the details: "Transaction / UPI ID" is required for ${paymentMode} transactions.`);
+                if(txElement) txElement.focus();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     function syncPrintPreviews() {
         document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
         document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
@@ -840,6 +922,8 @@
     });
 
     document.getElementById('printBtn').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; // Blocks execution completely
+        
         logReceiptData();
         syncPrintPreviews();
         window.print();
@@ -908,12 +992,13 @@
     }
 
     document.getElementById('download').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; // Blocks execution completely
+        
         logReceiptData();
         syncPrintPreviews();
         const { jsPDF } = window.jspdf;
         const receiptElement = document.getElementById('receipt');
         
-        // Temporary style shift to make sure canvas captures the neat printed look
         document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
         
@@ -923,7 +1008,6 @@
             pdf.addImage(imgData, 'PNG', 5, 5, 287, 200);
             pdf.save(`Receipt-${document.getElementById('receiptNo').value}.pdf`);
             
-            // Revert changes back to live form state
             document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'block');
             document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
         });
