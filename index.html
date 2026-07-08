@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- SheetJS library for seamless Excel exporting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         /* ==========================================================================
@@ -431,6 +433,8 @@
             display: flex;
             gap: 12px;
             margin-top: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .buttons button {
@@ -448,6 +452,7 @@
 
         #download { background-color: var(--primary-blue); }
         #printBtn { background-color: var(--accent-gold); color: #000; }
+        #exportExcel { background-color: #107c41; } /* Classic Excel Green */
         #clearForm { background-color: #ef4444; }
 
         .live-ledger-container {
@@ -807,6 +812,7 @@
     <div class="buttons">
         <button id="download"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
         <button id="printBtn"><i class="fa-solid fa-print"></i> Print Receipt</button>
+        <button id="exportExcel"><i class="fa-solid fa-file-excel"></i> Export to Excel</button>
         <button id="clearForm"><i class="fa-solid fa-trash"></i> Clear Form</button>
     </div>
 
@@ -926,7 +932,6 @@
         window.print();
     });
 
-    // UPDATED RESET CONFIRMATION DIALOG TEXT
     document.getElementById('clearForm').addEventListener('click', () => {
         if(confirm("Are you sure you want to reset the form ?")) {
             document.getElementById('name').value = '';
@@ -1009,6 +1014,44 @@
             document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'block');
             document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
         });
+    });
+
+    // EXCEL EXPORT ENGINE IMPLEMENTATION
+    document.getElementById('exportExcel').addEventListener('click', () => {
+        const records = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        
+        if (records.length === 0) {
+            alert("⚠️ There are no captured records to export yet!");
+            return;
+        }
+
+        // Mapping clean property titles for Excel layout representation
+        const dynamicDataRows = records.map(item => ({
+            "Receipt Number": item.receiptNo,
+            "Student Name": item.studentName,
+            "Registered Course": item.course,
+            "Amount Paid (INR)": Number(item.paidAmount),
+            "Payment Mode": item.paymentMode
+        }));
+
+        // Processing arrays inside sheet generator
+        const worksheet = XLSX.utils.json_to_sheet(dynamicDataRows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Batch Records Ledger");
+
+        // Dynamic auto-fit column configuration loop
+        const maxColumnsWidth = Object.keys(dynamicDataRows[0]).map(key => {
+            let maxLen = key.length;
+            dynamicDataRows.forEach(row => {
+                const valStr = row[key] ? row[key].toString() : '';
+                if(valStr.length > maxLen) maxLen = valStr.length;
+            });
+            return { wch: maxLen + 3 };
+        });
+        worksheet['!cols'] = maxColumnsWidth;
+
+        // Save file locally 
+        XLSX.writeFile(workbook, "Academy_Batch_Ledger_Records.xlsx");
     });
 
     updateLiveLedgerDisplay();
