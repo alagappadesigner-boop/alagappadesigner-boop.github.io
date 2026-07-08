@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- SheetJS library for seamless Excel exporting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
@@ -908,6 +907,11 @@
         document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
     }
 
+    // NUMERIC ONLY VALIDATION FOR PHONE FIELD
+    document.getElementById('phone').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    });
+
     document.getElementById('paidAmount').addEventListener('input', (e) => {
         const val = parseInt(e.target.value, 10);
         if (!isNaN(val) && val >= 0) {
@@ -1016,7 +1020,6 @@
         });
     });
 
-    // EXCEL EXPORT ENGINE IMPLEMENTATION
     document.getElementById('exportExcel').addEventListener('click', () => {
         const records = JSON.parse(localStorage.getItem('receiptLogs')) || [];
         
@@ -1025,7 +1028,6 @@
             return;
         }
 
-        // Mapping clean property titles for Excel layout representation
         const dynamicDataRows = records.map(item => ({
             "Receipt Number": item.receiptNo,
             "Student Name": item.studentName,
@@ -1034,12 +1036,10 @@
             "Payment Mode": item.paymentMode
         }));
 
-        // Processing arrays inside sheet generator
         const worksheet = XLSX.utils.json_to_sheet(dynamicDataRows);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Batch Records Ledger");
 
-        // Dynamic auto-fit column configuration loop
         const maxColumnsWidth = Object.keys(dynamicDataRows[0]).map(key => {
             let maxLen = key.length;
             dynamicDataRows.forEach(row => {
@@ -1050,7 +1050,6 @@
         });
         worksheet['!cols'] = maxColumnsWidth;
 
-        // Save file locally 
         XLSX.writeFile(workbook, "Academy_Batch_Ledger_Records.xlsx");
     });
 
