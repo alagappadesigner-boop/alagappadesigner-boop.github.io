@@ -853,7 +853,7 @@
         return str.trim() + ' Only';
     }
 
-    // Modern Form Field Checker Engine
+    // STRICT ALL-FIELDS FORM CHECKER ENGINE
     function validateReceiptForm() {
         const fields = [
             { id: 'receiptNo', name: 'Receipt Number' },
@@ -865,21 +865,22 @@
             { id: 'installment', name: 'Installment Selection' }
         ];
 
+        // 1. Check all standard input fields
         for (let field of fields) {
             const element = document.getElementById(field.id);
             if (!element || !element.value.trim()) {
-                alert(`Please fill in or select the required field: ${field.name}`);
+                alert(`Fill all the details: "${field.name}" is required.`);
                 if(element) element.focus();
                 return false;
             }
         }
 
-        // Require transaction ID if payment is online/digital (UPI, Card, Bank)
+        // 2. Strict Check: Transaction ID field is mandatory for ALL non-cash payments
         const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
         if (paymentMode !== 'Cash') {
             const txElement = document.getElementById('transactionId');
             if (!txElement || !txElement.value.trim()) {
-                alert(`Please enter the Transaction ID for ${paymentMode} payment mode.`);
+                alert(`Fill all the details: "Transaction / UPI ID" is required for ${paymentMode} transactions.`);
                 if(txElement) txElement.focus();
                 return false;
             }
@@ -921,7 +922,7 @@
     });
 
     document.getElementById('printBtn').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; // Halts print if validation fails
+        if (!validateReceiptForm()) return; // Blocks execution completely
         
         logReceiptData();
         syncPrintPreviews();
@@ -991,7 +992,7 @@
     }
 
     document.getElementById('download').addEventListener('click', () => {
-        if (!validateReceiptForm()) return; // Halts download loop if box data missing
+        if (!validateReceiptForm()) return; // Blocks execution completely
         
         logReceiptData();
         syncPrintPreviews();
