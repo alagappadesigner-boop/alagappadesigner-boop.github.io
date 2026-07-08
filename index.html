@@ -248,9 +248,8 @@
         }
 
         input[type="text"],
-        input[type="date"],
+        input[type="tel"],
         input[type="number"],
-        input[type="email"],
         select,
         textarea {
             width: 100%;
@@ -671,7 +670,7 @@
             <div class="title-area">
                 <h1>ALAGAPPA</h1>
                 <h2>PERFORMING ARTS ACADEMY</h2>
-                <p>BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</p>
+                <p>MUSIC | DANCE | YOGA | KARATE | ART | CHESS</p>
             </div>
             <div class="contact-box">
                 <div><i class="fa-solid fa-location-dot"></i> 49, Gangadeeshwar Koil St, Purasaiwalkam, Chennai - 600084</div>
@@ -704,7 +703,7 @@
                 <div class="details">
                     <div class="field">
                         <label>Phone</label>
-                        <input type="text" id="phone" placeholder="Phone Number">
+                        <input type="tel" id="phone" placeholder="Phone Number" pattern="[0-9]*" inputmode="numeric">
                         <span class="print-text-preview" id="print_phone"></span>
                     </div>
                 </div>
@@ -719,22 +718,17 @@
                             <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
                             <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
                             <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
-                           </select>
+                            <option value="Bachelor in Nattuvangam">Bachelor in Nattuvangam</option>
+                        </select>
                         <span class="print-text-preview" id="print_course"></span>
                     </div>
                 </div>
 
                 <div class="details">
                     <div class="field">
-                        <label>Year</label>
-                 <select id="course" required>
-                            <option value="" disabled selected hidden>Select Year</option>
-                            <option value="1st Year">1st Year</option>
-                            <option value="2nd Year">2nd Year</option>
-                            <option value="3rd Year">3rd Year</option>
-                           </select>
-                        <input type="text" id="batch" placeholder="Year Details">
-                        <span class="print-text-preview" id="print_Year"></span>
+                        <label>Batch</label>
+                        <input type="text" id="batch" placeholder="Batch Details">
+                        <span class="print-text-preview" id="print_batch"></span>
                     </div>
                 </div>
             </div>
@@ -912,9 +906,25 @@
         document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
     }
 
-    // NUMERIC ONLY VALIDATION FOR PHONE FIELD
-    document.getElementById('phone').addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    // ROBUST HIGH-SPEED FILTER FOR NUMERIC ENTRIES ONLY (HANDLES PASTE, DROP, & TYPING)
+    const phoneInput = document.getElementById('phone');
+    const cleanNonNumeric = (e) => {
+        setTimeout(() => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        }, 0);
+    };
+    phoneInput.addEventListener('input', cleanNonNumeric);
+    phoneInput.addEventListener('paste', cleanNonNumeric);
+    phoneInput.addEventListener('drop', cleanNonNumeric);
+    phoneInput.addEventListener('keydown', (e) => {
+        // Allow operational control keys (Backspace, Delete, Arrow keys, Tab)
+        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
+            return;
+        }
+        // Block text letters/symbols immediately on keydown
+        if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
+        }
     });
 
     document.getElementById('paidAmount').addEventListener('input', (e) => {
