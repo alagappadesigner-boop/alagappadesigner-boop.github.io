@@ -727,17 +727,17 @@
                <div class="details">
     <div class="field">
         <label>Year</label>
-<div class="input-group">
-  <span class="label">YEAR</span>
-  <span class="divider"></span>
-  
-  <select class="main-select">
-    <option>2nd Year</option>
-    <!-- Add other options -->
-  </select>
-  
-  <input type="text" class="sub-input" placeholder="Year Details">
-</div>
+
+        <select id="year" required>
+            <option value="" selected disabled>Select Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+        </select>
+
+        <input type="text" id="yearDetails" placeholder="Year Details">
+
+        <span class="print-text-preview" id="print\_Year"></span>
     </div>
 </div>
             <div class="grid-column">
@@ -962,7 +962,7 @@
 
 &#x20;       document.getElementById('print\_batch').innerText = document.getElementById('batch').value || 'N/A';
 
-&#x20;       document.getElementById('print\_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';  
+&#x20;       document.getElementById('print\_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
 
 &#x20;       document.getElementById('print\_words').innerText = document.getElementById('words').value || 'N/A';
 
