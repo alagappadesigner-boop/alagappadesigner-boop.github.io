@@ -1,6 +1,3 @@
-Here is the complete, clean JavaScript code integrating form validations, live data logging, dynamic receipt rendering, custom missing validation messages, conversion of numbers to words, and seamless downloads/exports.
-
-```javascript
 // --- 1. UTILITY: NUMBER TO WORDS ---
 function convertNumberToWords(amount) {
     if (amount === 0) return 'Zero';
@@ -28,7 +25,7 @@ function validateReceiptForm() {
         { id: 'name', name: 'Student Name' },
         { id: 'phone', name: 'Phone Number' },
         { id: 'course', name: 'Course' },
-        { id: 'batch', name: 'Batch / Year Details' },
+        { id: 'year', name: 'Year Details' },
         { id: 'paidAmount', name: 'Amount Paid' },
         { id: 'installment', name: 'Installment' }
     ];
@@ -61,7 +58,7 @@ function syncPrintPreviews() {
     document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
     document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
     document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
-    document.getElementById('print_batch').innerText = document.getElementById('batch').value || 'N/A';
+    document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
     document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
     document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
     document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
@@ -89,15 +86,15 @@ function logReceiptData() {
     updateLiveLedgerDisplay();
 }
 
-// --- 5. TABLE UI MANAGEMENT ---
+// --- 5. TABLE UI MANAGEMENT (ACTION COLUMN REMOVED) ---
 function updateLiveLedgerDisplay() {
     const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
     const tbody = document.getElementById('ledgerBody');
     if (!tbody) return;
     
-    tbody.innerHTML = currentRecords.length === 0 ? '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No records captured yet.</td></tr>' : '';
+    tbody.innerHTML = currentRecords.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No records captured yet.</td></tr>' : '';
     
-    currentRecords.forEach((rec, index) => {
+    currentRecords.forEach((rec) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${rec.receiptNo}</td>
@@ -105,18 +102,10 @@ function updateLiveLedgerDisplay() {
             <td>${rec.course}</td>
             <td>₹${rec.paidAmount}</td>
             <td>${rec.paymentMode}</td>
-            <td><button class="delete-btn" onclick="deleteLedgerRow(${index})"><i class="fa-solid fa-trash"></i></button></td>
         `;
         tbody.appendChild(tr);
     });
 }
-
-window.deleteLedgerRow = (index) => {
-    let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-    currentRecords.splice(index, 1);
-    localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
-    updateLiveLedgerDisplay();
-};
 
 // --- 6. LIVE EVENT LISTENERS ---
 document.getElementById('phone').addEventListener('input', (e) => {
@@ -130,16 +119,6 @@ document.getElementById('paidAmount').addEventListener('input', (e) => {
     } else {
         document.getElementById('words').value = '';
     }
-});
-
-document.getElementById('name').addEventListener('input', (e) => {
-    const preview = document.getElementById('studentNamePreview');
-    if (preview) preview.innerText = e.target.value || "______________________";
-});
-
-document.getElementById('course').addEventListener('change', (e) => {
-    const preview = document.getElementById('coursePreview');
-    if (preview) preview.innerText = e.target.value || "______________________";
 });
 
 // --- 7. ACTION BUTTON HANDLERS ---
@@ -156,7 +135,6 @@ document.getElementById('download').addEventListener('click', () => {
     logReceiptData();
     syncPrintPreviews();
     
-    // Smooth visibility switch for high-quality snapshot compilation
     document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
     
@@ -166,7 +144,6 @@ document.getElementById('download').addEventListener('click', () => {
         pdf.addImage(canvas.toDataURL('image/png', 1.0), 'PNG', 5, 5, 287, (canvas.height * 287) / canvas.width);
         pdf.save(`Receipt-${document.getElementById('receiptNo').value}.pdf`);
         
-        // Revert form fields safely back to layout cascade defaults
         document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = '');
         document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
     });
@@ -201,12 +178,8 @@ document.getElementById('clearForm').addEventListener('click', () => {
                 el.value = '';
             }
         });
-        document.getElementById('studentNamePreview').innerText = "______________________";
-        document.getElementById('coursePreview').innerText = "______________________";
     }
 });
 
 // Initialize Display View
 updateLiveLedgerDisplay();
-
-```
