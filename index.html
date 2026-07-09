@@ -1,3 +1,11 @@
+I see exactly what happened!
+
+1. **The Chat Text Leak:** The conversational code introduction text (*"Here is the complete, fully integrated..."*) got accidentally bundled directly into the actual layout inside the header.
+2. **The Print Mode Duplicate List:** Under the Payment Mode box during print view, the options duplicated into a raw vertical list instead of keeping a single clean text print.
+3. **The Web Page Title Headers/Footers:** The default browser stamp lines (*"7/9/26...", "https://..."*) are leaking into your printed pages.
+
+Here is the clean, fixed code. Make sure to completely select your entire `index.html` file, delete everything, and replace it with this clean slate:
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -266,6 +274,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            position: relative;
         }
 
         .panel-subtitle {
@@ -489,27 +498,27 @@
             display: none;
         }
 
-        /* --- 4. PRINT STYLE RULES OVERRIDES & HEADER ELIMINATION --- */
+        /* --- 4. PRINT STYLE RULES OVERRIDES --- */
         @media print {
             @page {
-                size: auto;
-                margin: 5mm 10mm; /* Minimal clean margins to naturally suppress default browser header string injectors */
+                size: portrait;
+                margin: 0mm; /* Forces elimination of system dates/URLs on page borders */
             }
             body {
                 background-color: #ffffff;
-                padding: 0;
-                margin: 0;
+                padding: 20px !important;
+                margin: 0 !important;
             }
             .action-toolbar, .ledger-container {
                 display: none !important;
             }
             .receipt-card {
-                border: none;
-                box-shadow: none;
-                padding: 0;
-                width: 100%;
+                border: 3px solid #004080 !important;
+                box-shadow: none !important;
+                padding: 30px !important;
+                width: 100% !important;
             }
-            input, select, textarea {
+            input, select, textarea, .radio-option {
                 display: none !important;
             }
             .print-text-preview {
@@ -518,12 +527,13 @@
                 color: #000000;
                 font-weight: 600;
             }
+            /* Keep form structure visual lines during printing */
             .pill-row {
-                border: none;
+                border: 2px solid #004080 !important;
             }
             .pill-label {
-                border: none;
-                padding-left: 0;
+                border-right: 1px solid #cbd5e1 !important;
+                padding-left: 20px !important;
             }
         }
     </style>
@@ -819,7 +829,7 @@
                 const receipt = document.getElementById('receipt');
 
                 try {
-                    const inputs = receipt.querySelectorAll('input, select, textarea');
+                    const inputs = receipt.querySelectorAll('input, select, textarea, .radio-option');
                     const previews = receipt.querySelectorAll('.print-text-preview');
                     
                     inputs.forEach(el => el.style.setProperty('display', 'none', 'important'));
@@ -852,7 +862,7 @@
                 } catch (err) {
                     console.error(err);
                     alert("Compilation failed.");
-                    document.querySelectorAll('input, select, textarea').forEach(el => el.style.removeProperty('display'));
+                    document.querySelectorAll('input, select, textarea, .radio-option').forEach(el => el.style.removeProperty('display'));
                     document.querySelectorAll('.print-text-preview').forEach(el => el.style.removeProperty('display'));
                 }
             });
