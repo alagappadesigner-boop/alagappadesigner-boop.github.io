@@ -170,7 +170,7 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-dark);
-            width: 110px;
+            width: 120px;
         }
 
         /* --- Structural Input Cards Grid Layout --- */
@@ -593,7 +593,7 @@
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
                 <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input" placeholder="APA-2026-0001" readonly><span id="print_receiptNo" class="print-preview-label"></span></span>
-                <span><strong>Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input" style="width:85px;"><span id="print_receiptDate" class="print-preview-label"></span></span>
+                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input" style="width:90px;" readonly><span id="print_receiptDate" class="print-preview-label"></span></span>
             </div>
         </div>
 
@@ -664,6 +664,14 @@
                     <div class="field-container">
                         <input type="text" id="words" class="doc-input" placeholder="Zero Only" readonly>
                         <span id="print_words" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">Payment Date</span>
+                    <div class="field-container">
+                        <input type="text" id="paymentDate" class="doc-input" placeholder="DD/MM/YYYY">
+                        <span id="print_paymentDate" class="print-preview-label"></span>
                     </div>
                 </div>
 
@@ -783,10 +791,13 @@
         
         let sessionIsUnlocked = false; 
 
-        // Current real-time clock parsing setup
+        // Current real-time clock parsing setup for auto-generated Receipt Date
         const now = new Date();
         const dateString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
         document.getElementById('receiptDate').value = dateString;
+        
+        // Initialize the manual payment date field with the current date layout as a placeholder template text
+        document.getElementById('paymentDate').value = dateString;
 
         const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
         document.getElementById('lblTimestamp').innerText = now.toLocaleString('en-US', options).replace(/,/g, '');
@@ -847,6 +858,7 @@
             document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
             document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + parseFloat(document.getElementById('paidAmount').value).toLocaleString('en-IN') : '₹ 0';
             document.getElementById('print_words').innerText = document.getElementById('words').value || 'Zero Only';
+            document.getElementById('print_paymentDate').innerText = document.getElementById('paymentDate').value || 'N/A';
             document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
             document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
             document.getElementById('print_remarks').innerText = document.getElementById('remarks').value || 'N/A';
@@ -996,6 +1008,8 @@
                         el.value = '';
                     }
                 });
+                // Reset the payment date back to today following field clear
+                document.getElementById('paymentDate').value = dateString;
                 updateReceiptNumberSequence();
             }
         });
