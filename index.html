@@ -732,9 +732,7 @@
                             <option value="2nd Year">2nd Year</option>
                             <option value="3rd Year">3rd Year</option>
                         </select>
-                        <input type="date" id="receiptDate" class="box-text-input">
-<span class="print-text-preview" id="print_receiptDate"></span>
-                    </div>
+                                            </div>
                 </div>
             </div>
 
@@ -1053,6 +1051,94 @@
     });
 
     updateLiveLedgerDisplay();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alagappa Performing Arts Academy Fee Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root { --primary-blue: #0b407b; --accent-gold: #cca43b; --text-dark: #1e293b; --bg-light: #f8fafc; --border-color: #cbd5e1; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f0f4f8; padding: 20px; min-height: 100vh; }
+        .page { max-width: 900px; margin: auto; }
+        #receipt { background: #fff; padding: 25px; border: 3px solid var(--primary-blue); border-radius: 12px; margin-bottom: 20px; }
+        .landscape-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .field { display: flex; align-items: center; border: 2px solid var(--primary-blue); border-radius: 30px; padding: 5px 15px; margin-bottom: 8px; background: #fff; }
+        .full { width: 100%; margin-bottom: 8px; }
+        label { font-size: 11px; font-weight: 800; color: var(--primary-blue); text-transform: uppercase; padding-right: 10px; min-width: 75px; border-right: 2px solid #e2e8f0; }
+        input, select, textarea { border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-dark); outline: none; width: 100%; }
+        .print-text-preview { display: none; font-weight: 600; color: var(--text-dark); }
+        .buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: 700; }
+        .ledger-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .ledger-table th { background: var(--primary-blue); color: white; padding: 10px; }
+        .ledger-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div id="receipt">
+        <h3>Alagappa Performing Arts Academy</h3>
+        <div class="receipt-number">Receipt No: <input type="text" id="receiptNo" value="APA-2026-0001"></div>
+        
+        <div class="landscape-grid">
+            <div class="grid-column">
+                <div class="field"><label>Name</label><input type="text" id="name"><span class="print-text-preview" id="print_name"></span></div>
+                <div class="field"><label>Phone</label><input type="text" id="phone"><span class="print-text-preview" id="print_phone"></span></div>
+                <div class="field"><label>Course</label><select id="course"><option value="Diploma">Diploma</option></select><span class="print-text-preview" id="print_course"></span></div>
+                <div class="field"><label>Year</label><select id="year"><option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option></select><span class="print-text-preview" id="print_Year"></span></div>
+            </div>
+            <div class="grid-column">
+                <div class="field full"><label>Amount</label><input type="number" id="paidAmount"><span class="print-text-preview" id="print_paidAmount"></span></div>
+                <div class="field full"><label>In Words</label><input type="text" id="words" readonly><span class="print-text-preview" id="print_words"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="download" style="background:var(--primary-blue)">Download PDF</button>
+        <button id="printBtn" style="background:var(--accent-gold)">Print</button>
+        <button id="clearForm" style="background:#ef4444">Clear Form</button>
+    </div>
+
+    <table class="ledger-table" id="ledgerBody"></table>
+</div>
+
+<script>
+    function convertNumberToWords(amount) { /* Your existing word conversion logic */ return amount + " only"; }
+
+    function syncPrintPreviews() {
+        document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
+        document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
+        document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
+        document.getElementById('print_Year').innerText = document.getElementById('year').value || 'N/A';
+        document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
+        document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
+    }
+
+    document.getElementById('clearForm').addEventListener('click', () => {
+        if(confirm("Reset form?")) {
+            document.querySelectorAll('input, select').forEach(el => el.value = '');
+            document.querySelectorAll('.print-text-preview').forEach(el => el.innerText = '');
+        }
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => {
+        syncPrintPreviews();
+        window.print();
+    });
+
+    // Add your existing logReceiptData and event listener logic here...
 </script>
 </body>
 </html>
