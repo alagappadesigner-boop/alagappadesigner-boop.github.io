@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alagappa Performing Arts Academy - Fee Receipt System</title>
     
+    <!-- External Dependencies for Icons, Canvas, and PDF Generation -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -165,12 +166,18 @@
 
         .meta-inline-input {
             border: none;
+            border-bottom: 1px solid transparent;
             outline: none;
             background: transparent;
             font-size: 13px;
             font-weight: 600;
             color: var(--text-dark);
             width: 120px;
+            transition: border-color 0.2s;
+        }
+
+        .meta-inline-input:focus {
+            border-bottom-color: var(--brand-gold);
         }
 
         /* --- Structural Input Cards Grid Layout --- */
@@ -560,8 +567,10 @@
 
 <div class="container">
     
+    <!-- MAIN RECEIPT FORM LAYOUT PANEL -->
     <div id="receiptBlock" class="receipt-card">
         
+        <!-- Header -->
         <header class="receipt-header">
             <div class="logo-container">
                 <img src="Logo.png" alt="Logo" onerror="this.style.display='none';">
@@ -589,16 +598,19 @@
             </div>
         </header>
 
+        <!-- Document Identifier -->
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
                 <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input" placeholder="APA-2026-0001" readonly><span id="print_receiptNo" class="print-preview-label"></span></span>
-                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input" style="width:90px;" readonly><span id="print_receiptDate" class="print-preview-label"></span></span>
+                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input" style="width:110px;" placeholder="DD/MM/YYYY"><span id="print_receiptDate" class="print-preview-label"></span></span>
             </div>
         </div>
 
+        <!-- Symmetrical Card Grid Layout -->
         <div class="receipt-grid">
             
+            <!-- Left Card Component: Student & Course Particulars -->
             <div class="info-card">
                 <h3 class="card-heading">Student & Course Details</h3>
                 
@@ -648,6 +660,7 @@
 
             </div>
 
+            <!-- Right Card Component: Financial Summary Parameters -->
             <div class="info-card">
                 <h3 class="card-heading">Payment Information</h3>
                 
@@ -713,12 +726,14 @@
             </div>
         </div>
 
+        <!-- Enclosed Information Remarks Box Component -->
         <div class="remarks-box">
             <span class="remarks-inner-label">Remarks & Extra Declarations:</span>
             <textarea id="remarks" class="remarks-textarea" placeholder="Enter transaction reference statements or structural data notes here..."></textarea>
             <span id="print_remarks" class="print-preview-label" style="text-align: left; width: 100%;"></span>
         </div>
 
+        <!-- Closing Diagnostics & Sign-off Layout Block -->
         <div class="closing-area">
             <div class="verification-zone">
                 <div class="qr-placeholder">
@@ -739,6 +754,7 @@
             </div>
         </div>
 
+        <!-- Institutional Fine-Print Footer -->
         <footer class="receipt-footer">
             <div class="thank-you">Thank You!</div>
             <div class="system-generated-text">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
@@ -746,6 +762,7 @@
 
     </div>
 
+    <!-- CONTROL GATEWAY UTILITY PANEL -->
     <div class="secure-controller-gateway">
         <div class="gateway-header">
             <div class="gateway-title">
@@ -764,6 +781,7 @@
         </div>
     </div>
 
+    <!-- LIVE DATABASE BATCH VISUAL LEDGER TABLE -->
     <div class="ledger-container">
         <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger</div>
         <table class="ledger-table">
@@ -777,12 +795,14 @@
                 </tr>
             </thead>
             <tbody id="ledgerBody">
-                </tbody>
+                <!-- Data storage rows get populated here instantly -->
+            </tbody>
         </table>
     </div>
 
 </div>
 
+<!-- --- JAVASCRIPT LOGIC ENGINE --- -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const downloadBtn = document.getElementById('download');
@@ -791,12 +811,12 @@
         
         let sessionIsUnlocked = false; 
 
-        // Current real-time clock parsing setup for auto-generated Receipt Date
+        // Current real-time clock parsing setup for pre-filling manual fields
         const now = new Date();
         const dateString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
-        document.getElementById('receiptDate').value = dateString;
         
-        // Initialize the manual payment date field with the current date layout as a placeholder template text
+        // Initializing both parameters with default current dates as template starters
+        document.getElementById('receiptDate').value = dateString;
         document.getElementById('paymentDate').value = dateString;
 
         const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
@@ -1004,11 +1024,12 @@
                 document.querySelectorAll('input, select, textarea').forEach(el => {
                     if (el.type === 'radio') {
                         if (el.value === 'Cash') el.checked = true;
-                    } else if (el.id !== 'receiptDate') {
+                    } else {
                         el.value = '';
                     }
                 });
-                // Reset the payment date back to today following field clear
+                // Reset the inputs back to today's date placeholder formatting following a manual form drop
+                document.getElementById('receiptDate').value = dateString;
                 document.getElementById('paymentDate').value = dateString;
                 updateReceiptNumberSequence();
             }
