@@ -562,7 +562,6 @@
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
-
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -848,18 +847,15 @@
         if (amount === 0) return 'Zero';
         const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
         const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
         if ((amount = amount.toString()).length > 9) return 'Overflow';
         let n = ('000000000' + amount).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-        if (!n) return ''; 
-        
+        if (!n) return '';
         let str = '';
         str += n[1] != 0 ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
         str += n[2] != 0 ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
         str += n[3] != 0 ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
         str += n[4] != 0 ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
         str += n[5] != 0 ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
-        
         return str.trim() + ' Only';
     }
 
@@ -873,7 +869,6 @@
             { id: 'paidAmount' },
             { id: 'installment' }
         ];
-
         for (let field of fields) {
             const element = document.getElementById(field.id);
             if (!element || !element.value.trim()) {
@@ -905,7 +900,6 @@
         const yearVal = document.getElementById('year').value || '';
         const detailsVal = document.getElementById('yearDetails').value || '';
         document.getElementById('print_Year').innerText = detailsVal ? `${yearVal} (${detailsVal})` : yearVal || 'N/A';
-        
         document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';  
         document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
         document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
@@ -919,7 +913,6 @@
     document.getElementById('phone').addEventListener('input', (e) => {
         e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
-
     document.getElementById('paidAmount').addEventListener('input', (e) => {
         const val = parseInt(e.target.value, 10);
         if (!isNaN(val) && val >= 0) {
@@ -928,21 +921,18 @@
             document.getElementById('words').value = '';
         }
     });
-
     document.getElementById('name').addEventListener('input', (e) => {
         document.getElementById('studentNamePreview').innerText = e.target.value || "______________________";
     });
     document.getElementById('course').addEventListener('change', (e) => {
         document.getElementById('coursePreview').innerText = e.target.value || "______________________";
     });
-
     document.getElementById('printBtn').addEventListener('click', () => {
         if (!validateReceiptForm()) return; 
         logReceiptData();
         syncPrintPreviews();
         window.print();
     });
-
     document.getElementById('clearForm').addEventListener('click', () => {
         if(confirm("Are you sure you want to reset the form?")) {
             document.getElementById('name').value = '';
@@ -1046,6 +1036,7 @@
 
         const worksheet = XLSX.utils.json_to_sheet(dynamicDataRows);
         const workbook = XLSX.utils.book_new();
+        
         XLSX.utils.book_append_sheet(workbook, worksheet, "Batch Records Ledger");
 
         const maxColumnsWidth = Object.keys(dynamicDataRows[0]).map(key => {
