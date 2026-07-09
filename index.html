@@ -211,6 +211,13 @@
             background-color: #ffffff;
             height: 44px;
             overflow: hidden;
+            transition: border-color 0.2s ease;
+        }
+
+        /* Validation Error State */
+        .pill-row.validation-error {
+            border-color: #dc2626 !important;
+            background-color: #fef2f2;
         }
 
         .pill-label {
@@ -507,7 +514,7 @@
         @media print {
             @page {
                 size: portrait;
-                margin: 0mm; /* Forces elimination of system dates/URLs on page borders */
+                margin: 0mm;
             }
             body {
                 background-color: #ffffff;
@@ -532,7 +539,6 @@
                 color: #000000;
                 font-weight: 600;
             }
-            /* Keep form structure visual lines during printing */
             .pill-row {
                 border: 2px solid #004080 !important;
             }
@@ -565,11 +571,11 @@
                 </div>
                 <div class="info-item">
                     <i class="fa-solid fa-phone"></i>
-                    <span>+91 7358-596403</span>
+                    <span>+91 99419 25769</span>
                 </div>
                 <div class="info-item">
                     <i class="fa-solid fa-envelope"></i>
-                    <span>vaishnavi@alagappaarts.com</span>
+                    <span>info@alagappaacademy.com</span>
                 </div>
             </div>
         </div>
@@ -590,13 +596,13 @@
             <div class="section-box">
                 <div class="section-header-tag">Student Information</div>
                 
-                <div class="pill-row">
+                <div class="pill-row" id="row_name">
                     <div class="pill-label">NAME</div>
                     <input type="text" id="name" class="pill-input-field" placeholder="Enter Student Name">
                     <span id="print_name" class="print-text-preview"></span>
                 </div>
 
-                <div class="pill-row">
+                <div class="pill-row" id="row_phone">
                     <div class="pill-label">PHONE</div>
                     <input type="text" id="phone" class="pill-input-field" placeholder="Phone Number" maxlength="10">
                     <span id="print_phone" class="print-text-preview"></span>
@@ -604,18 +610,20 @@
 
                 <div class="section-header-tag" style="margin-top: 5px;">Course Details</div>
 
-                <div class="pill-row">
+                <div class="pill-row" id="row_course">
                     <div class="pill-label">COURSE</div>
                     <select id="course" class="pill-select-field">
                         <option value="" disabled selected hidden>Select Course</option>
-                        <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
-                        <option value="Diploma in Bharathanatyam">Diploma in Bharathanatyam</option>
-                        <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
+                        <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
+                        <option value="Carnatic Vocal">Carnatic Vocal</option>
+                        <option value="Keyboard">Keyboard</option>
+                        <option value="Drawing">Drawing</option>
+                        <option value="Abacus">Abacus</option>
                     </select>
                     <span id="print_course" class="print-text-preview"></span>
                 </div>
 
-                <div class="pill-row">
+                <div class="pill-row" id="row_year">
                     <div class="pill-label">YEAR</div>
                     <select id="year" class="pill-select-field">
                         <option value="" disabled selected hidden>Select Year</option>
@@ -630,7 +638,7 @@
             <div class="section-box">
                 <div class="section-header-tag">Payment Details</div>
 
-                <div class="pill-row">
+                <div class="pill-row" id="row_paidAmount">
                     <div class="pill-label">AMOUNT PAID ₹</div>
                     <input type="number" id="paidAmount" class="pill-input-field" placeholder="0">
                     <span id="print_paidAmount" class="print-text-preview"></span>
@@ -758,7 +766,51 @@
                 return str.trim() + ' Only';
             }
 
-            // --- 2. SYNC UI FORM VALUES TO PRINT PREVIEWS ---
+            // --- 2. FORM VALIDATION ENGINE (EXCEPT REMARKS) ---
+            function checkFormFieldsValid() {
+                let isValid = true;
+                
+                // Fields that must be completed
+                const fieldsToCheck = [
+                    { id: 'name', rowId: 'row_name' },
+                    { id: 'phone', rowId: 'row_phone' },
+                    { id: 'course', rowId: 'row_course' },
+                    { id: 'year', rowId: 'row_year' },
+                    { id: 'paidAmount', rowId: 'row_paidAmount' }
+                ];
+
+                fieldsToCheck.forEach(field => {
+                    const el = document.getElementById(field.id);
+                    const rowEl = document.getElementById(field.rowId);
+                    
+                    if (!el.value || el.value.trim() === "" || el.value === "0") {
+                        isValid = false;
+                        if (rowEl) rowEl.classList.add('validation-error');
+                    } else {
+                        if (rowEl) rowEl.classList.remove('validation-error');
+                    }
+                });
+
+                if (!isValid) {
+                    alert("Action Denied: Please fill out all standard fields before exporting or printing standard layouts.");
+                }
+
+                return isValid;
+            }
+
+            // Remove error highlight instantly when a user inputs data
+            ['name', 'phone', 'course', 'year', 'paidAmount'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    const row = document.getElementById('row_' + id);
+                    if (row) row.classList.remove('validation-error');
+                });
+                document.getElementById(id).addEventListener('change', () => {
+                    const row = document.getElementById('row_' + id);
+                    if (row) row.classList.remove('validation-error');
+                });
+            });
+
+            // --- 3. SYNC UI FORM VALUES TO PRINT PREVIEWS ---
             function syncPrintPreviews() {
                 document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
                 document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
@@ -778,7 +830,7 @@
                 document.getElementById('lblCourseName').innerText = document.getElementById('course').value || "______________________";
             }
 
-            // --- 3. BATCH LOGGING SYSTEM ---
+            // --- 4. BATCH LOGGING SYSTEM ---
             function logReceiptData() {
                 const record = {
                     receiptNo: document.getElementById('receiptNo')?.value || 'N/A',
@@ -807,7 +859,7 @@
                 });
             }
 
-            // --- 4. LIVE INTERACTIVE ACTION EVENT LISTENERS ---
+            // --- 5. LIVE INTERACTIVE ACTION EVENT LISTENERS ---
             document.getElementById('phone').addEventListener('input', (e) => {
                 e.target.value = e.target.value.replace(/[^0-9]/g, '');
             });
@@ -829,8 +881,11 @@
                 document.getElementById('lblCourseName').innerText = e.target.value || "______________________";
             });
 
-            // --- 5. DOWNLOAD PDF BUTTON LOGIC ENGINE ---
+            // --- 6. DOWNLOAD PDF BUTTON LOGIC ENGINE ---
             downloadBtn.addEventListener('click', async () => {
+                // Run the validation block check
+                if (!checkFormFieldsValid()) return;
+
                 syncPrintPreviews();
                 const receipt = document.getElementById('receipt');
 
@@ -873,8 +928,11 @@
                 }
             });
 
-            // --- 6. PRINT RECEIPT BUTTON LOGIC ENGINE ---
+            // --- 7. PRINT RECEIPT BUTTON LOGIC ENGINE ---
             printBtn.addEventListener('click', () => {
+                // Run the validation block check
+                if (!checkFormFieldsValid()) return;
+
                 syncPrintPreviews();
                 logReceiptData();
                 setTimeout(() => {
@@ -882,7 +940,7 @@
                 }, 150);
             });
 
-            // --- 7. EXCEL EXPORT LEDGER LOGIC ENGINE ---
+            // --- 8. EXCEL EXPORT LEDGER LOGIC ENGINE ---
             document.getElementById('exportExcel').addEventListener('click', () => {
                 const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
                 if (currentRecords.length === 0) return alert("There are no captured records to export yet!");
@@ -903,7 +961,7 @@
                 }
             });
 
-            // --- 8. RESET FORM MANAGEMENT ---
+            // --- 9. RESET FORM MANAGEMENT ---
             document.getElementById('clearForm').addEventListener('click', () => {
                 if (confirm("Are you sure you want to clear the form?")) {
                     document.querySelectorAll('input, select, textarea').forEach(el => {
@@ -913,6 +971,7 @@
                             el.value = '';
                         }
                     });
+                    document.querySelectorAll('.pill-row').forEach(row => row.classList.remove('validation-error'));
                     document.getElementById('receiptNo').value = "APA-2026-0001";
                     document.getElementById('lblStudentName').innerText = "______________________";
                     document.getElementById('lblCourseName').innerText = "______________________";
