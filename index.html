@@ -3,704 +3,1144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academy Fee Receipt System</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Alagappa Performing Arts Academy Fee Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* --- 1. GLOBAL STYLES & RESET --- */
+        /* ==========================================================================
+           1. GLOBAL REBOOT & THEME VARIABLES
+           ========================================================================== */
+        :root {
+            --primary-blue: #0b407b;
+            --accent-gold: #cca43b;
+            --text-dark: #1e293b;
+            --border-color: #cbd5e1;
+            --bg-light: #f8fafc;
+        }
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            background-color: #f1f5f9;
-            color: #1e293b;
-            padding: 40px 20px;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ==========================================================================
+           2. MAIN RECEIPT WINDOW CONTAINER (FLUID LANDSCAPE RATIO)
+           ========================================================================== */
+        .page {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
-        }
-
-        /* --- 2. CONTROL BUTTONS HEADER --- */
-        .action-toolbar {
-            display: flex;
             gap: 15px;
             width: 100%;
-            max-width: 1000px;
-            justify-content: center;
-            flex-wrap: wrap;
+            max-width: 1050px;
         }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #ffffff;
-        }
-
-        #printBtn { background-color: #02529c; }
-        #printBtn:hover { background-color: #013e75; }
-        #download { background-color: #eab308; color: #1e293b; }
-        #download:hover { background-color: #ca8a04; }
-        #clearForm { background-color: #dc2626; }
-        #clearForm:hover { background-color: #b91c1c; }
-
-        /* --- 3. RECEIPT MAIN PANEL --- */
-        .receipt-card {
-            background-color: #ffffff;
+        #receipt {
+            background: #ffffff;
             width: 100%;
-            max-width: 1000px;
-            border: 3px solid #004080;
+            padding: 20px 25px;
             border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+            border: 3px solid var(--primary-blue);
             position: relative;
+            overflow: hidden;
         }
 
-        /* BRANDING HEADER BANNER COMPONENT */
-        .brand-banner {
-            background-color: #002e5b;
+        /* ==========================================================================
+           3. BRAND BANNER HEADER & FIXED LOGO CONTRAST AREA
+           ========================================================================== */
+        .header {
+            display: grid;
+            grid-template-columns: 140px 1fr auto;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #06284f 100%);
             color: #ffffff;
+            padding: 15px 20px;
             border-radius: 8px;
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-bottom: 5px solid #d4af37;
-        }
-
-        .brand-left {
-            display: flex;
-            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 4px solid var(--accent-gold);
             gap: 20px;
         }
 
-        .logo-placeholder {
-            background-color: #ffffff;
-            width: 150px;
-            height: 65px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 900;
-            color: #002e5b;
-            font-size: 26px;
-            letter-spacing: -1px;
-            border: 1px solid rgba(0,0,0,0.1);
+        .logo-area, [id="receipt"] .logo-area, .header .logo-area {
+            background: #ffffff !important;
+            padding: 8px !important;
+            border-radius: 8px !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+            height: 75px !important;
+            width: 140px !important;
         }
 
-        .brand-title-block h1 {
-            font-size: 28px;
+        .logo-area img {
+            max-height: 100% !important;
+            max-width: 100% !important;
+            object-fit: contain !important;
+            filter: none !important;
+        }
+
+        .title-area {
+            text-align: left;
+        }
+
+        .title-area h1 {
+            font-size: 24px;
             font-weight: 800;
+            color: #ffffff;
             letter-spacing: 1px;
             line-height: 1.1;
         }
 
-        .brand-title-block h2 {
-            font-size: 13px;
-            font-weight: 700;
-            color: #eab308;
+        .title-area h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-gold);
             letter-spacing: 1.5px;
             margin-top: 2px;
-            text-transform: uppercase;
         }
 
-        .brand-title-block p {
-            font-size: 10px;
-            color: #94a3b8;
-            margin-top: 4px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .brand-right-info {
-            border-left: 2px solid #eab308;
-            padding-left: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 11px;
-            font-weight: 500;
+        .title-area p {
+            font-size: 9px;
+            font-weight: 400;
             color: #e2e8f0;
+            margin-top: 2px;
         }
 
-        .info-item i {
-            color: #eab308;
-            width: 12px;
-            text-align: center;
-        }
-
-        /* Document Title Row Layout */
-        .receipt-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f8fafc;
-            padding: 12px 20px;
-            border-radius: 6px;
-            margin-bottom: 25px;
-        }
-
-        .receipt-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: #004080;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .receipt-number-block {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .receipt-number-block label {
-            font-size: 12px;
-            font-weight: 800;
-            color: #004080;
-            line-height: 1.2;
-            text-align: right;
-        }
-
-        .receipt-number-block input {
-            border: none;
-            background: transparent;
-            font-size: 16px;
-            font-weight: 700;
-            color: #1e293b;
-            width: 140px;
-            outline: none;
-            letter-spacing: 0.5px;
-        }
-
-        /* Form Content Splitting Grid Layout */
-        .receipt-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .section-box {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .section-header-tag {
-            background-color: #004080;
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 6px 16px;
-            border-radius: 4px;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-            text-transform: uppercase;
-        }
-
-        /* Pill Input Form Elements */
-        .pill-row {
-            display: flex;
-            align-items: center;
-            border: 2px solid #004080;
-            border-radius: 50px;
-            background-color: #ffffff;
-            height: 44px;
-            overflow: hidden;
-        }
-
-        .pill-label {
-            font-size: 11px;
-            font-weight: 800;
-            color: #004080;
-            width: 100px;
-            padding-left: 20px;
-            border-right: 1px solid #cbd5e1;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-
-        .pill-input-field {
-            flex: 1;
-            height: 100%;
-            border: none;
-            outline: none;
-            padding: 0 15px;
-            font-size: 14px;
-            color: #334155;
-            background: transparent;
-        }
-
-        /* Dropdown custom styling configuration */
-        .pill-select-field {
-            flex: 1;
-            height: 100%;
-            border: none;
-            outline: none;
-            padding: 0 35px 0 15px;
-            font-size: 14px;
-            color: #334155;
-            background: transparent;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23004080' viewBox='0 0 16 16'><path d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>");
-            background-repeat: no-repeat;
-            background-position: calc(100% - 15px) center;
-            cursor: pointer;
-        }
-
-        /* Secondary multi-panel containers layout */
-        .payment-inner-flex {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .border-panel {
-            border: 2px solid #004080;
-            border-radius: 8px;
-            padding: 12px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .panel-subtitle {
-            font-size: 11px;
-            font-weight: 800;
-            color: #004080;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 4px;
-            margin-bottom: 2px;
-            text-transform: uppercase;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #004080;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .radio-option input[type="radio"] {
-            accent-color: #004080;
-            transform: scale(1.05);
-        }
-
-        .small-input-stack {
+        .contact-box {
             display: flex;
             flex-direction: column;
             gap: 4px;
+            font-size: 11px;
+            color: #f8fafc;
+            border-left: 2px solid var(--accent-gold);
+            padding-left: 15px;
+            max-width: 320px;
         }
 
-        .small-input-stack label {
-            font-size: 10px;
-            font-weight: 800;
-            color: #004080;
-            text-transform: uppercase;
+        .contact-box div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .box-text-input, .box-select-input {
-            width: 100%;
-            height: 34px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            padding: 0 10px;
-            font-size: 13px;
-            outline: none;
-            color: #334155;
+        .contact-box i {
+            color: var(--accent-gold);
+            font-size: 11px;
         }
 
-        .remarks-textarea {
-            width: 100%;
-            height: 50px;
-            border: 2px solid #004080;
+        /* ==========================================================================
+           4. RECEIPT METRICS & HEADINGS
+           ========================================================================== */
+        .receipt-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: var(--bg-light);
+            padding: 8px 15px;
             border-radius: 6px;
-            padding: 10px 15px;
-            font-size: 13px;
-            resize: none;
-            outline: none;
-            color: #334155;
+            border-left: 5px solid var(--primary-blue);
         }
 
-        /* Summary Footnote Statement Style Box */
-        .thank-you-statement {
-            background-color: #f8fafc;
-            border-left: 4px solid #ca8a04;
-            border-right: 4px solid #ca8a04;
-            padding: 14px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 600;
-            color: #334155;
-            margin-top: 15px;
-            border-radius: 4px;
-            line-height: 1.6;
+        .receipt-heading h2 {
+            font-size: 18px;
+            color: var(--primary-blue);
+            font-weight: 800;
+            letter-spacing: 1px;
         }
 
-        .dynamic-underline {
+        .receipt-number {
+            font-size: 13px;
             font-weight: 700;
-            color: #004080;
-            text-decoration: underline;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Hidden Print Element Preview Fields Container */
+        .receipt-number input {
+            width: 150px;
+            padding: 4px 10px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 6px;
+            font-weight: 700;
+            color: #ef4444;
+            text-align: center;
+            background: #ffffff;
+        }
+
         .print-text-preview {
             display: none;
+            font-weight: 600;
+            color: var(--text-dark);
         }
 
-        /* --- 4. PRINT STYLE RULES OVERRIDES --- */
+        /* ==========================================================================
+           5. LANDSCAPE GRID ENGINE (FORCES SIDE-BY-SIDE EQUAL HALVES)
+           ========================================================================== */
+        .landscape-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .grid-column {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .details {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+
+        /* ==========================================================================
+           6. CAPSULE PILL INPUT STRUCTS (DYNAMIC ALIGNMENT)
+           ========================================================================== */
+        .field {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            border: 2px solid var(--primary-blue);
+            border-radius: 30px;
+            padding: 5px 15px;
+            background: #ffffff;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .field.full {
+            flex: none;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-right: 2px solid #e2e8f0;
+            padding-right: 10px;
+            min-width: 75px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            border: none !important;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #ffffff;
+            background: var(--primary-blue);
+            padding: 4px 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+
+        /* ==========================================================================
+           7. PAYMENT METHODS GRID
+           ========================================================================== */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .payment-box {
+            border: 2px solid var(--primary-blue);
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--bg-light);
+        }
+
+        .payment-box h3 {
+            font-size: 11px;
+            margin-bottom: 6px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 2px;
+        }
+
+        .payment-box label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            padding: 0;
+            min-width: auto;
+        }
+
+        textarea {
+            border: 2px solid var(--primary-blue) !important;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 8px;
+            resize: none;
+            width: 100%;
+        }
+
+        /* ==========================================================================
+           8. LEGAL TEXT & SIGNATURE TRACKS
+           ========================================================================== */
+        .declaration {
+            background: #f0f7ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #1e293b;
+            text-align: center;
+            margin: 10px 0;
+            border-left: 5px solid var(--accent-gold);
+            border-right: 5px solid var(--accent-gold);
+            font-weight: 500;
+            line-height: 1.4;
+            width: 100%;
+        }
+
+        .declaration strong {
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        /* ==========================================================================
+           ELEGANT SIGNATURE ENGINE (PNG BRANDED)
+           ========================================================================== */
+        .signature-section {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding: 0 25px;
+            width: 100%;
+        }
+
+        .signature-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 220px;
+            position: relative;
+        }
+
+        .signature-image-wrapper {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            position: relative;
+        }
+
+        .signature-image-wrapper img {
+            max-height: 75px;
+            max-width: 180px;
+            object-fit: contain;
+            position: absolute;
+            bottom: -5px;
+            pointer-events: none;
+        }
+
+        .signature-line {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary-blue) 15%, var(--primary-blue) 85%, transparent);
+            margin-top: 5px;
+            margin-bottom: 8px;
+        }
+
+        .signature-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ==========================================================================
+           9. BRAND FOOTER SIGN-OFF
+           ========================================================================== */
+        footer {
+            text-align: center;
+            margin-top: 15px;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 10px;
+            width: 100%;
+        }
+
+        footer h2 {
+            font-size: 14px;
+            color: var(--accent-gold);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        footer p {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        /* ==========================================================================
+           10. INTERACTION SYSTEM UTILITY BUTTONS & ADVANCED LEDGER
+           ========================================================================== */
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #download { background-color: var(--primary-blue); }
+        #printBtn { background-color: var(--accent-gold); color: #000; }
+        #exportExcel { background-color: #107c41; } 
+        #clearForm { background-color: #ef4444; }
+
+        .live-ledger-container {
+            width: 100%;
+            max-width: 1050px;
+            background: #ffffff;
+            margin-top: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .ledger-header h3 {
+            color: var(--primary-blue);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 6px;
+        }
+
+        .ledger-table-wrapper {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .ledger-table th {
+            background: var(--primary-blue);
+            color: #ffffff;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+        }
+
+        .ledger-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ledger-table tr:nth-child(even) { background: var(--bg-light); }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover { background: #ef4444; color: #fff; }
+
+        /* ==========================================================================
+           11. ABSOLUTE PRINT ORIENTATION ENGINE (FORCE EXACTLY 1 PAGE A4 LANDSCAPE)
+           ========================================================================== */
         @media print {
-            body {
-                background-color: #ffffff;
-                padding: 0;
+            @page {
+                size: A4 landscape;
+                margin: 4mm 6mm;
             }
-            .action-toolbar {
+
+            html, body {
+                background-color: #ffffff !important;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            body {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+
+            .buttons,
+            .live-ledger-container {
                 display: none !important;
             }
-            .receipt-card {
-                border: none;
-                box-shadow: none;
-                padding: 0;
-                width: 100%;
-            }
+
             input, select, textarea {
                 display: none !important;
             }
+
             .print-text-preview {
                 display: inline-block !important;
-                font-size: 14px;
-                color: #000000;
-                font-weight: 600;
             }
-            .pill-row {
-                border: none;
+
+            #receipt {
+                box-shadow: none !important;
+                border: 2px solid var(--primary-blue) !important;
+                border-radius: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                max-height: calc(210mm - 8mm) !important;
+                padding: 10px 16px !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+ 
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
-            .pill-label {
-                border: none;
-                padding-left: 0;
+
+            .header {
+                padding: 8px 14px !important;
+                margin-bottom: 6px !important;
+                gap: 12px !important;
             }
+
+            .logo-area, [id="receipt"] .logo-area, .header .logo-area {
+                height: 52px !important;
+                width: 110px !important;
+                padding: 4px !important;
+            }
+
+            .title-area h1 { font-size: 18px !important; }
+            .title-area h2 { font-size: 12px !important; }
+            .title-area p { display: none !important; }
+            .contact-box { padding-left: 10px !important; gap: 2px !important; font-size: 10px !important; }
+
+            .receipt-heading {
+                margin-bottom: 6px !important;
+                padding: 3px 10px !important;
+            }
+            .receipt-heading h2 { font-size: 15px !important; }
+            .receipt-number { font-size: 11px !important; }
+
+            .landscape-grid {
+                gap: 14px !important;
+                margin-bottom: 2px !important;
+            }
+
+            .details {
+                margin-bottom: 4px !important;
+                gap: 8px !important;
+            }
+
+            .field {
+                padding: 2px 10px !important;
+                height: 28px !important;
+            }
+            .field.full {
+                margin-bottom: 4px !important;
+            }
+            label {
+                font-size: 10px !important;
+                min-width: 65px !important;
+                padding-right: 6px !important;
+            }
+            .print-text-preview {
+                font-size: 11px !important;
+            }
+
+            .section-title {
+                font-size: 10px !important;
+                padding: 1px 8px !important;
+                margin: 3px 0 !important;
+            }
+
+            .payment-grid { gap: 8px !important; }
+            .payment-box { padding: 4px 8px !important; }
+            .payment-box h3 { font-size: 10px !important; margin-bottom: 4px !important; }
+            .payment-box label { display: none !important; }
+
+            textarea {
+                padding: 4px 8px !important;
+                height: 32px !important;
+                font-size: 11px !important;
+            }
+
+            .declaration {
+                margin: 4px 0 !important;
+                padding: 4px 10px !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+            }
+
+            .signature-section {
+                margin-top: 15px !important;
+                margin-bottom: 5px !important;
+            }
+            .signature-image-wrapper {
+                height: 45px !important;
+            }
+            .signature-image-wrapper img {
+                max-height: 55px !important;
+                bottom: -3px !important;
+            }
+            .signature-title { font-size: 10px !important; }
+
+            footer { margin-top: 4px !important; padding-top: 4px !important; }
+            footer h2 { font-size: 12px !important; }
+            footer p { font-size: 9px !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="action-toolbar">
-        <button id="printBtn" class="btn"><i class="fa-solid fa-print"></i> Print Receipt</button>
-        <button id="download" class="btn"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
-        <button id="clearForm" class="btn"><i class="fa-solid fa-rotate-left"></i> Reset Form</button>
-    </div>
+<div class="page">
+    <div id="receipt">
+        <header class="header">
+            <div class="logo-area">
+                <img src="Logo.png" alt="Logo">
+            </div>
+            <div class="title-area">
+                <h1>ALAGAPPA</h1>
+                <h2>PERFORMING ARTS ACADEMY</h2>
+                <p>BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</p>
+            </div>
+            <div class="contact-box">
+                <div><i class="fa-solid fa-location-dot"></i> 49, Gangadeeshwar Koil St, Purasaiwalkam, Chennai - 600084</div>
+                <div><i class="fa-solid fa-phone"></i> +91 99419 25769</div>
+                <div><i class="fa-solid fa-envelope"></i> info@alagappaacademy.com</div>
+            </div>
+        </header>
 
-    <div id="receipt" class="receipt-card">
-        
-        <div class="brand-banner">
-            <div class="brand-left">
-                <div class="logo-placeholder">APAA</div>
-                <div class="brand-title-block">
-                    <h1>ALAGAPPA</h1>
-                    <h2>Performing Arts Academy</h2>
-                    <p>BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</p>
-                </div>
-            </div>
-            <div class="brand-right-info">
-                <div class="info-item">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <span>49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084</span>
-                </div>
-                <div class="info-item">
-                    <i class="fa-solid fa-phone"></i>
-                    <span>+91 99419 25769</span>
-                </div>
-                <div class="info-item">
-                    <i class="fa-solid fa-envelope"></i>
-                    <span>info@alagappaacademy.com</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="receipt-header">
-            <div class="receipt-title">Fee Receipt</div>
-            <div class="receipt-number-block">
-                <label>RECEIPT NO.</label>
-                <input type="text" id="receiptNo" placeholder="APA-2026-0001" value="APA-2026-0001">
-                <span id="print_receiptNo" class="print-text-preview"></span>
+        <div class="receipt-heading">
+            <h2>FEE RECEIPT</h2>
+            <div class="receipt-number">
+                <span>RECEIPT NO.</span>
+                <input type="text" id="receiptNo" value="APA-2026-0001">
+                <span class="print-text-preview" id="print_receiptNo" style="color:#ef4444; font-weight:700;"></span>
             </div>
         </div>
 
-        <div class="receipt-grid">
-            
-            <div class="section-box">
-                <div class="section-header-tag">Student Information</div>
-                
-                <div class="pill-row">
-                    <div class="pill-label">NAME</div>
-                    <input type="text" id="name" class="pill-input-field" placeholder="Enter Student Name">
-                    <span id="print_name" class="print-text-preview"></span>
+        <div class="landscape-grid">
+            <div class="grid-column">
+                <div class="section-title" style="margin-top: 0;">Student Information</div>
+ 
+                <div class="details">
+                    <div class="field">
+                        <label>Name</label>
+                        <input type="text" id="name" placeholder="Enter Student Name">
+                        <span class="print-text-preview" id="print_name"></span>
+                    </div>
                 </div>
 
-                <div class="pill-row">
-                    <div class="pill-label">PHONE</div>
-                    <input type="text" id="phone" class="pill-input-field" placeholder="Phone Number" maxlength="10">
-                    <span id="print_phone" class="print-text-preview"></span>
+                <div class="details">
+                    <div class="field">
+                        <label>Phone</label>
+                        <input type="text" id="phone" placeholder="Phone Number">
+                        <span class="print-text-preview" id="print_phone"></span>
+                    </div>
                 </div>
 
-                <div class="section-header-tag" style="margin-top: 5px;">Course Details</div>
-
-                <div class="pill-row">
-                    <div class="pill-label">COURSE</div>
-                    <select id="course" class="pill-select-field">
-                        <option value="" disabled selected hidden>Select Course</option>
-                        <option value="Bharatanatyam">Bharatanatyam</option>
-                        <option value="Carnatic Vocal">Carnatic Vocal</option>
-                        <option value="Keyboard">Keyboard</option>
-                        <option value="Drawing">Drawing</option>
-                        <option value="Abacus">Abacus</option>
-                    </select>
-                    <span id="print_course" class="print-text-preview"></span>
+                <div class="section-title">Course Details</div>
+ 
+                <div class="details">
+                    <div class="field">
+                        <label>Course</label>
+                        <select id="course" required>
+                            <option value="" disabled selected hidden>Select Course</option>
+                            <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
+                            <option value="Bachelor in Bharathanatyam">Bachelor in Bharathanatyam</option>
+                            <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
+                        </select>
+                        <span class="print-text-preview" id="print_course"></span>
+                    </div>
                 </div>
 
-                <div class="pill-row">
-                    <div class="pill-label">YEAR</div>
-                    <select id="year" class="pill-select-field">
-                        <option value="" disabled selected hidden>Select Year</option>
-                        <option value="1st Year">1st Year</option>
-                        <option value="2nd Year">2nd Year</option>
-                        <option value="3rd Year">3rd Year</option>
-                    </select>
-                    <span id="print_year" class="print-text-preview"></span>
+                <div class="details">
+                    <div class="field">
+                        <label>Year</label>
+                        <select id="year" required>
+                            <option value="" selected disabled>Select Year</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                        </select>
+                        <input type="text" id="yearDetails" placeholder="Year Details">
+                        <span class="print-text-preview" id="print_Year"></span>
+                    </div>
                 </div>
             </div>
 
-            <div class="section-box">
-                <div class="section-header-tag">Payment Details</div>
-
-                <div class="pill-row">
-                    <div class="pill-label">AMOUNT PAID ₹</div>
-                    <input type="number" id="paidAmount" class="pill-input-field" placeholder="0">
-                    <span id="print_paidAmount" class="print-text-preview"></span>
+            <div class="grid-column">
+                <div class="section-title" style="margin-top: 0;">Payment Details</div>
+ 
+                <div class="field full">
+                    <label>Amount Paid</label>
+                    <input type="number" id="paidAmount" placeholder="₹">
+                    <span class="print-text-preview" id="print_paidAmount" style="font-weight:700;"></span>
                 </div>
 
-                <div class="pill-row">
-                    <div class="pill-label">IN WORDS</div>
-                    <input type="text" id="words" class="pill-input-field" placeholder="Amount in words" readonly>
-                    <span id="print_words" class="print-text-preview"></span>
+                <div class="field full">
+                    <label>In Words</label>
+                    <input type="text" id="words" placeholder="Amount in words" readonly style="color: var(--primary-blue); font-weight: 700;">
+                    <span class="print-text-preview" id="print_words" style="color: var(--primary-blue); font-weight: 700;"></span>
                 </div>
 
-                <div class="payment-inner-flex">
-                    
-                    <div class="border-panel">
-                        <div class="panel-subtitle">Payment Mode</div>
-                        <label class="radio-option">
-                            <input type="radio" name="payment" value="Cash" checked> Cash
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="payment" value="UPI"> UPI
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="payment" value="Card"> Card
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="payment" value="Bank"> Bank
-                        </label>
-                        <span id="print_paymentMode" class="print-text-preview"></span>
+                <div class="payment-grid">
+                    <div class="payment-box">
+                        <h3>Payment Mode</h3>
+                        <label><input type="radio" name="payment" value="Cash" checked> Cash</label><br>
+                        <label><input type="radio" name="payment" value="UPI"> UPI</label><br>
+                        <label><input type="radio" name="payment" value="Card"> Card</label><br>
+                        <label><input type="radio" name="payment" value="Bank Transfer"> Bank</label>
+                        <span class="print-text-preview" id="print_paymentMode" style="font-weight:700; color:var(--primary-blue);"></span>
                     </div>
 
-                    <div class="border-panel">
-                        <div class="small-input-stack">
-                            <label>TXN / UPI ID</label>
-                            <input type="text" id="transactionId" class="box-text-input" placeholder="Transaction ID">
-                            <span id="print_transactionId" class="print-text-preview"></span>
-                        </div>
-                        <div class="small-input-stack">
-                            <label>INSTALLMENT</label>
-                            <select id="installment" class="box-select-input">
+                    <div class="payment-box">
+                        <div class="grid-column" style="gap: 4px;">
+                            <div style="font-size: 10px; font-weight: 700; color: var(--primary-blue);">TXN / UPI ID</div>
+                            <input type="text" id="transactionId" placeholder="Transaction ID" style="border: 1px solid var(--border-color) !important; border-radius:4px; padding:2px 6px; background:#fff;">
+                            <span class="print-text-preview" id="print_transactionId"></span>
+ 
+                            <div style="font-size: 10px; font-weight: 700; color: var(--primary-blue); margin-top:2px;">INSTALLMENT</div>
+                            <select id="installment" style="border: 1px solid var(--border-color) !important; border-radius:4px; padding:2px 6px; background:#fff;">
                                 <option value="" disabled selected hidden></option>
-                                <option value="Full Payment">Full Payment</option>
                                 <option value="First Installment">First Installment</option>
                                 <option value="Second Installment">Second Installment</option>
                                 <option value="Final Installment">Final Installment</option>
+                                <option value="Full Payment">Full Payment</option>
                             </select>
-                            <span id="print_installment" class="print-text-preview"></span>
+                            <span class="print-text-preview" id="print_installment"></span>
                         </div>
                     </div>
-
                 </div>
 
-                <div class="section-header-tag" style="margin-top: 2px;">Remarks</div>
-                <textarea id="remarks" class="remarks-textarea" placeholder="Remarks (Optional)"></textarea>
-                <span id="print_remarks" class="print-text-preview"></span>
-
+                <div class="section-title">Remarks</div>
+                <textarea id="remarks" rows="2" placeholder="Remarks (Optional)"></textarea>
+                <span class="print-text-preview" id="print_remarks" style="font-style: italic; font-size:11px;"></span>
             </div>
         </div>
 
-        <div class="thank-you-statement">
-            Received with thanks from <span id="lblStudentName" class="dynamic-underline">______________________</span> towards the course fee for <span id="lblCourseName" class="dynamic-underline">______________________</span> at Alagappa Performing Arts Academy.
+        <div class="declaration">
+            <p>
+                Received with thanks from <strong id="studentNamePreview">______________________</strong>
+                towards the course fee for <strong id="coursePreview">______________________</strong>
+                at Alagappa Performing Arts Academy.
+            </p>
         </div>
 
+        <div class="signature-section">
+            <div class="signature-container">
+                <div class="signature-image-wrapper">
+                    <img src="signature.png" alt="Signature">
+                </div>
+                <div class="signature-line"></div>
+                <p class="signature-title">Authorized Signature</p>
+            </div>
+        </div>
+
+        <footer>
+            <h2>THANK YOU!</h2>
+            <p>We appreciate your trust in Alagappa Performing Arts Academy.</p>
+        </footer>
     </div>
 
-    <script>
-        // --- 1. UTILITY: NUMBER TO WORDS ---
-        function convertNumberToWords(amount) {
-            if (amount === 0) return 'Zero';
-            const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
-            const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-            
-            if ((amount = amount.toString()).length > 9) return 'Overflow';
-            let n = ('000000000' + amount).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-            if (!n) return ''; 
-            
-            let str = '';
-            str += n[1] != 0 ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
-            str += n[2] != 0 ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
-            str += n[3] != 0 ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
-            str += n[4] != 0 ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
-            str += n[5] != 0 ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
-            
-            return str.trim() + ' Only';
+    <div class="buttons">
+        <button id="download"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+        <button id="printBtn"><i class="fa-solid fa-print"></i> Print Receipt</button>
+        <button id="exportExcel"><i class="fa-solid fa-file-excel"></i> Export to Excel</button>
+        <button id="clearForm"><i class="fa-solid fa-trash"></i> Clear Form</button>
+    </div>
+
+    <div class="live-ledger-container">
+        <div class="ledger-header">
+            <h3>Current Batch Records Ledger (Live View)</h3>
+        </div>
+        <div class="ledger-table-wrapper">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Receipt No</th>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th>Paid</th>
+                        <th>Mode</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ledgerBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function convertNumberToWords(amount) {
+        if (amount === 0) return 'Zero';
+        const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+        const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+        if ((amount = amount.toString()).length > 9) return 'Overflow';
+        let n = ('000000000' + amount).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+        if (!n) return '';
+        let str = '';
+        str += n[1] != 0 ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+        str += n[2] != 0 ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+        str += n[3] != 0 ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+        str += n[4] != 0 ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+        str += n[5] != 0 ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+        return str.trim() + ' Only';
+    }
+
+    function validateReceiptForm() {
+        const fields = [
+            { id: 'receiptNo' },
+            { id: 'name' },
+            { id: 'phone' },
+            { id: 'course' },
+            { id: 'year' },
+            { id: 'paidAmount' },
+            { id: 'installment' }
+        ];
+        for (let field of fields) {
+            const element = document.getElementById(field.id);
+            if (!element || !element.value.trim()) {
+                alert("⚠️ Please fill in all the required details to proceed.");
+                if(element) element.focus();
+                return false;
+            }
         }
 
-        // --- 2. FORM INTEGRITY ENGINE VALIDATION ---
-        function validateReceiptForm() {
-            const fields = [
-                { id: 'receiptNo', name: 'Receipt Number' },
-                { id: 'name', name: 'Student Name' },
-                { id: 'phone', name: 'Phone Number' },
-                { id: 'course', name: 'Course' },
-                { id: 'year', name: 'Year' },
-                { id: 'paidAmount', name: 'Amount Paid' },
-                { id: 'installment', name: 'Installment' }
-            ];
-
-            for (let field of fields) {
-                const element = document.getElementById(field.id);
-                if (!element || !element.value.trim()) {
-                    alert(`⚠️ Missing Required Information: "${field.name}" is required.`);
-                    if (element) element.focus();
-                    return false;
-                }
+        const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
+        if (paymentMode !== 'Cash') {
+            const txElement = document.getElementById('transactionId');
+            if (!txElement || !txElement.value.trim()) {
+                alert("⚠️ Please fill in all the required details to proceed.");
+                if(txElement) txElement.focus();
+                return false;
             }
-
-            const paymentMode = document.querySelector('input[name="payment"]:checked')?.value || 'Cash';
-            if (paymentMode !== 'Cash') {
-                const txElement = document.getElementById('transactionId');
-                if (!txElement || !txElement.value.trim()) {
-                    alert('⚠️ Missing Required Information: "Transaction ID" is required for non-cash payments.');
-                    if (txElement) txElement.focus();
-                    return false;
-                }
-            }
-
-            return true;
         }
 
-        // --- 3. LIVE RUNTIME VIEW STATE SYNC ---
-        function syncPrintPreviews() {
-            document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
-            document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
-            document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
-            document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
-            document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
-            document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
-            document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
-            document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
-            document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
-            document.getElementById('print_remarks').innerText = document.getElementById('remarks').value ? 'Remarks: ' + document.getElementById('remarks').value : '';
-            
-            const checkedPayment = document.querySelector('input[name="payment"]:checked');
-            document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
+        return true;
+    }
+
+    function syncPrintPreviews() {
+        document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
+        document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
+        document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
+        document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
+        
+        const yearVal = document.getElementById('year').value || '';
+        const detailsVal = document.getElementById('yearDetails').value || '';
+        document.getElementById('print_Year').innerText = detailsVal ? `${yearVal} (${detailsVal})` : yearVal || 'N/A';
+        document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';  
+        document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
+        document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
+        document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
+        document.getElementById('print_remarks').innerText = document.getElementById('remarks').value ? 'Remarks: ' + document.getElementById('remarks').value : '';
+        
+        const checkedPayment = document.querySelector('input[name="payment"]:checked');
+        document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
+    }
+
+    document.getElementById('phone').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    });
+    document.getElementById('paidAmount').addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val) && val >= 0) {
+            document.getElementById('words').value = convertNumberToWords(val);
+        } else {
+            document.getElementById('words').value = '';
+        }
+    });
+    document.getElementById('name').addEventListener('input', (e) => {
+        document.getElementById('studentNamePreview').innerText = e.target.value || "______________________";
+    });
+    document.getElementById('course').addEventListener('change', (e) => {
+        document.getElementById('coursePreview').innerText = e.target.value || "______________________";
+    });
+    document.getElementById('printBtn').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; 
+        logReceiptData();
+        syncPrintPreviews();
+        window.print();
+    });
+    document.getElementById('clearForm').addEventListener('click', () => {
+        if(confirm("Are you sure you want to reset the form?")) {
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('course').value = '';
+            document.getElementById('year').value = '';
+            document.getElementById('yearDetails').value = '';
+            document.getElementById('paidAmount').value = '';
+            document.getElementById('words').value = '';
+            document.getElementById('transactionId').value = '';
+            document.getElementById('installment').value = '';
+            document.getElementById('remarks').value = '';
+            document.getElementById('studentNamePreview').innerText = "______________________";
+            document.getElementById('coursePreview').innerText = "______________________";
+        }
+    });
+
+    function updateLiveLedgerDisplay() {
+        const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        const tbody = document.getElementById('ledgerBody');
+        tbody.innerHTML = '';
+
+        if(currentRecords.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No records captured yet.</td></tr>`;
+            return;
         }
 
-        // --- 4. ACTION INTERACTION LISTENERS ---
-        document.getElementById('phone').addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        currentRecords.forEach((rec, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${rec.receiptNo}</td>
+                <td>${rec.studentName}</td>
+                <td>${rec.course}</td>
+                <td>₹${rec.paidAmount}</td>
+                <td>${rec.paymentMode}</td>
+                <td><button class="delete-btn" onclick="deleteLedgerRow(${index})"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
         });
+    }
 
-        document.getElementById('paidAmount').addEventListener('input', (e) => {
-            const val = parseInt(e.target.value, 10);
-            if (!isNaN(val) && val >= 0) {
-                document.getElementById('words').value = convertNumberToWords(val);
-            } else {
-                document.getElementById('words').value = '';
-            }
-        });
+    window.deleteLedgerRow = function(index) {
+        let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        currentRecords.splice(index, 1);
+        localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
+        updateLiveLedgerDisplay();
+    };
 
-        document.getElementById('name').addEventListener('input', (e) => {
-            document.getElementById('lblStudentName').innerText = e.target.value.trim() || "______________________";
-        });
+    function logReceiptData() {
+        const record = {
+            receiptNo: document.getElementById('receiptNo').value || 'N/A',
+            studentName: document.getElementById('name').value || 'N/A',
+            course: document.getElementById('course').value || 'N/A',
+            paidAmount: document.getElementById('paidAmount').value || '0',
+            paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
+        };
 
-        document.getElementById('course').addEventListener('change', (e) => {
-            document.getElementById('lblCourseName').innerText = e.target.value || "______________________";
-        });
+        let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        currentRecords.push(record);
+        localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
+        updateLiveLedgerDisplay();
+    }
 
-        // --- 5. EXPORT AND ACTION EVENT BUTTON HANDLERS ---
-        document.getElementById('printBtn').addEventListener('click', () => {
-            if (!validateReceiptForm()) return;
-            syncPrintPreviews();
-            window.print();
-        });
-
-        document.getElementById('download').addEventListener('click', () => {
-            if (!validateReceiptForm()) return;
-            syncPrintPreviews();
+    document.getElementById('download').addEventListener('click', () => {
+        if (!validateReceiptForm()) return; 
+        
+        logReceiptData();
+        syncPrintPreviews();
+        const { jsPDF } = window.jspdf;
+        const receiptElement = document.getElementById('receipt');
+        
+        document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
+        
+        html2canvas(receiptElement, { scale: 2, useCORS: true }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('l', 'mm', 'a4');
+            pdf.addImage(imgData, 'PNG', 5, 5, 287, 200);
+            pdf.save(`Receipt-${document.getElementById('receiptNo').value}.pdf`);
             
-            document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
-            
-            html2canvas(document.getElementById('receipt'), { scale: 3, useCORS: true }).then(canvas => {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('l', 'mm', 'a4');
-                pdf.addImage(canvas.toDataURL('image/png', 1.0), 'PNG', 5, 5, 287, (canvas.height * 287) / canvas.width);
-                pdf.save(`Receipt-${document.getElementById('receiptNo').value}.pdf`);
-                
-                document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = '');
-                document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = '');
+            document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
+        });
+    });
+
+    document.getElementById('exportExcel').addEventListener('click', () => {
+        const records = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        
+        if (records.length === 0) {
+            alert("⚠️ There are no captured records to export yet!");
+            return;
+        }
+
+        const dynamicDataRows = records.map(item => ({
+            "Receipt Number": item.receiptNo,
+            "Student Name": item.studentName,
+            "Registered Course": item.course,
+            "Amount Paid (INR)": Number(item.paidAmount),
+            "Payment Mode": item.paymentMode
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(dynamicDataRows);
+        const workbook = XLSX.utils.book_new();
+        
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Batch Records Ledger");
+
+        const maxColumnsWidth = Object.keys(dynamicDataRows[0]).map(key => {
+            let maxLen = key.length;
+            dynamicDataRows.forEach(row => {
+                const valStr = row[key] ? row[key].toString() : '';
+                if(valStr.length > maxLen) maxLen = valStr.length;
             });
+            return { wch: maxLen + 3 };
         });
+        worksheet['!cols'] = maxColumnsWidth;
 
-        document.getElementById('clearForm').addEventListener('click', () => {
-            if (confirm("Are you sure you want to reset the form?")) {
-                document.querySelectorAll('input, select, textarea').forEach(el => {
-                    if (el.type === 'radio') {
-                        if (el.value === 'Cash') el.checked = true;
-                    } else {
-                        el.value = '';
-                    }
-                });
-                document.getElementById('lblStudentName').innerText = "______________________";
-                document.getElementById('lblCourseName').innerText = "______________________";
-            }
-        });
-    </script>
+        XLSX.writeFile(workbook, "Academy_Batch_Ledger_Records.xlsx");
+    });
+
+    updateLiveLedgerDisplay();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alagappa Performing Arts Academy Fee Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root { --primary-blue: #0b407b; --accent-gold: #cca43b; --text-dark: #1e293b; --bg-light: #f8fafc; --border-color: #cbd5e1; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f0f4f8; padding: 20px; min-height: 100vh; }
+        .page { max-width: 900px; margin: auto; }
+        #receipt { background: #fff; padding: 25px; border: 3px solid var(--primary-blue); border-radius: 12px; margin-bottom: 20px; }
+        .landscape-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .field { display: flex; align-items: center; border: 2px solid var(--primary-blue); border-radius: 30px; padding: 5px 15px; margin-bottom: 8px; background: #fff; }
+        .full { width: 100%; margin-bottom: 8px; }
+        label { font-size: 11px; font-weight: 800; color: var(--primary-blue); text-transform: uppercase; padding-right: 10px; min-width: 75px; border-right: 2px solid #e2e8f0; }
+        input, select, textarea { border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-dark); outline: none; width: 100%; }
+        .print-text-preview { display: none; font-weight: 600; color: var(--text-dark); }
+        .buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: 700; }
+        .ledger-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .ledger-table th { background: var(--primary-blue); color: white; padding: 10px; }
+        .ledger-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div id="receipt">
+        <h3>Alagappa Performing Arts Academy</h3>
+        <div class="receipt-number">Receipt No: <input type="text" id="receiptNo" value="APA-2026-0001"></div>
+        
+        <div class="landscape-grid">
+            <div class="grid-column">
+                <div class="field"><label>Name</label><input type="text" id="name"><span class="print-text-preview" id="print_name"></span></div>
+                <div class="field"><label>Phone</label><input type="text" id="phone"><span class="print-text-preview" id="print_phone"></span></div>
+                <div class="field"><label>Course</label><select id="course"><option value="Diploma">Diploma</option></select><span class="print-text-preview" id="print_course"></span></div>
+                <div class="field"><label>Year</label><select id="year"><option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option></select><span class="print-text-preview" id="print_Year"></span></div>
+            </div>
+            <div class="grid-column">
+                <div class="field full"><label>Amount</label><input type="number" id="paidAmount"><span class="print-text-preview" id="print_paidAmount"></span></div>
+                <div class="field full"><label>In Words</label><input type="text" id="words" readonly><span class="print-text-preview" id="print_words"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="download" style="background:var(--primary-blue)">Download PDF</button>
+        <button id="printBtn" style="background:var(--accent-gold)">Print</button>
+        <button id="clearForm" style="background:#ef4444">Clear Form</button>
+    </div>
+
+    <table class="ledger-table" id="ledgerBody"></table>
+</div>
+
+<script>
+    function convertNumberToWords(amount) { /* Your existing word conversion logic */ return amount + " only"; }
+
+    function syncPrintPreviews() {
+        document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
+        document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
+        document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
+        document.getElementById('print_Year').innerText = document.getElementById('year').value || 'N/A';
+        document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
+        document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
+    }
+
+    document.getElementById('clearForm').addEventListener('click', () => {
+        if(confirm("Reset form?")) {
+            document.querySelectorAll('input, select').forEach(el => el.value = '');
+            document.querySelectorAll('.print-text-preview').forEach(el => el.innerText = '');
+        }
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => {
+        syncPrintPreviews();
+        window.print();
+    });
+
+    // Add your existing logReceiptData and event listener logic here...
+</script>
 </body>
 </html>
