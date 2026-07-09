@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academy Fee Receipt System</title>
     
-    <!-- External Dependencies for Icons and Canvas/PDF Exports -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -552,10 +551,8 @@
 </head>
 <body>
 
-    <!-- MAIN RECEIPT FORM DISPLAY BODY -->
     <div id="receipt" class="receipt-card">
         
-        <!-- INSTITUTIONAL BRANDING HEADER BANNER PANEL -->
         <div class="brand-banner">
             <div class="brand-left">
                 <div class="logo-placeholder">
@@ -583,7 +580,6 @@
             </div>
         </div>
         
-        <!-- Sub Header Document Row -->
         <div class="receipt-header">
             <div class="receipt-title">Fee Receipt</div>
             <div class="receipt-meta-block">
@@ -595,21 +591,17 @@
             </div>
         </div>
 
-        <!-- Symmetric Form Two-Column Grid Alignment Box -->
         <div class="receipt-grid">
             
-            <!-- Left Grid Pane: Context Inputs Container -->
             <div class="section-box">
                 <div class="section-header-tag">Student Information</div>
                 
-                <!-- Name Row Field Box -->
                 <div class="pill-row" id="row_name">
                     <div class="pill-label">NAME</div>
                     <input type="text" id="name" class="pill-input-field" placeholder="Enter Student Name">
                     <span id="print_name" class="print-text-preview"></span>
                 </div>
 
-                <!-- Phone Row Field Box -->
                 <div class="pill-row" id="row_phone">
                     <div class="pill-label">PHONE</div>
                     <input type="text" id="phone" class="pill-input-field" placeholder="Phone Number" maxlength="10">
@@ -618,7 +610,6 @@
 
                 <div class="section-header-tag" style="margin-top: 5px;">Course Details</div>
 
-                <!-- Course Dropdown Selection Box -->
                 <div class="pill-row" id="row_course">
                     <div class="pill-label">COURSE</div>
                     <select id="course" class="pill-select-field">
@@ -632,7 +623,6 @@
                     <span id="print_course" class="print-text-preview"></span>
                 </div>
 
-                <!-- Year Dropdown Selection Box -->
                 <div class="pill-row" id="row_year">
                     <div class="pill-label">YEAR</div>
                     <select id="year" class="pill-select-field">
@@ -645,28 +635,23 @@
                 </div>
             </div>
 
-            <!-- Right Grid Pane: Payment Processing Parameters Container -->
             <div class="section-box">
                 <div class="section-header-tag">Payment Details</div>
 
-                <!-- Amount Input Row Field Box -->
                 <div class="pill-row" id="row_paidAmount">
                     <div class="pill-label">AMOUNT PAID ₹</div>
                     <input type="number" id="paidAmount" class="pill-input-field" placeholder="0">
                     <span id="print_paidAmount" class="print-text-preview"></span>
                 </div>
 
-                <!-- Words Amount Text Box -->
                 <div class="pill-row">
                     <div class="pill-label">IN WORDS</div>
                     <input type="text" id="words" class="pill-input-field" placeholder="Amount in words" readonly>
                     <span id="print_words" class="print-text-preview"></span>
                 </div>
 
-                <!-- Inner Multi-Panel Details Wrapper Box -->
                 <div class="payment-inner-flex">
                     
-                    <!-- Selection Mode Choice Box Panel -->
                     <div class="border-panel">
                         <div class="panel-subtitle">Payment Mode</div>
                         <label class="radio-option">
@@ -684,7 +669,6 @@
                         <span id="print_paymentMode" class="print-text-preview"></span>
                     </div>
 
-                    <!-- Meta Data Text Stack Inputs Container Box -->
                     <div class="border-panel">
                         <div class="small-input-stack">
                             <label>TXN / UPI ID</label>
@@ -713,7 +697,6 @@
             </div>
         </div>
 
-        <!-- Declarative Summary Statement & Footer Row Box Section -->
         <div class="receipt-footer-row">
             <div class="thank-you-statement">
                 Received with thanks from <span id="lblStudentName" class="dynamic-underline">______________________</span> towards the course fee for <span id="lblCourseName" class="dynamic-underline">______________________</span> at Alagappa Performing Arts Academy.
@@ -734,7 +717,6 @@
 
     </div>
 
-    <!-- ACTION CONTROL HEADERS -->
     <div class="action-toolbar">
         <button id="download" class="btn"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
         <button id="printBtn" class="btn"><i class="fa-solid fa-print"></i> Print Receipt</button>
@@ -742,7 +724,6 @@
         <button id="clearForm" class="btn"><i class="fa-solid fa-trash-can"></i> Clear Form</button>
     </div>
 
-    <!-- LIVE BATCH RECOVERY LEDGER SYSTEM VISUAL COMPONENT -->
     <div class="ledger-container">
         <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger</div>
         <table class="ledger-table">
@@ -756,12 +737,10 @@
                 </tr>
             </thead>
             <tbody id="ledgerBody">
-                <!-- Records go here -->
-            </tbody>
+                </tbody>
         </table>
     </div>
 
-    <!-- --- JAVASCRIPT LOGIC ENGINE --- -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const downloadBtn = document.getElementById('download');
@@ -821,7 +800,7 @@
                 });
 
                 if (!isValid) {
-                    alert("Action Denied: Please fill out all standard fields before exporting or printing standard layouts.");
+                    alert("Action Denied: Please fill out all fields before processing.");
                 }
 
                 return isValid;
@@ -859,21 +838,25 @@
                 document.getElementById('lblCourseName').innerText = document.getElementById('course').value || "______________________";
             }
 
-            // --- 5. BATCH LOGGING SYSTEM ---
+            // --- 5. FIXED BATCH LOGGING SYSTEM (SAVES CURRENT VALUE BEFORE STEPPING SEQUENCE) ---
             function logReceiptData() {
+                // Read what's CURRENTLY printed in the field
+                const activeReceiptNo = document.getElementById('receiptNo').value;
+
                 const record = {
-                    receiptNo: document.getElementById('receiptNo')?.value || 'N/A',
-                    studentName: document.getElementById('name')?.value || 'N/A',
-                    course: document.getElementById('course')?.value || 'N/A',
-                    paidAmount: document.getElementById('paidAmount')?.value || '0',
+                    receiptNo: activeReceiptNo,
+                    studentName: document.getElementById('name').value || 'N/A',
+                    course: document.getElementById('course').value || 'N/A',
+                    paidAmount: document.getElementById('paidAmount').value || '0',
                     paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
                 };
+
                 let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
                 currentRecords.push(record);
                 localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
                 
                 updateLiveLedgerDisplay();
-                updateReceiptNumberSequence(); // Trigger auto-increment immediately after save
+                updateReceiptNumberSequence(); // Safely increments to the NEXT value for the next transaction
             }
 
             function updateLiveLedgerDisplay() {
@@ -885,7 +868,7 @@
                 
                 currentRecords.forEach((rec) => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${rec.receiptNo}</td><td>${rec.studentName}</td><td>${rec.course}</td><td>₹${rec.paidAmount}</td><td>${rec.paymentMode}</td>`;
+                    tr.innerHTML = `<td><b>${rec.receiptNo}</b></td><td>${rec.studentName}</td><td>${rec.course}</td><td>₹${rec.paidAmount}</td><td>${rec.paymentMode}</td>`;
                     tbody.appendChild(tr);
                 });
             }
@@ -912,7 +895,7 @@
                 document.getElementById('lblCourseName').innerText = e.target.value || "______________________";
             });
 
-            // --- 7. DOWNLOAD PDF BUTTON LOGIC ENGINE ---
+            // --- 7. DOWNLOAD PDF BUTTON LOGIC ---
             downloadBtn.addEventListener('click', async () => {
                 if (!checkFormFieldsValid()) return;
 
@@ -946,10 +929,10 @@
                     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
                     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                    const currentReceiptNo = document.getElementById('receiptNo').value || 'Receipt';
+                    const currentReceiptNo = document.getElementById('receiptNo').value;
                     pdf.save(`APA_Receipt_${currentReceiptNo}.pdf`);
 
-                    logReceiptData();
+                    logReceiptData(); // Saved and incremented
                 } catch (err) {
                     console.error(err);
                     alert("Compilation failed.");
@@ -958,18 +941,18 @@
                 }
             });
 
-            // --- 8. PRINT RECEIPT BUTTON LOGIC ENGINE ---
+            // --- 8. PRINT RECEIPT BUTTON LOGIC ---
             printBtn.addEventListener('click', () => {
                 if (!checkFormFieldsValid()) return;
 
                 syncPrintPreviews();
-                logReceiptData();
+                logReceiptData(); // Saved and incremented
                 setTimeout(() => {
                     window.print();
                 }, 150);
             });
 
-            // --- 9. EXCEL EXPORT LEDGER LOGIC ENGINE ---
+            // --- 9. EXCEL EXPORT LEDGER ---
             document.getElementById('exportExcel').addEventListener('click', () => {
                 const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
                 if (currentRecords.length === 0) return alert("There are no captured records to export yet!");
@@ -1002,7 +985,7 @@
                         }
                     });
                     document.querySelectorAll('.pill-row').forEach(row => row.classList.remove('validation-error'));
-                    updateReceiptNumberSequence(); // Keep sequence correct even when form is cleared
+                    updateReceiptNumberSequence();
                     document.getElementById('lblStudentName').innerText = "______________________";
                     document.getElementById('lblCourseName').innerText = "______________________";
                 }
