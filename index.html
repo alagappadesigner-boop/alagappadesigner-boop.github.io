@@ -215,7 +215,7 @@
         }
 
         /* Validation Error State */
-        .pill-row.validation-error {
+        .pill-row.validation-error, .border-panel.validation-error {
             border-color: #dc2626 !important;
             background-color: #fef2f2;
         }
@@ -277,6 +277,7 @@
             flex-direction: column;
             gap: 8px;
             position: relative;
+            transition: border-color 0.2s ease;
         }
 
         .panel-subtitle {
@@ -669,7 +670,7 @@
                         <span id="print_paymentMode" class="print-text-preview"></span>
                     </div>
 
-                    <div class="border-panel">
+                    <div class="border-panel" id="panel_meta">
                         <div class="small-input-stack">
                             <label>TXN / UPI ID</label>
                             <input type="text" id="transactionId" class="box-text-input" placeholder="Transaction ID">
@@ -678,7 +679,7 @@
                         <div class="small-input-stack">
                             <label>INSTALLMENT</label>
                             <select id="installment" class="box-select-input">
-                                <option value="" disabled selected hidden></option>
+                                <option value="" disabled selected hidden>Select Type</option>
                                 <option value="Full Payment">Full Payment</option>
                                 <option value="First Installment">First Installment</option>
                                 <option value="Second Installment">Second Installment</option>
@@ -784,7 +785,8 @@
                     { id: 'phone', rowId: 'row_phone' },
                     { id: 'course', rowId: 'row_course' },
                     { id: 'year', rowId: 'row_year' },
-                    { id: 'paidAmount', rowId: 'row_paidAmount' }
+                    { id: 'paidAmount', rowId: 'row_paidAmount' },
+                    { id: 'installment', rowId: 'panel_meta' } // Included installment validation rules here
                 ];
 
                 fieldsToCheck.forEach(field => {
@@ -795,12 +797,15 @@
                         isValid = false;
                         if (rowEl) rowEl.classList.add('validation-error');
                     } else {
-                        if (rowEl) rowEl.classList.remove('validation-error');
+                        if (rowEl && !rowEl.querySelector('.validation-error')) {
+                            // Only remove error state if the fields sharing this element block are sound
+                            rowEl.classList.remove('validation-error');
+                        }
                     }
                 });
 
                 if (!isValid) {
-                    alert("Action Denied: Please fill out all fields before processing.");
+                    alert("Action Denied: Please fill out all required fields, including the Installment option, before processing.");
                 }
 
                 return isValid;
@@ -816,6 +821,11 @@
                     const row = document.getElementById('row_' + id);
                     if (row) row.classList.remove('validation-error');
                 });
+            });
+
+            // Specific clearance target rule configuration for dynamic layout boxes
+            document.getElementById('installment').addEventListener('change', () => {
+                document.getElementById('panel_meta').classList.remove('validation-error');
             });
 
             // --- 4. SYNC UI FORM VALUES TO PRINT PREVIEWS ---
@@ -838,9 +848,8 @@
                 document.getElementById('lblCourseName').innerText = document.getElementById('course').value || "______________________";
             }
 
-            // --- 5. FIXED BATCH LOGGING SYSTEM (SAVES CURRENT VALUE BEFORE STEPPING SEQUENCE) ---
+            // --- 5. FIXED BATCH LOGGING SYSTEM ---
             function logReceiptData() {
-                // Read what's CURRENTLY printed in the field
                 const activeReceiptNo = document.getElementById('receiptNo').value;
 
                 const record = {
@@ -856,7 +865,7 @@
                 localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
                 
                 updateLiveLedgerDisplay();
-                updateReceiptNumberSequence(); // Safely increments to the NEXT value for the next transaction
+                updateReceiptNumberSequence();
             }
 
             function updateLiveLedgerDisplay() {
@@ -932,7 +941,7 @@
                     const currentReceiptNo = document.getElementById('receiptNo').value;
                     pdf.save(`APA_Receipt_${currentReceiptNo}.pdf`);
 
-                    logReceiptData(); // Saved and incremented
+                    logReceiptData();
                 } catch (err) {
                     console.error(err);
                     alert("Compilation failed.");
@@ -946,7 +955,7 @@
                 if (!checkFormFieldsValid()) return;
 
                 syncPrintPreviews();
-                logReceiptData(); // Saved and incremented
+                logReceiptData();
                 setTimeout(() => {
                     window.print();
                 }, 150);
@@ -984,7 +993,7 @@
                             el.value = '';
                         }
                     });
-                    document.querySelectorAll('.pill-row').forEach(row => row.classList.remove('validation-error'));
+                    document.querySelectorAll('.pill-row, .border-panel').forEach(row => row.classList.remove('validation-error'));
                     updateReceiptNumberSequence();
                     document.getElementById('lblStudentName').innerText = "______________________";
                     document.getElementById('lblCourseName').innerText = "______________________";
