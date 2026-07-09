@@ -1,35 +1,52 @@
-// SIMPLE TEST PDF DOWNLOAD - Replace only this part
-document.getElementById('download').addEventListener('click', async () => {
-    if (!validateReceiptForm()) return;
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadBtn = document.getElementById('download');
+    const printBtn = document.getElementById('printBtn');
 
-    alert("✅ Button clicked! Starting PDF generation...");
+    // 1. DOWNLOAD PDF FUNCTION
+    downloadBtn.addEventListener('click', async () => {
+        if (typeof validateReceiptForm === 'function' && !validateReceiptForm()) return;
 
-    try {
-        syncPrintPreviews();
+        // Ensure text previews are synced before capture
+        if (typeof syncPrintPreviews === 'function') syncPrintPreviews();
 
         const receipt = document.getElementById('receipt');
+
+        try {
+            // Add a slight delay to ensure UI is ready
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const canvas = await html2canvas(receipt, { 
+                scale: 2, 
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' for Landscape
+            const imgData = canvas.toDataURL('image/png');
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            
+            const receiptNo = document.getElementById('receiptNo')?.value || 'Receipt';
+            pdf.save(`APA_Receipt_${receiptNo}.pdf`);
+        } catch (err) {
+            console.error("PDF Generation Error:", err);
+            alert("Failed to generate PDF. Check console for details.");
+        }
+    });
+
+    // 2. PRINT RECEIPT FUNCTION
+    printBtn.addEventListener('click', () => {
+        if (typeof validateReceiptForm === 'function' && !validateReceiptForm()) return;
         
-        document.querySelectorAll('input, select, textarea').forEach(el => {
-            if (!el.closest('.buttons')) el.style.display = 'none';
-        });
-        document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'inline-block');
-
-        const canvas = await html2canvas(receipt, { scale: 2 });
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const width = pdf.internal.pageSize.getWidth();
-        const height = (canvas.height * width) / canvas.width;
-
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, width, height);
-        pdf.save(`APA_Receipt_${document.getElementById('receiptNo').value || 'TEST'}.pdf`);
-
-        // Restore
-        document.querySelectorAll('input, select, textarea').forEach(el => el.style.display = '');
-        document.querySelectorAll('.print-text-preview').forEach(el => el.style.display = 'none');
-
-    } catch (err) {
-        console.error(err);
-        alert("Error: " + err.message);
-    }
+        // Sync previews so the print-ready text is visible
+        if (typeof syncPrintPreviews === 'function') syncPrintPreviews();
+        
+        // Triggers the browser print dialog
+        // The @media print CSS in your style sheet will handle hiding buttons
+        window.print();
+    });
 });
