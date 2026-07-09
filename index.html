@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academy Fee Receipt System - Secure Admin Panel</title>
     
-    <!-- External Dependencies for Icons and Canvas/PDF Exports -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -213,12 +212,6 @@
             height: 44px;
             overflow: hidden;
             transition: border-color 0.2s ease;
-        }
-
-        /* Validation Error State */
-        .pill-row.validation-error, .border-panel.validation-error {
-            border-color: #dc2626 !important;
-            background-color: #fef2f2;
         }
 
         .pill-label {
@@ -607,10 +600,8 @@
 </head>
 <body>
 
-    <!-- MAIN RECEIPT FORM DISPLAY BODY -->
     <div id="receipt" class="receipt-card">
         
-        <!-- INSTITUTIONAL BRANDING HEADER BANNER PANEL -->
         <div class="brand-banner">
             <div class="brand-left">
                 <div class="logo-placeholder">
@@ -638,7 +629,6 @@
             </div>
         </div>
         
-        <!-- Sub Header Document Row -->
         <div class="receipt-header">
             <div class="receipt-title">Fee Receipt</div>
             <div class="receipt-meta-block">
@@ -650,21 +640,17 @@
             </div>
         </div>
 
-        <!-- Symmetric Form Two-Column Grid Alignment Box -->
         <div class="receipt-grid">
             
-            <!-- Left Grid Pane: Context Inputs Container -->
             <div class="section-box">
                 <div class="section-header-tag">Student Information</div>
                 
-                <!-- Name Row Field Box -->
                 <div class="pill-row" id="row_name">
                     <div class="pill-label">NAME</div>
                     <input type="text" id="name" class="pill-input-field" placeholder="Enter Student Name">
                     <span id="print_name" class="print-text-preview"></span>
                 </div>
 
-                <!-- Phone Row Field Box -->
                 <div class="pill-row" id="row_phone">
                     <div class="pill-label">PHONE</div>
                     <input type="text" id="phone" class="pill-input-field" placeholder="Phone Number" maxlength="10">
@@ -673,7 +659,6 @@
 
                 <div class="section-header-tag" style="margin-top: 5px;">Course Details</div>
 
-                <!-- Course Dropdown Selection Box -->
                 <div class="pill-row" id="row_course">
                     <div class="pill-label">COURSE</div>
                     <select id="course" class="pill-select-field">
@@ -687,7 +672,6 @@
                     <span id="print_course" class="print-text-preview"></span>
                 </div>
 
-                <!-- Year Dropdown Selection Box -->
                 <div class="pill-row" id="row_year">
                     <div class="pill-label">YEAR</div>
                     <select id="year" class="pill-select-field">
@@ -700,28 +684,23 @@
                 </div>
             </div>
 
-            <!-- Right Grid Pane: Payment Processing Parameters Container -->
             <div class="section-box">
                 <div class="section-header-tag">Payment Details</div>
 
-                <!-- Amount Input Row Field Box -->
                 <div class="pill-row" id="row_paidAmount">
                     <div class="pill-label">AMOUNT PAID ₹</div>
                     <input type="number" id="paidAmount" class="pill-input-field" placeholder="0">
                     <span id="print_paidAmount" class="print-text-preview"></span>
                 </div>
 
-                <!-- Words Amount Text Box -->
                 <div class="pill-row">
                     <div class="pill-label">IN WORDS</div>
                     <input type="text" id="words" class="pill-input-field" placeholder="Amount in words" readonly>
                     <span id="print_words" class="print-text-preview"></span>
                 </div>
 
-                <!-- Inner Multi-Panel Details Wrapper Box -->
                 <div class="payment-inner-flex">
                     
-                    <!-- Selection Mode Choice Box Panel -->
                     <div class="border-panel">
                         <div class="panel-subtitle">Payment Mode</div>
                         <label class="radio-option">
@@ -739,7 +718,6 @@
                         <span id="print_paymentMode" class="print-text-preview"></span>
                     </div>
 
-                    <!-- Meta Data Text Stack Inputs Container Box -->
                     <div class="border-panel" id="panel_meta">
                         <div class="small-input-stack">
                             <label>TXN / UPI ID</label>
@@ -768,7 +746,6 @@
             </div>
         </div>
 
-        <!-- Summary Footer Row Box Section -->
         <div class="receipt-footer-row">
             <div class="thank-you-statement">
                 Received with thanks from <span id="lblStudentName" class="dynamic-underline">______________________</span> towards the course fee for <span id="lblCourseName" class="dynamic-underline">______________________</span> at Alagappa Performing Arts Academy.
@@ -789,7 +766,6 @@
 
     </div>
 
-    <!-- SEPARATED ACTION CONTROL GATEWAY -->
     <div class="secure-action-gateway">
         <div class="gateway-header">
             <div class="gateway-title">
@@ -808,7 +784,6 @@
         </div>
     </div>
 
-    <!-- LIVE BATCH RECOVERY LEDGER SYSTEM VISUAL COMPONENT -->
     <div class="ledger-container">
         <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger</div>
         <table class="ledger-table">
@@ -822,19 +797,17 @@
                 </tr>
             </thead>
             <tbody id="ledgerBody">
-                <!-- Records go here -->
-            </tbody>
+                </tbody>
         </table>
     </div>
 
-    <!-- --- JAVASCRIPT LOGIC ENGINE --- -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const downloadBtn = document.getElementById('download');
             const printBtn = document.getElementById('printBtn');
             const lockStatus = document.getElementById('lockStatus');
             
-            // Administrative Security Flag (Defaults to locked - strictly controls ledger history erasures)
+            // Administrative Security Flag (Strictly guards ledger wiping tasks)
             let sessionIsUnlocked = false; 
 
             // Click security badge widget to toggle authorization
@@ -883,54 +856,7 @@
                 return str.trim() + ' Only';
             }
 
-            // --- 3. FORM VALIDATION ENGINE (Unrestricted Workflow) ---
-            function checkFormFieldsValid() {
-                let isValid = true;
-                const fieldsToCheck = [
-                    { id: 'name', rowId: 'row_name' },
-                    { id: 'phone', rowId: 'row_phone' },
-                    { id: 'course', rowId: 'row_course' },
-                    { id: 'year', rowId: 'row_year' },
-                    { id: 'paidAmount', rowId: 'row_paidAmount' },
-                    { id: 'installment', rowId: 'panel_meta' }
-                ];
-
-                fieldsToCheck.forEach(field => {
-                    const el = document.getElementById(field.id);
-                    const rowEl = document.getElementById(field.rowId);
-                    
-                    if (!el.value || el.value.trim() === "" || el.value === "0") {
-                        isValid = false;
-                        if (rowEl) rowEl.classList.add('validation-error');
-                    } else {
-                        if (rowEl) rowEl.classList.remove('validation-error');
-                    }
-                });
-
-                if (!isValid) {
-                    alert("Action Denied: Please complete all structural input fields before generating your sheet profile.");
-                }
-
-                return isValid;
-            }
-
-            // Interactive focus cleanup triggers
-            ['name', 'phone', 'course', 'year', 'paidAmount'].forEach(id => {
-                document.getElementById(id).addEventListener('input', () => {
-                    const row = document.getElementById('row_' + id);
-                    if (row) row.classList.remove('validation-error');
-                });
-                document.getElementById(id).addEventListener('change', () => {
-                    const row = document.getElementById('row_' + id);
-                    if (row) row.classList.remove('validation-error');
-                });
-            });
-
-            document.getElementById('installment').addEventListener('change', () => {
-                document.getElementById('panel_meta').classList.remove('validation-error');
-            });
-
-            // --- 4. SYNC UI FORM VALUES TO PRINT PREVIEWS ---
+            // --- 3. SYNC UI FORM VALUES TO PRINT PREVIEWS ---
             function syncPrintPreviews() {
                 document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
                 document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
@@ -950,7 +876,7 @@
                 document.getElementById('lblCourseName').innerText = document.getElementById('course').value || "______________________";
             }
 
-            // --- 5. BATCH LOGGING SYSTEM ---
+            // --- 4. BATCH LOGGING SYSTEM ---
             function logReceiptData() {
                 const activeReceiptNo = document.getElementById('receiptNo').value;
 
@@ -1006,10 +932,8 @@
                 document.getElementById('lblCourseName').innerText = e.target.value || "______________________";
             });
 
-            // --- 6. DOWNLOAD PDF LOGIC (Instant Execution) ---
+            // --- 5. DOWNLOAD PDF LOGIC (Instant Execution - No Security Wall) ---
             downloadBtn.addEventListener('click', async () => {
-                if (!checkFormFieldsValid()) return;
-
                 syncPrintPreviews();
                 const receipt = document.getElementById('receipt');
 
@@ -1050,10 +974,8 @@
                 }
             });
 
-            // --- 7. PRINT RECEIPT LOGIC (Instant Execution) ---
+            // --- 6. PRINT RECEIPT LOGIC (Instant Execution - No Security Wall) ---
             printBtn.addEventListener('click', () => {
-                if (!checkFormFieldsValid()) return;
-
                 syncPrintPreviews();
                 logReceiptData();
                 setTimeout(() => {
@@ -1061,7 +983,7 @@
                 }, 150);
             });
 
-            // --- 8. EXCEL EXPORT & SECURE LEDGER RESET CLEAR LOOP ---
+            // --- 7. EXCEL EXPORT & SECURE LEDGER RESET CLEAR LOOP ---
             document.getElementById('exportExcel').addEventListener('click', () => {
                 const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
                 if (currentRecords.length === 0) return alert("There are no captured records to export yet!");
@@ -1076,12 +998,12 @@
                 link.download = "Academy_Batch_Ledger_Records.csv";
                 link.click();
                 
-                // --- STRICT SEGREGATION POINT ---
-                // The verification wall only checks when wiping data from the history list panel view
+                // --- ADMIN LOCK POINT ---
+                // The verification wall only triggers here when dropping ledger logs completely
                 setTimeout(() => {
-                    if (confirm("Do you want to delete and clear the history log list from the database table?")) {
+                    if (confirm("Do you want to clear and wipe out the history log table database?")) {
                         if (!sessionIsUnlocked) {
-                            alert("Action Blocked: The batch table history logs cannot be cleared while Secure Mode is active. Click the lock/shield status switch to authorize ledger modification tasks.");
+                            alert("Action Blocked: Captured Batch Records Ledger history can only be dropped while secure mode is unlocked. Click the security badge at the top to clear.");
                         } else {
                             localStorage.removeItem('receiptLogs');
                             updateLiveLedgerDisplay();
@@ -1092,7 +1014,7 @@
                 }, 300);
             });
 
-            // --- 9. RESET FORM FIELD ENTRIES ---
+            // --- 8. RESET FORM FIELD ENTRIES ---
             document.getElementById('clearForm').addEventListener('click', () => {
                 if (confirm("Are you sure you want to clear the active form fields?")) {
                     document.querySelectorAll('input, select, textarea').forEach(el => {
@@ -1102,7 +1024,6 @@
                             el.value = '';
                         }
                     });
-                    document.querySelectorAll('.pill-row, .border-panel').forEach(row => row.classList.remove('validation-error'));
                     updateReceiptNumberSequence();
                     document.getElementById('lblStudentName').innerText = "______________________";
                     document.getElementById('lblCourseName').innerText = "______________________";
