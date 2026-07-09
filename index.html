@@ -1,7 +1,3 @@
-Here is the complete, fully integrated `index.html` file combining your design layout, the updated button positioning underneath the receipt, and the optimized JavaScript logic engine to make downloading and printing work seamlessly.
-
-Delete everything currently inside your `index.html` file, paste this entire block in, and save it.
-
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -407,7 +403,7 @@ Delete everything currently inside your `index.html` file, paste this entire blo
             font-weight: 500;
         }
 
-        /* --- 3. CONTROL BUTTONS TOOLBAR (UNDER THE RECEIPT) --- */
+        /* --- 3. CONTROL BUTTONS TOOLBAR --- */
         .action-toolbar {
             display: flex;
             gap: 15px;
@@ -493,11 +489,16 @@ Delete everything currently inside your `index.html` file, paste this entire blo
             display: none;
         }
 
-        /* --- 4. PRINT STYLE RULES OVERRIDES --- */
+        /* --- 4. PRINT STYLE RULES OVERRIDES & HEADER ELIMINATION --- */
         @media print {
+            @page {
+                size: auto;
+                margin: 5mm 10mm; /* Minimal clean margins to naturally suppress default browser header string injectors */
+            }
             body {
                 background-color: #ffffff;
                 padding: 0;
+                margin: 0;
             }
             .action-toolbar, .ledger-container {
                 display: none !important;
@@ -757,7 +758,6 @@ Delete everything currently inside your `index.html` file, paste this entire blo
                 const checkedPayment = document.querySelector('input[name="payment"]:checked');
                 document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
 
-                // Bottom text snippet updates
                 document.getElementById('lblStudentName').innerText = document.getElementById('name').value.trim() || "______________________";
                 document.getElementById('lblCourseName').innerText = document.getElementById('course').value || "______________________";
             }
@@ -819,7 +819,6 @@ Delete everything currently inside your `index.html` file, paste this entire blo
                 const receipt = document.getElementById('receipt');
 
                 try {
-                    // Temporarily toggle styling configurations for pixel-perfect screenshotting
                     const inputs = receipt.querySelectorAll('input, select, textarea');
                     const previews = receipt.querySelectorAll('.print-text-preview');
                     
@@ -835,7 +834,6 @@ Delete everything currently inside your `index.html` file, paste this entire blo
                         logging: false
                     });
 
-                    // Instantly restore forms visually so user workflow remains uninterrupted
                     inputs.forEach(el => el.style.removeProperty('display'));
                     previews.forEach(el => el.style.removeProperty('display'));
 
@@ -852,10 +850,8 @@ Delete everything currently inside your `index.html` file, paste this entire blo
 
                     logReceiptData();
                 } catch (err) {
-                    console.error("PDF generation failure context tracker:", err);
-                    alert("Compilation failed. Alternatively, use 'Print Receipt' -> 'Save as PDF'.");
-                    
-                    // Fallback restoration
+                    console.error(err);
+                    alert("Compilation failed.");
                     document.querySelectorAll('input, select, textarea').forEach(el => el.style.removeProperty('display'));
                     document.querySelectorAll('.print-text-preview').forEach(el => el.style.removeProperty('display'));
                 }
@@ -907,7 +903,6 @@ Delete everything currently inside your `index.html` file, paste this entire blo
                 }
             });
 
-            // Initialize ledger view on load
             updateLiveLedgerDisplay();
         });
     </script>
