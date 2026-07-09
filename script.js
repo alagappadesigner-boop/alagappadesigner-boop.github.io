@@ -22,10 +22,11 @@ function convertNumberToWords(amount) {
 function validateReceiptForm() {
     const fields = [
         { id: 'receiptNo', name: 'Receipt Number' },
+        { id: 'receiptDate', name: 'Receipt Date' },
+        { id: 'billDate', name: 'Bill Date' },
         { id: 'name', name: 'Student Name' },
         { id: 'phone', name: 'Phone Number' },
         { id: 'course', name: 'Course' },
-        { id: 'year', name: 'Year Details' },
         { id: 'paidAmount', name: 'Amount Paid' },
         { id: 'installment', name: 'Installment' }
     ];
@@ -54,11 +55,20 @@ function validateReceiptForm() {
 
 // --- 3. SYNC: UI TO PRINT VIEW ---
 function syncPrintPreviews() {
+    // Helper function to convert YYYY-MM-DD input value to standard readable DD/MM/YYYY
+    const formatDate = (id) => {
+        const val = document.getElementById(id)?.value;
+        if (!val) return 'N/A';
+        const [y, m, d] = val.split('-');
+        return `${d}/${m}/${y}`;
+    };
+
     document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value;
+    document.getElementById('print_receiptDate').innerText = formatDate('receiptDate');
+    document.getElementById('print_billDate').innerText = formatDate('billDate');
     document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
     document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
     document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
-    document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
     document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + document.getElementById('paidAmount').value : 'N/A';
     document.getElementById('print_words').innerText = document.getElementById('words').value || 'N/A';
     document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
@@ -73,7 +83,8 @@ function syncPrintPreviews() {
 function logReceiptData() {
     const record = {
         receiptNo: document.getElementById('receiptNo')?.value || 'N/A',
-        date: new Date().toLocaleDateString(),
+        receiptDate: document.getElementById('receiptDate')?.value || 'N/A',
+        billDate: document.getElementById('billDate')?.value || 'N/A',
         studentName: document.getElementById('name')?.value || 'N/A',
         phone: document.getElementById('phone')?.value || 'N/A',
         course: document.getElementById('course')?.value || 'N/A',
@@ -153,9 +164,9 @@ document.getElementById('exportExcel').addEventListener('click', () => {
     const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
     if (currentRecords.length === 0) return alert("⚠️ There are no captured records to export yet!");
     
-    let csv = "Receipt No,Date,Student Name,Phone,Course,Amount Paid,Payment Mode\n";
+    let csv = "Receipt No,Receipt Date,Bill Date,Student Name,Phone,Course,Amount Paid,Payment Mode\n";
     currentRecords.forEach(r => {
-        csv += `"${r.receiptNo}","${r.date}","${r.studentName}","${r.phone}","${r.course}","${r.paidAmount}","${r.paymentMode}"\n`;
+        csv += `"${r.receiptNo}","${r.receiptDate}","${r.billDate}","${r.studentName}","${r.phone}","${r.course}","${r.paidAmount}","${r.paymentMode}"\n`;
     });
     
     const link = document.createElement("a");
@@ -178,8 +189,20 @@ document.getElementById('clearForm').addEventListener('click', () => {
                 el.value = '';
             }
         });
+        // Auto-reset dates back to today after clearing
+        setInitialDates();
     }
 });
 
-// Initialize Display View
-updateLiveLedgerDisplay();
+// --- 8. AUTO SET INITIAL DATES ON LOAD ---
+function setInitialDates() {
+    const today = new Date().toISOString().split('T')[0];
+    if (document.getElementById('receiptDate')) document.getElementById('receiptDate').value = today;
+    if (document.getElementById('billDate')) document.getElementById('billDate').value = today;
+}
+
+// Initialize View Engine Elements
+window.addEventListener('DOMContentLoaded', () => {
+    setInitialDates();
+    updateLiveLedgerDisplay();
+});
