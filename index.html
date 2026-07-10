@@ -680,17 +680,13 @@
                     BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM
                 </div>
             </div>
-           <div class="contact-container">
+            <div class="contact-container">
                 <div class="contact-item">
                     <span>49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084</span>
                     <i class="fa-solid fa-location-dot"></i>
                 </div>
                 <div class="contact-item">
-                    <span>+91 7358 596403</span>
-                    <i class="fa-solid fa-phone"></i>
-                </div>
-                <div class="contact-item">
-                    <span>vaishnavi@alagappaarts.com</span>
+                    <span>Vaishnavi@alagappaarts.com</span>
                     <i class="fa-solid fa-envelope"></i>
                 </div>
             </div>
@@ -699,7 +695,7 @@
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
-                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APAA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
+                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
                 <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input system-locked-field" style="width:110px;" placeholder="DD/MM/YYYY" readonly tabindex="-1"><span id="print_receiptDate" class="print-preview-label"></span></span>
             </div>
         </div>
@@ -741,9 +737,11 @@
                     <div class="field-container">
                         <select id="course" class="doc-select">
                             <option value="" disabled selected hidden>Select Course</option>
-                            <option value="Bachelor's in Bharathanatyam">Bachelor in Bharathanatyam</option>
-                            <option value="Diploma in Bharathanatyam">Diploma in Bharathanatyam</option>
-                            <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
+                            <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
+                            <option value="Carnatic Vocal">Carnatic Vocal</option>
+                            <option value="Keyboard">Keyboard</option>
+                            <option value="Drawing">Drawing</option>
+                            <option value="Abacus">Abacus</option>
                         </select>
                         <span id="print_course" class="print-preview-label"></span>
                     </div>
@@ -951,7 +949,7 @@
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             const nextSequenceNumber = currentRecords.length + 1;
             const formattedNumber = String(nextSequenceNumber).padStart(4, '0');
-            document.getElementById('receiptNo').value = `APAA-2026-${formattedNumber}`;
+            document.getElementById('receiptNo').value = `APA-2026-${formattedNumber}`;
         }
 
         // --- 2. NUMBER TO WORDS TRANSLATION CONVERTER ---
@@ -1060,9 +1058,21 @@
             document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
         }
 
-        // --- 6. DATA LOGGING FOR BATCH TRACKING ---
+        // --- 6. CHECK FOR REPLICATED ENTRY DUPLICATES ---
+        function isDuplicateRecord(targetReceiptNo) {
+            const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+            // Scans local collection array to find matching receipt number tokens
+            return currentRecords.some(record => record.receiptNo === targetReceiptNo);
+        }
+
+        // --- 7. DATA LOGGING FOR BATCH TRACKING ---
         function logReceiptData() {
             const activeReceiptNo = document.getElementById('receiptNo').value;
+
+            // Extra validation layers ensuring runtime storage operations do not duplicate logs
+            if (isDuplicateRecord(activeReceiptNo)) {
+                return false;
+            }
 
             const record = {
                 receiptNo: activeReceiptNo,
@@ -1078,6 +1088,7 @@
             
             updateLiveLedgerDisplay();
             updateReceiptNumberSequence();
+            return true;
         }
 
         function updateLiveLedgerDisplay() {
@@ -1115,9 +1126,15 @@
             }
         });
 
-        // --- 7. INSTANT OPEN DOWNLOAD PDF ENGINE ---
+        // --- 8. INSTANT OPEN DOWNLOAD PDF ENGINE ---
         downloadBtn.addEventListener('click', async () => {
             if (!runReceiptFormValidation()) return;
+
+            const activeReceiptNo = document.getElementById('receiptNo').value;
+            if (isDuplicateRecord(activeReceiptNo)) {
+                alert("Duplicate record detected. This payment has already been recorded.");
+                return;
+            }
 
             syncPrintPreviews();
             const targetElement = document.getElementById('receiptBlock');
@@ -1154,11 +1171,8 @@
                 
                 // --- CUSTOM FILE NAMING CONFIGURATION ENGINE ---
                 const rawStudentName = document.getElementById('name').value.trim();
-                // Strip whitespace and clean characters for safe file storage limits
                 const cleanedStudentName = rawStudentName.replace(/[^a-zA-Z0-9]/g, '');
-                
-                const fullReceiptNo = document.getElementById('receiptNo').value; // e.g., "APAA-2026-0001"
-                const lastFourDigits = fullReceiptNo.slice(-4); // Pulls out "0001"
+                const lastFourDigits = activeReceiptNo.slice(-4);
                 
                 pdf.save(`${cleanedStudentName}_${lastFourDigits}.pdf`);
 
@@ -1169,9 +1183,15 @@
             }
         });
 
-        // --- 8. PRINT CAPABILITY CONTROLLER ENGINE ---
+        // --- 9. PRINT CAPABILITY CONTROLLER ENGINE ---
         printBtn.addEventListener('click', () => {
             if (!runReceiptFormValidation()) return;
+
+            const activeReceiptNo = document.getElementById('receiptNo').value;
+            if (isDuplicateRecord(activeReceiptNo)) {
+                alert("Duplicate record detected. This payment has already been recorded.");
+                return;
+            }
 
             syncPrintPreviews();
             logReceiptData();
@@ -1180,7 +1200,7 @@
             }, 150);
         });
 
-        // --- 9. BATCH LEDGER EXPORT LOGIC & PIN SECURED WIPE HOOK ---
+        // --- 10. BATCH LEDGER EXPORT LOGIC & PIN SECURED WIPE HOOK ---
         document.getElementById('exportExcel').addEventListener('click', () => {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             if (currentRecords.length === 0) return alert("There are no captured ledger logs available to compile!");
@@ -1209,7 +1229,7 @@
             }, 300);
         });
 
-        // --- 10. STRUCTURAL ENTRY FIELD RESET ---
+        // --- 11. STRUCTURAL ENTRY FIELD RESET ---
         document.getElementById('clearForm').addEventListener('click', () => {
             if (confirm("Are you sure you want to clear the active form inputs?")) {
                 document.querySelectorAll('input, select, textarea').forEach(el => {
