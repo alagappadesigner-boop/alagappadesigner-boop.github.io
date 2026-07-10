@@ -136,7 +136,7 @@
             padding-left: 20px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         .contact-item {
@@ -144,6 +144,7 @@
             align-items: center;
             justify-content: flex-end;
             gap: 6px;
+            line-height: 1.4;
         }
 
         .contact-item i {
@@ -197,6 +198,18 @@
 
         .meta-inline-input:focus {
             border-bottom-color: var(--brand-gold);
+        }
+
+        /* Non-editable system field adjustments */
+        .system-locked-field {
+            cursor: default;
+            user-select: none;
+            pointer-events: none;
+            color: var(--text-muted);
+        }
+
+        .system-locked-field:focus {
+            border-bottom-color: transparent !important;
         }
 
         /* --- Structural Input Cards Grid Layout --- */
@@ -673,11 +686,7 @@
                     <i class="fa-solid fa-location-dot"></i>
                 </div>
                 <div class="contact-item">
-                    <span>+91 99419 25769</span>
-                    <i class="fa-solid fa-phone"></i>
-                </div>
-                <div class="contact-item">
-                    <span>info@alagappaacademy.com</span>
+                    <span>Vaishnavi@alagappaarts.com</span>
                     <i class="fa-solid fa-envelope"></i>
                 </div>
             </div>
@@ -686,8 +695,8 @@
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
-                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input" placeholder="APA-2026-0001" readonly><span id="print_receiptNo" class="print-preview-label"></span></span>
-                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input" style="width:110px;" placeholder="DD/MM/YYYY"><span id="print_receiptDate" class="print-preview-label"></span></span>
+                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
+                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input system-locked-field" style="width:110px;" placeholder="DD/MM/YYYY" readonly tabindex="-1"><span id="print_receiptDate" class="print-preview-label"></span></span>
             </div>
         </div>
 
@@ -838,7 +847,7 @@
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
-                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:45 AM</span><br>
+                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 11:31 AM</span><br>
                     <strong>Secure Mode:</strong> Active System Gateway
                 </div>
             </div>
@@ -910,6 +919,7 @@
         const now = new Date();
         const dateString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
         
+        // Receipt Date is fully assigned and systematically managed here
         document.getElementById('receiptDate').value = dateString;
         document.getElementById('paymentDate').value = dateString;
 
@@ -1139,8 +1149,16 @@
                 const pdfHeight = (canvas.height * useWidth) / canvas.width;
 
                 pdf.addImage(imgData, 'PNG', paddingSpace, paddingSpace, useWidth, pdfHeight);
-                const currentReceiptNo = document.getElementById('receiptNo').value;
-                pdf.save(`Receipt_${currentReceiptNo}.pdf`);
+                
+                // --- CUSTOM FILE NAMING CONFIGURATION ENGINE ---
+                const rawStudentName = document.getElementById('name').value.trim();
+                // Strip whitespace and clean characters for safe file storage limits
+                const cleanedStudentName = rawStudentName.replace(/[^a-zA-Z0-9]/g, '');
+                
+                const fullReceiptNo = document.getElementById('receiptNo').value; // e.g., "APA-2026-0001"
+                const lastFourDigits = fullReceiptNo.slice(-4); // Pulls out "0001"
+                
+                pdf.save(`${cleanedStudentName}_${lastFourDigits}.pdf`);
 
                 logReceiptData();
             } catch (err) {
@@ -1196,12 +1214,14 @@
                     if (el.type === 'radio') {
                         if (el.value === 'Cash') el.checked = true;
                     } else {
-                        el.value = '';
+                        // Skip rewriting locked system constants
+                        if (el.id !== 'receiptNo' && el.id !== 'receiptDate') {
+                            el.value = '';
+                        }
                     }
                 });
                 countryCodeSelect.value = "+91"; // Reverts selector back to default prefix safely
                 phoneError.style.display = 'none';
-                document.getElementById('receiptDate').value = dateString;
                 document.getElementById('paymentDate').value = dateString;
                 updateReceiptNumberSequence();
             }
