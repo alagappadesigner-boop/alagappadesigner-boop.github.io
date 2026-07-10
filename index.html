@@ -692,10 +692,10 @@
                                 <option value="+65" data-min="8" data-max="8">+65 (SG)</option>
                                 <option value="+971" data-min="9" data-max="9">+971 (UAE)</option>
                             </select>
-                            <input type="text" id="phone" class="doc-input" placeholder="Enter phone number" maxlength="15">
+                            <input type="text" id="phone" class="doc-input" placeholder="Enter phone number" maxlength="25">
                         </div>
                         <span id="print_phone" class="print-preview-label"></span>
-                        <div id="phoneError" class="inline-error-msg"> Please enter a valid mobile number for the selected country.</div>
+                        <div id="phoneError" class="inline-error-msg">Please enter a valid phone number for the selected country.</div>
                     </div>
                 </div>
 
@@ -814,7 +814,7 @@
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
-                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:10 AM</span><br>
+                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:21 AM</span><br>
                     <strong>Secure Mode:</strong> Active System Gateway
                 </div>
             </div>
@@ -938,23 +938,25 @@
             return str.trim() + ' Only';
         }
 
-        // --- 3. DYNAMIC COUNTRY PHONE VALIDATION CHECK POINT ---
+        // --- 3. DYNAMIC SANITIZED COUNTRY PHONE VALIDATION ENGINE ---
         function runLivePhoneVerification() {
-            const phoneVal = phoneInput.value.trim();
+            const rawValue = phoneInput.value;
+            // Strip out formatting elements (spaces, hyphens, parentheses) to measure pure structural digits
+            const sanitizedDigits = rawValue.replace(/[\s\-\(\)]/g, '');
             
-            // If completely empty, hide message but consider invalid for processing
-            if (phoneVal.length === 0) {
+            // If completely empty, hide the text message tracking container but preserve block states
+            if (rawValue.trim().length === 0) {
                 phoneError.style.display = 'none';
                 return false;
             }
 
-            // Extract validation meta from selected item options attributes
+            // Extract minimum and maximum required count metrics from selected options parameters
             const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
             const minLength = parseInt(selectedOption.getAttribute('data-min'), 10);
             const maxLength = parseInt(selectedOption.getAttribute('data-max'), 10);
 
-            // Validate against the specific country's standard constraints
-            if (phoneVal.length < minLength || phoneVal.length > maxLength) {
+            // Check if clean numbers fall perfectly into regional standard windows
+            if (sanitizedDigits.length < minLength || sanitizedDigits.length > maxLength) {
                 phoneError.style.display = 'block';
                 return false;
             } else {
@@ -966,7 +968,6 @@
         // --- 4. FORM INPUT MASTER VALIDATION ENGINE ---
         function runReceiptFormValidation() {
             const name = document.getElementById('name').value.trim();
-            const phone = phoneInput.value.trim();
             const course = document.getElementById('course').value;
             const year = document.getElementById('year').value;
             const paidAmount = document.getElementById('paidAmount').value.trim();
@@ -975,12 +976,12 @@
             const installment = document.getElementById('installment').value;
 
             // 1. Mandatory Field Presence Check
-            if (!name || !phone || !course || !year || !paidAmount || !paymentDate || !receiptDate || !installment) {
+            if (!name || !course || !year || !paidAmount || !paymentDate || !receiptDate || !installment) {
                 alert("Please complete all mandatory fields before printing or downloading the receipt.");
                 return false;
             }
 
-            // 2. Continuous validation validation hook for specific country rules
+            // 2. Strict global phone verification checkout interceptor
             if (!runLivePhoneVerification()) {
                 return false;
             }
@@ -994,8 +995,8 @@
             document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
             document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
             
-            // Combines chosen Country Prefix with dynamic phone digits cleanly
-            const combinedPhone = `${countryCodeSelect.value} ${phoneInput.value}`;
+            // Outputs the string safely as typed with formatting choices included
+            const combinedPhone = `${countryCodeSelect.value} ${phoneInput.value.trim()}`;
             document.getElementById('print_phone').innerText = phoneInput.value ? combinedPhone : 'N/A';
             
             document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
@@ -1047,15 +1048,14 @@
             });
         }
 
-        // Live Event Handling Sanitation Hooks
+        // --- SANITATION CAPABILITIES & ACTION FILTERS ---
         phoneInput.addEventListener('input', (e) => {
-            // Instantly drop any non-numeric character inputs
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-            // Fires dynamic validation lookup
+            // Allows numbers, spaces, hyphens, and brackets. Strips any illegal letters or symbols instantly.
+            e.target.value = e.target.value.replace(/[^0-9\s\-\(\)]/g, '');
+            // Process validation state checks live
             runLivePhoneVerification();
         });
 
-        // Retrigger check instantly if country selector is changed
         countryCodeSelect.addEventListener('change', () => {
             runLivePhoneVerification();
         });
@@ -1165,7 +1165,7 @@
                         el.value = '';
                     }
                 });
-                countryCodeSelect.value = "+91"; // Revert country dropdown selector back to default
+                countryCodeSelect.value = "+91"; // Reverts selector back to default prefix safely
                 phoneError.style.display = 'none';
                 document.getElementById('receiptDate').value = dateString;
                 document.getElementById('paymentDate').value = dateString;
