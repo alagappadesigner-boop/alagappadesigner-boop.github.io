@@ -699,7 +699,7 @@
                                 <option value="+65" data-min="8" data-max="8">+65 (SG)</option>
                                 <option value="+971" data-min="9" data-max="9">+971 (UAE)</option>
                             </select>
-                            <input type="text" id="phone" class="doc-input" placeholder="Enter phone number" maxlength="25">
+                            <input type="text" id="phone" class="doc-input" placeholder="Enter phone number" maxlength="30">
                         </div>
                         <span id="print_phone" class="print-preview-label"></span>
                         <div id="phoneError" class="inline-error-msg">Please enter a valid phone number for the selected country.</div>
@@ -821,7 +821,7 @@
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
-                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:27 AM</span><br>
+                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:35 AM</span><br>
                     <strong>Secure Mode:</strong> Active System Gateway
                 </div>
             </div>
@@ -948,21 +948,22 @@
         // --- 3. DYNAMIC SANITIZED COUNTRY PHONE VALIDATION ENGINE ---
         function runLivePhoneVerification() {
             const rawValue = phoneInput.value;
-            // Strip out formatting elements (spaces, hyphens, parentheses) to measure pure structural digits
-            const sanitizedDigits = rawValue.replace(/[\s\-\(\)]/g, '');
             
-            // If completely empty, hide the text message tracking container but preserve block states
+            // Strip away formatting definitions (plus signs, spaces, hyphens, brackets) to extract only raw index digits
+            const sanitizedDigits = rawValue.replace(/[\+\s\-\(\)]/g, '');
+            
+            // If completely empty, hide message layer but intercept submit states
             if (rawValue.trim().length === 0) {
                 phoneError.style.display = 'none';
                 return false;
             }
 
-            // Extract minimum and maximum required count metrics from selected options parameters
+            // Extract validation length constraints from attributes
             const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
             const minLength = parseInt(selectedOption.getAttribute('data-min'), 10);
             const maxLength = parseInt(selectedOption.getAttribute('data-max'), 10);
 
-            // Check if clean numbers fall perfectly into regional standard windows
+            // Validate numeric structural integrity
             if (sanitizedDigits.length < minLength || sanitizedDigits.length > maxLength) {
                 phoneError.style.display = 'block';
                 return false;
@@ -1002,9 +1003,18 @@
             document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
             document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
             
-            // Outputs the string safely as typed with formatting choices included
-            const combinedPhone = `${countryCodeSelect.value} ${phoneInput.value.trim()}`;
-            document.getElementById('print_phone').innerText = phoneInput.value ? combinedPhone : 'N/A';
+            // Capture typed field layouts safely for document presentation output
+            const rawPhoneValue = phoneInput.value.trim();
+            const selectedPrefix = countryCodeSelect.value;
+            
+            // Clean up to prevent duplicate country prefix if user manually entered it inside the input box
+            let formattedPhoneOutput = rawPhoneValue;
+            if (rawPhoneValue.startsWith(selectedPrefix)) {
+                formattedPhoneOutput = rawPhoneValue.slice(selectedPrefix.length).trim();
+            }
+            
+            const combinedPhone = `${selectedPrefix} ${formattedPhoneOutput}`;
+            document.getElementById('print_phone').innerText = rawPhoneValue ? combinedPhone : 'N/A';
             
             document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
             document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
@@ -1057,8 +1067,8 @@
 
         // --- SANITATION CAPABILITIES & ACTION FILTERS ---
         phoneInput.addEventListener('input', (e) => {
-            // Allows numbers, spaces, hyphens, and brackets. Strips any illegal letters or symbols instantly.
-            e.target.value = e.target.value.replace(/[^0-9\s\-\(\)]/g, '');
+            // Expanded regex structure allows plus signals, spaces, hyphens, and brackets smoothly while dropping bad strings
+            e.target.value = e.target.value.replace(/[^0-9\s\-\(\)\+]/g, '');
             // Process validation state checks live
             runLivePhoneVerification();
         });
