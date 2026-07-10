@@ -18,6 +18,7 @@
             --text-muted: #7F8C8D;
             --border-light: #E2E8F0;
             --bg-light: #F8FAFC;
+            --error-red: #DC2626;
         }
 
         * {
@@ -212,6 +213,7 @@
             align-items: center;
             margin-bottom: 12px;
             font-size: 13px;
+            flex-wrap: wrap;
         }
 
         .data-row:last-child {
@@ -229,6 +231,12 @@
             display: flex;
             justify-content: flex-end;
             position: relative;
+        }
+
+        /* Dedicated container spacing adjustments for fields containing inline tracking text blocks */
+        .field-container-stack {
+            flex-direction: column;
+            align-items: flex-end;
         }
 
         .doc-input, .doc-select {
@@ -255,6 +263,17 @@
             appearance: none;
             -webkit-appearance: none;
             padding-right: 4px;
+        }
+
+        /* Dedicated Inline Phone Validation Styling Zone */
+        .inline-error-msg {
+            display: none;
+            color: var(--error-red);
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 4px;
+            text-align: right;
+            width: 100%;
         }
 
         /* Custom Focal Points */
@@ -317,7 +336,7 @@
             height: 40px;
         }
 
-        /* New Fixed Academy Declaration Block styling */
+        /* Fixed Academy Declaration Block styling */
         .academy-declaration-clause {
             background-color: #FFFDF4;
             border: 1px dashed #E9D5A1;
@@ -558,7 +577,7 @@
                 padding: 0 !important;
                 margin: 0 !important;
             }
-            .secure-controller-gateway, .ledger-container {
+            .secure-controller-gateway, .ledger-container, .inline-error-msg {
                 display: none !important;
             }
             .receipt-card {
@@ -639,9 +658,10 @@
 
                 <div class="data-row">
                     <span class="label">Phone Number *</span>
-                    <div class="field-container">
+                    <div class="field-container field-container-stack">
                         <input type="text" id="phone" class="doc-input" placeholder="Enter 10 Digits" maxlength="10">
                         <span id="print_phone" class="print-preview-label"></span>
+                        <div id="phoneError" class="inline-error-msg">Invalid Phone Number. Please enter a valid 10-digit mobile number.</div>
                     </div>
                 </div>
 
@@ -822,6 +842,8 @@
         const downloadBtn = document.getElementById('download');
         const printBtn = document.getElementById('printBtn');
         const lockStatus = document.getElementById('lockStatus');
+        const phoneInput = document.getElementById('phone');
+        const phoneError = document.getElementById('phoneError');
         
         let sessionIsUnlocked = false; 
 
@@ -881,10 +903,30 @@
             return str.trim() + ' Only';
         }
 
-        // --- 3. FORM INPUT MASTER VALIDATION ENGINE ---
+        // --- 3. LIVE PHONE VALIDATION CHECK POINT ---
+        function runLivePhoneVerification() {
+            const phoneVal = phoneInput.value.trim();
+            
+            // If completely clear, suppress any inline notification
+            if (phoneVal.length === 0) {
+                phoneError.style.display = 'none';
+                return false;
+            }
+
+            // Explicitly requires exactly 10 characters
+            if (phoneVal.length !== 10) {
+                phoneError.style.display = 'block';
+                return false;
+            } else {
+                phoneError.style.display = 'none';
+                return true;
+            }
+        }
+
+        // --- 4. FORM INPUT MASTER VALIDATION ENGINE ---
         function runReceiptFormValidation() {
             const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+            const phone = phoneInput.value.trim();
             const course = document.getElementById('course').value;
             const year = document.getElementById('year').value;
             const paidAmount = document.getElementById('paidAmount').value.trim();
@@ -898,21 +940,20 @@
                 return false;
             }
 
-            // 2. Strict Phone Field Metric Inspection
-            if (phone.length !== 10) {
-                alert("Invalid Phone Number. Please enter a valid 10-digit mobile number.");
+            // 2. Fallback execution verification hook for phone correctness rules
+            if (!runLivePhoneVerification()) {
                 return false;
             }
 
             return true;
         }
 
-        // --- 4. SYNC INTERACTIVE FIELD LAYOUT VALUES TO PURE TEXT PRINT TAGS ---
+        // --- 5. SYNC INTERACTIVE FIELD LAYOUT VALUES TO PURE TEXT PRINT TAGS ---
         function syncPrintPreviews() {
             document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
             document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
             document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
-            document.getElementById('print_phone').innerText = document.getElementById('phone').value || 'N/A';
+            document.getElementById('print_phone').innerText = phoneInput.value || 'N/A';
             document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
             document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
             document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + parseFloat(document.getElementById('paidAmount').value).toLocaleString('en-IN') : '₹ 0';
@@ -921,7 +962,6 @@
             document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
             document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
             
-            // Dynamic check behavior: defaults to "No Remarks" if string matches an empty footprint
             const remarksContent = document.getElementById('remarks').value.trim();
             document.getElementById('print_remarks').innerText = remarksContent ? remarksContent : 'No Remarks';
             
@@ -929,7 +969,7 @@
             document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
         }
 
-        // --- 5. DATA LOGGING FOR BATCH TRACKING ---
+        // --- 6. DATA LOGGING FOR BATCH TRACKING ---
         function logReceiptData() {
             const activeReceiptNo = document.getElementById('receiptNo').value;
 
@@ -964,9 +1004,11 @@
         }
 
         // Live Event Handling Sanitation Hooks
-        document.getElementById('phone').addEventListener('input', (e) => {
+        phoneInput.addEventListener('input', (e) => {
             // Automatically blocks characters, punctuation symbols, and layout spaces
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            // Fires immediate evaluation block state updates
+            runLivePhoneVerification();
         });
 
         document.getElementById('paidAmount').addEventListener('input', (e) => {
@@ -978,9 +1020,8 @@
             }
         });
 
-        // --- 6. INSTANT OPEN DOWNLOAD PDF ENGINE ---
+        // --- 7. INSTANT OPEN DOWNLOAD PDF ENGINE ---
         downloadBtn.addEventListener('click', async () => {
-            // Cancel transaction if the validation criteria matrix throws a mismatch flag
             if (!runReceiptFormValidation()) return;
 
             syncPrintPreviews();
@@ -1025,9 +1066,8 @@
             }
         });
 
-        // --- 7. PRINT CAPABILITY CONTROLLER ENGINE ---
+        // --- 8. PRINT CAPABILITY CONTROLLER ENGINE ---
         printBtn.addEventListener('click', () => {
-            // Cancel transaction if the validation criteria matrix throws a mismatch flag
             if (!runReceiptFormValidation()) return;
 
             syncPrintPreviews();
@@ -1037,7 +1077,7 @@
             }, 150);
         });
 
-        // --- 8. BATCH LEDGER EXPORT LOGIC & PIN SECURED WIPE HOOK ---
+        // --- 9. BATCH LEDGER EXPORT LOGIC & PIN SECURED WIPE HOOK ---
         document.getElementById('exportExcel').addEventListener('click', () => {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             if (currentRecords.length === 0) return alert("There are no captured ledger logs available to compile!");
@@ -1066,7 +1106,7 @@
             }, 300);
         });
 
-        // --- 9. STRUCTURAL ENTRY FIELD RESET ---
+        // --- 10. STRUCTURAL ENTRY FIELD RESET ---
         document.getElementById('clearForm').addEventListener('click', () => {
             if (confirm("Are you sure you want to clear the active form inputs?")) {
                 document.querySelectorAll('input, select, textarea').forEach(el => {
@@ -1076,6 +1116,7 @@
                         el.value = '';
                     }
                 });
+                phoneError.style.display = 'none';
                 document.getElementById('receiptDate').value = dateString;
                 document.getElementById('paymentDate').value = dateString;
                 updateReceiptNumberSequence();
