@@ -680,22 +680,27 @@
                     BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM
                 </div>
             </div>
-            <div class="contact-container">
+<div class="contact-container">
                 <div class="contact-item">
                     <span>49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084</span>
                     <i class="fa-solid fa-location-dot"></i>
                 </div>
                 <div class="contact-item">
-                    <span>Vaishnavi@alagappaarts.com</span>
+                    <span>+91 7358-596403</span>
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="contact-item">
+                    <span>vaishnavi@alagappaarts.com</span>
                     <i class="fa-solid fa-envelope"></i>
                 </div>
             </div>
+
         </header>
 
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
-                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
+                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APAA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
                 <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input system-locked-field" style="width:110px;" placeholder="DD/MM/YYYY" readonly tabindex="-1"><span id="print_receiptDate" class="print-preview-label"></span></span>
             </div>
         </div>
@@ -737,11 +742,9 @@
                     <div class="field-container">
                         <select id="course" class="doc-select">
                             <option value="" disabled selected hidden>Select Course</option>
-                            <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
-                            <option value="Carnatic Vocal">Carnatic Vocal</option>
-                            <option value="Keyboard">Keyboard</option>
-                            <option value="Drawing">Drawing</option>
-                            <option value="Abacus">Abacus</option>
+                            <option value="Bachelor's in Bharathanatyam">Bachelor's in Bharathanatyam</option>
+                            <option value="Diploma in Bharathanatyam">Diploma in Bharathanatyam</option>
+                            <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
                         </select>
                         <span id="print_course" class="print-preview-label"></span>
                     </div>
@@ -949,7 +952,7 @@
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             const nextSequenceNumber = currentRecords.length + 1;
             const formattedNumber = String(nextSequenceNumber).padStart(4, '0');
-            document.getElementById('receiptNo').value = `APA-2026-${formattedNumber}`;
+            document.getElementById('receiptNo').value = `APAA-2026-${formattedNumber}`;
         }
 
         // --- 2. NUMBER TO WORDS TRANSLATION CONVERTER ---
