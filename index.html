@@ -699,7 +699,7 @@
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
-                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
+                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APAA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
                 <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input system-locked-field" style="width:110px;" placeholder="DD/MM/YYYY" readonly tabindex="-1"><span id="print_receiptDate" class="print-preview-label"></span></span>
             </div>
         </div>
@@ -951,7 +951,7 @@
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             const nextSequenceNumber = currentRecords.length + 1;
             const formattedNumber = String(nextSequenceNumber).padStart(4, '0');
-            document.getElementById('receiptNo').value = `APA-2026-${formattedNumber}`;
+            document.getElementById('receiptNo').value = `APAA-2026-${formattedNumber}`;
         }
 
         // --- 2. NUMBER TO WORDS TRANSLATION CONVERTER ---
@@ -1157,7 +1157,7 @@
                 // Strip whitespace and clean characters for safe file storage limits
                 const cleanedStudentName = rawStudentName.replace(/[^a-zA-Z0-9]/g, '');
                 
-                const fullReceiptNo = document.getElementById('receiptNo').value; // e.g., "APA-2026-0001"
+                const fullReceiptNo = document.getElementById('receiptNo').value; // e.g., "APAA-2026-0001"
                 const lastFourDigits = fullReceiptNo.slice(-4); // Pulls out "0001"
                 
                 pdf.save(`${cleanedStudentName}_${lastFourDigits}.pdf`);
