@@ -21,10 +21,17 @@
             --error-red: #DC2626;
         }
 
+        /* Global Reset to eliminate unwanted click/tap outlines on non-interactive zones */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Ensure body and wrapper blocks don't draw highlight rings on arbitrary clicks */
+        body, div, header, footer, table, tbody, thead, tr, th, td, h1, h2, h3, span, label, p {
+            outline: none;
         }
 
         body {
@@ -814,7 +821,7 @@
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
-                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:21 AM</span><br>
+                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:27 AM</span><br>
                     <strong>Secure Mode:</strong> Active System Gateway
                 </div>
             </div>
