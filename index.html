@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alagappa Performing Arts Academy - Fee Receipt System</title>
     
+    <!-- External Dependencies for Icons, Canvas, and PDF Generation -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -263,6 +264,30 @@
             appearance: none;
             -webkit-appearance: none;
             padding-right: 4px;
+        }
+
+        /* --- Seamless Flex Wrapper for Country Code + Phone Number Input --- */
+        .phone-input-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .country-select {
+            border: none;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-navy);
+            background: transparent;
+            cursor: pointer;
+            padding: 2px 0;
+            width: auto;
+            max-width: 75px;
+            text-align: left;
         }
 
         /* Dedicated Inline Phone Validation Styling Zone */
@@ -585,7 +610,7 @@
                 padding: 20px !important;
                 width: 100% !important;
             }
-            .doc-input, .doc-select, .mode-radio-group, .remarks-textarea, .meta-inline-input {
+            .doc-input, .doc-select, .mode-radio-group, .remarks-textarea, .meta-inline-input, .country-select {
                 display: none !important;
             }
             .print-preview-label {
@@ -606,8 +631,10 @@
 
 <div class="container">
     
+    <!-- MAIN RECEIPT FORM LAYOUT PANEL -->
     <div id="receiptBlock" class="receipt-card">
         
+        <!-- Header -->
         <header class="receipt-header">
             <div class="logo-container">
                 <img src="Logo.png" alt="Logo" onerror="this.style.display='none';">
@@ -635,6 +662,7 @@
             </div>
         </header>
 
+        <!-- Document Identifier -->
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
@@ -643,8 +671,10 @@
             </div>
         </div>
 
+        <!-- Symmetrical Card Grid Layout -->
         <div class="receipt-grid">
             
+            <!-- Left Card Component: Student & Course Particulars -->
             <div class="info-card">
                 <h3 class="card-heading">Student & Course Details</h3>
                 
@@ -659,9 +689,19 @@
                 <div class="data-row">
                     <span class="label">Phone Number *</span>
                     <div class="field-container field-container-stack">
-                        <input type="text" id="phone" class="doc-input" placeholder="Enter 10 Digits" maxlength="10">
+                        <div class="phone-input-wrapper">
+                            <select id="countryCode" class="country-select">
+                                <option value="+91" selected>+91 (IN)</option>
+                                <option value="+1">+1 (US/CA)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+61">+61 (AU)</option>
+                                <option value="+65">+65 (SG)</option>
+                                <option value="+971">+971 (UAE)</option>
+                            </select>
+                            <input type="text" id="phone" class="doc-input" placeholder="Enter 10 Digits" maxlength="10">
+                        </div>
                         <span id="print_phone" class="print-preview-label"></span>
-                        <div id="phoneError" class="inline-error-msg">Please enter a valid 10-digit mobile number.</div>
+                        <div id="phoneError" class="inline-error-msg">Invalid Phone Number. Please enter a valid 10-digit mobile number.</div>
                     </div>
                 </div>
 
@@ -695,6 +735,7 @@
 
             </div>
 
+            <!-- Right Card Component: Financial Summary Parameters -->
             <div class="info-card">
                 <h3 class="card-heading">Payment Information</h3>
                 
@@ -760,12 +801,14 @@
             </div>
         </div>
 
+        <!-- Enclosed Information Remarks Box Component -->
         <div class="remarks-box">
             <span class="remarks-inner-label">Remarks & Extra Declarations:</span>
             <textarea id="remarks" class="remarks-textarea" placeholder="Enter payment references, cheque details, UPI transaction IDs, installment notes, or instructions..."></textarea>
             <span id="print_remarks" class="print-preview-label" style="text-align: left; width: 100%;"></span>
         </div>
 
+        <!-- System Institutional Declaration Standard Notice -->
         <div class="academy-declaration-clause">
             <i class="fa-solid fa-circle-info"></i>
             <div>
@@ -773,6 +816,7 @@
             </div>
         </div>
 
+        <!-- Closing Diagnostics & Sign-off Layout Block -->
         <div class="closing-area">
             <div class="verification-zone">
                 <div class="qr-placeholder">
@@ -793,6 +837,7 @@
             </div>
         </div>
 
+        <!-- Institutional Fine-Print Footer -->
         <footer class="receipt-footer">
             <div class="thank-you">Thank You!</div>
             <div class="system-generated-text">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
@@ -800,6 +845,7 @@
 
     </div>
 
+    <!-- CONTROL GATEWAY UTILITY PANEL -->
     <div class="secure-controller-gateway">
         <div class="gateway-header">
             <div class="gateway-title">
@@ -818,6 +864,7 @@
         </div>
     </div>
 
+    <!-- LIVE DATABASE BATCH VISUAL LEDGER TABLE -->
     <div class="ledger-container">
         <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger</div>
         <table class="ledger-table">
@@ -831,18 +878,21 @@
                 </tr>
             </thead>
             <tbody id="ledgerBody">
-                </tbody>
+                <!-- Data storage rows get populated here instantly -->
+            </tbody>
         </table>
     </div>
 
 </div>
 
+<!-- --- JAVASCRIPT LOGIC ENGINE --- -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const downloadBtn = document.getElementById('download');
         const printBtn = document.getElementById('printBtn');
         const lockStatus = document.getElementById('lockStatus');
         const phoneInput = document.getElementById('phone');
+        const countryCodeSelect = document.getElementById('countryCode');
         const phoneError = document.getElementById('phoneError');
         
         let sessionIsUnlocked = false; 
@@ -913,7 +963,7 @@
                 return false;
             }
 
-            // Explicitly requires exactly 10 characters
+            // Explicitly requires exactly 10 digits
             if (phoneVal.length !== 10) {
                 phoneError.style.display = 'block';
                 return false;
@@ -953,7 +1003,11 @@
             document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
             document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
             document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
-            document.getElementById('print_phone').innerText = phoneInput.value || 'N/A';
+            
+            // Combines Country Code with Phone Number for Print Output Display
+            const combinedPhone = `${countryCodeSelect.value} ${phoneInput.value}`;
+            document.getElementById('print_phone').innerText = phoneInput.value ? combinedPhone : 'N/A';
+            
             document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
             document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
             document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + parseFloat(document.getElementById('paidAmount').value).toLocaleString('en-IN') : '₹ 0';
@@ -972,6 +1026,7 @@
         // --- 6. DATA LOGGING FOR BATCH TRACKING ---
         function logReceiptData() {
             const activeReceiptNo = document.getElementById('receiptNo').value;
+            const combinedPhone = `${countryCodeSelect.value} ${phoneInput.value}`;
 
             const record = {
                 receiptNo: activeReceiptNo,
@@ -1005,9 +1060,14 @@
 
         // Live Event Handling Sanitation Hooks
         phoneInput.addEventListener('input', (e) => {
-            // Automatically blocks characters, punctuation symbols, and layout spaces
+            // Automatically blocks non-numeric characters
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
             // Fires immediate evaluation block state updates
+            runLivePhoneVerification();
+        });
+
+        // Ensure altering the country code runs validations if a number is present
+        countryCodeSelect.addEventListener('change', () => {
             runLivePhoneVerification();
         });
 
@@ -1028,7 +1088,7 @@
             const targetElement = document.getElementById('receiptBlock');
 
             try {
-                const inputs = targetElement.querySelectorAll('input, select, textarea, .mode-radio-group');
+                const inputs = targetElement.querySelectorAll('input, select, textarea, .mode-radio-group, .country-select');
                 const previews = targetElement.querySelectorAll('.print-preview-label');
                 
                 inputs.forEach(el => el.style.setProperty('display', 'none', 'important'));
@@ -1116,6 +1176,7 @@
                         el.value = '';
                     }
                 });
+                countryCodeSelect.value = "+91"; // Reverts selector back to default prefix
                 phoneError.style.display = 'none';
                 document.getElementById('receiptDate').value = dateString;
                 document.getElementById('paymentDate').value = dateString;
