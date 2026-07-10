@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alagappa Performing Arts Academy - Fee Receipt System</title>
     
-    <!-- External Dependencies for Icons, Canvas, and PDF Generation -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -61,7 +60,7 @@
 
         .container {
             width: 100%;
-            max-width: 1050px;
+            max-width: 950px;
             display: flex;
             flex-direction: column;
             gap: 25px;
@@ -590,7 +589,6 @@
             padding: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border-light);
-            overflow-x: auto;
         }
 
         .ledger-title {
@@ -608,8 +606,7 @@
         .ledger-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
-            min-width: 950px;
+            font-size: 13px;
         }
 
         .ledger-table th {
@@ -617,39 +614,16 @@
             color: var(--primary-navy);
             font-weight: 600;
             text-align: left;
-            padding: 12px 10px;
+            padding: 10px;
             border-bottom: 2px solid var(--border-light);
             text-transform: uppercase;
             font-size: 11px;
-            white-space: nowrap;
         }
 
         .ledger-table td {
             padding: 10px;
-            border-bottom: 1px solid #F1F5F9;
+            border-bottom: 1px solid var(--bg-light);
             color: var(--text-dark);
-            vertical-align: middle;
-        }
-
-        .btn-ledger-print {
-            background-color: var(--bg-light);
-            border: 1px solid var(--border-light);
-            color: var(--primary-navy);
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 11px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-        }
-
-        .btn-ledger-print:hover {
-            background-color: var(--primary-navy);
-            color: #FFFFFF;
-            border-color: var(--primary-navy);
         }
 
         /* Pure Text Element Previews Container */
@@ -693,10 +667,8 @@
 
 <div class="container">
     
-    <!-- MAIN RECEIPT FORM LAYOUT PANEL -->
     <div id="receiptBlock" class="receipt-card">
         
-        <!-- Header -->
         <header class="receipt-header">
             <div class="logo-container">
                 <img src="Logo.png" alt="Logo" onerror="this.style.display='none';">
@@ -720,7 +692,6 @@
             </div>
         </header>
 
-        <!-- Document Identifier -->
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
@@ -729,10 +700,8 @@
             </div>
         </div>
 
-        <!-- Symmetrical Card Grid Layout -->
         <div class="receipt-grid">
             
-            <!-- Left Card Component: Student & Course Particulars -->
             <div class="info-card">
                 <h3 class="card-heading">Student & Course Details</h3>
                 
@@ -741,14 +710,6 @@
                     <div class="field-container">
                         <input type="text" id="name" class="doc-input" placeholder="Enter Name">
                         <span id="print_name" class="print-preview-label"></span>
-                    </div>
-                </div>
-
-                <div class="data-row">
-                    <span class="label">Registration No *</span>
-                    <div class="field-container">
-                        <input type="text" id="regNo" class="doc-input" placeholder="e.g., REG-2026-101">
-                        <span id="print_regNo" class="print-preview-label"></span>
                     </div>
                 </div>
 
@@ -801,7 +762,6 @@
 
             </div>
 
-            <!-- Right Card Component: Financial Summary Parameters -->
             <div class="info-card">
                 <h3 class="card-heading">Payment Information</h3>
                 
@@ -867,14 +827,12 @@
             </div>
         </div>
 
-        <!-- Enclosed Information Remarks Box Component -->
         <div class="remarks-box">
             <span class="remarks-inner-label">Remarks & Extra Declarations:</span>
             <textarea id="remarks" class="remarks-textarea" placeholder="Enter payment references, cheque details, UPI transaction IDs, installment notes, or instructions..."></textarea>
             <span id="print_remarks" class="print-preview-label" style="text-align: left; width: 100%;"></span>
         </div>
 
-        <!-- System Institutional Declaration Standard Notice -->
         <div class="academy-declaration-clause">
             <i class="fa-solid fa-circle-info"></i>
             <div>
@@ -882,7 +840,6 @@
             </div>
         </div>
 
-        <!-- Closing Diagnostics & Sign-off Layout Block -->
         <div class="closing-area">
             <div class="verification-zone">
                 <div class="qr-placeholder">
@@ -903,7 +860,6 @@
             </div>
         </div>
 
-        <!-- Institutional Fine-Print Footer -->
         <footer class="receipt-footer">
             <div class="thank-you">Thank You!</div>
             <div class="system-generated-text">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
@@ -911,7 +867,6 @@
 
     </div>
 
-    <!-- CONTROL GATEWAY UTILITY PANEL -->
     <div class="secure-controller-gateway">
         <div class="gateway-header">
             <div class="gateway-title">
@@ -930,33 +885,25 @@
         </div>
     </div>
 
-    <!-- LIVE DATABASE BATCH VISUAL LEDGER TABLE -->
     <div class="ledger-container">
         <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger</div>
         <table class="ledger-table">
             <thead>
                 <tr>
                     <th>Receipt No</th>
-                    <th>Reg No</th>
                     <th>Student Name</th>
-                    <th>Phone</th>
                     <th>Course</th>
-                    <th>Amount</th>
-                    <th>Mode</th>
-                    <th>Date</th>
-                    <th>Stage</th>
-                    <th style="text-align: center;">Actions</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Mode</th>
                 </tr>
             </thead>
             <tbody id="ledgerBody">
-                <!-- Data storage rows populated dynamically -->
-            </tbody>
+                </tbody>
         </table>
     </div>
 
 </div>
 
-<!-- --- JAVASCRIPT LOGIC ENGINE --- -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const downloadBtn = document.getElementById('download');
@@ -968,17 +915,18 @@
         
         let sessionIsUnlocked = false; 
 
-        // Current real-time clock parsing setup
+        // Current real-time clock parsing setup for pre-filling manual fields
         const now = new Date();
         const dateString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
         
+        // Receipt Date is fully assigned and systematically managed here
         document.getElementById('receiptDate').value = dateString;
         document.getElementById('paymentDate').value = dateString;
 
         const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
         document.getElementById('lblTimestamp').innerText = now.toLocaleString('en-US', options).replace(/,/g, '');
 
-        // Click security badge widget to toggle ledger configurations
+        // Click security badge widget to toggle ledger clearing configurations
         lockStatus.addEventListener('click', () => {
             if(!sessionIsUnlocked) {
                 let verification = prompt("Enter Administrative Security PIN to unlock ledger clearing functions:");
@@ -1027,17 +975,22 @@
         // --- 3. DYNAMIC SANITIZED COUNTRY PHONE VALIDATION ENGINE ---
         function runLivePhoneVerification() {
             const rawValue = phoneInput.value;
+            
+            // Strip away formatting definitions (plus signs, spaces, hyphens, brackets) to extract only raw index digits
             const sanitizedDigits = rawValue.replace(/[\+\s\-\(\)]/g, '');
             
+            // If completely empty, hide message layer but intercept submit states
             if (rawValue.trim().length === 0) {
                 phoneError.style.display = 'none';
                 return false;
             }
 
+            // Extract validation length constraints from attributes
             const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
             const minLength = parseInt(selectedOption.getAttribute('data-min'), 10);
             const maxLength = parseInt(selectedOption.getAttribute('data-max'), 10);
 
+            // Validate numeric structural integrity
             if (sanitizedDigits.length < minLength || sanitizedDigits.length > maxLength) {
                 phoneError.style.display = 'block';
                 return false;
@@ -1050,7 +1003,6 @@
         // --- 4. FORM INPUT MASTER VALIDATION ENGINE ---
         function runReceiptFormValidation() {
             const name = document.getElementById('name').value.trim();
-            const regNo = document.getElementById('regNo').value.trim();
             const course = document.getElementById('course').value;
             const year = document.getElementById('year').value;
             const paidAmount = document.getElementById('paidAmount').value.trim();
@@ -1058,11 +1010,13 @@
             const receiptDate = document.getElementById('receiptDate').value.trim();
             const installment = document.getElementById('installment').value;
 
-            if (!name || !regNo || !course || !year || !paidAmount || !paymentDate || !receiptDate || !installment) {
-                alert("Please complete all mandatory fields before processing the receipt statement.");
+            // 1. Mandatory Field Presence Check
+            if (!name || !course || !year || !paidAmount || !paymentDate || !receiptDate || !installment) {
+                alert("Please complete all mandatory fields before printing or downloading the receipt.");
                 return false;
             }
 
+            // 2. Strict global phone verification checkout interceptor
             if (!runLivePhoneVerification()) {
                 return false;
             }
@@ -1075,10 +1029,12 @@
             document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
             document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
             document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
-            document.getElementById('print_regNo').innerText = document.getElementById('regNo').value || 'N/A';
             
+            // Capture typed field layouts safely for document presentation output
             const rawPhoneValue = phoneInput.value.trim();
             const selectedPrefix = countryCodeSelect.value;
+            
+            // Clean up to prevent duplicate country prefix if user manually entered it inside the input box
             let formattedPhoneOutput = rawPhoneValue;
             if (rawPhoneValue.startsWith(selectedPrefix)) {
                 formattedPhoneOutput = rawPhoneValue.slice(selectedPrefix.length).trim();
@@ -1102,39 +1058,51 @@
             document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
         }
 
-        // --- 6. CHECK FOR REPLICATED ENTRY DUPLICATES ---
-        function isDuplicateRecord(targetReceiptNo) {
+        // --- 6. ADVANCED COMPREHENSIVE DUPLICATE RECORD IDENTIFIER ---
+        function isDuplicateRecord() {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-            return currentRecords.some(record => record.receiptNo === targetReceiptNo);
+            
+            const activeReceiptNo = document.getElementById('receiptNo').value;
+            const activeName = document.getElementById('name').value.trim().toLowerCase();
+            const activeCourse = document.getElementById('course').value;
+            const activeInstallment = document.getElementById('installment').value;
+            const activePhone = phoneInput.value.replace(/[\+\s\-\(\)]/g, '');
+
+            return currentRecords.some(record => {
+                // Criteria 1: Receipt Number Match
+                const receiptMatch = (record.receiptNo === activeReceiptNo);
+                
+                // Criteria 2: Matching unique student phone payload
+                const phoneMatch = (activePhone && record.phoneRaw === activePhone);
+                
+                // Criteria 3: Duplicate Student Payment Event Match (Same Name + Same Class Track + Same Payment Milestone Stage)
+                const paymentInstanceMatch = (
+                    record.studentName.trim().toLowerCase() === activeName &&
+                    record.course === activeCourse &&
+                    record.installmentStage === activeInstallment
+                );
+
+                return receiptMatch || phoneMatch || paymentInstanceMatch;
+            });
         }
 
-        // --- 7. DATA LOGGING FOR BATCH TRACKING (9 FULL AUDIT FIELDS) ---
+        // --- 7. DATA LOGGING FOR BATCH TRACKING ---
         function logReceiptData() {
-            const activeReceiptNo = document.getElementById('receiptNo').value;
-
-            if (isDuplicateRecord(activeReceiptNo)) {
+            if (isDuplicateRecord()) {
                 return false;
             }
 
-            const rawPhoneValue = phoneInput.value.trim();
-            const selectedPrefix = countryCodeSelect.value;
-            const combinedPhone = `${selectedPrefix} ${rawPhoneValue}`;
+            const activeReceiptNo = document.getElementById('receiptNo').value;
+            const rawPhoneValue = phoneInput.value.replace(/[\+\s\-\(\)]/g, '');
 
             const record = {
                 receiptNo: activeReceiptNo,
-                receiptDate: document.getElementById('receiptDate').value,
-                regNo: document.getElementById('regNo').value.trim(),
-                studentName: document.getElementById('name').value.trim(),
-                phone: combinedPhone,
-                course: document.getElementById('course').value,
-                academicYear: document.getElementById('year').value,
-                paidAmount: document.getElementById('paidAmount').value,
-                amountInWords: document.getElementById('words').value,
-                paymentDate: document.getElementById('paymentDate').value,
-                paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash',
-                transactionId: document.getElementById('transactionId').value.trim() || 'N/A',
-                installmentStage: document.getElementById('installment').value,
-                remarks: document.getElementById('remarks').value.trim() || 'No Remarks'
+                studentName: document.getElementById('name').value || 'N/A',
+                phoneRaw: rawPhoneValue || '',
+                course: document.getElementById('course').value || 'N/A',
+                installmentStage: document.getElementById('installment').value || 'N/A',
+                paidAmount: document.getElementById('paidAmount').value || '0',
+                paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
             };
 
             let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
@@ -1146,88 +1114,18 @@
             return true;
         }
 
-        // --- 8. LEDGER CONTROLLER AND CONTEXT-PRESERVING RE-PRINT HOOK ---
         function updateLiveLedgerDisplay() {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             const tbody = document.getElementById('ledgerBody');
             if (!tbody) return;
             
-            tbody.innerHTML = currentRecords.length === 0 ? '<tr><td colspan="10" style="text-align:center; color:#94a3b8; padding: 20px;">No records captured yet.</td></tr>' : '';
+            tbody.innerHTML = currentRecords.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No records captured yet.</td></tr>' : '';
             
             currentRecords.forEach((rec) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><b>${rec.receiptNo}</b></td>
-                    <td>${rec.regNo || 'N/A'}</td>
-                    <td>${rec.studentName}</td>
-                    <td>${rec.phone || 'N/A'}</td>
-                    <td>${rec.course}</td>
-                    <td>₹${parseFloat(rec.paidAmount).toLocaleString('en-IN')}</td>
-                    <td><span style="font-size:10px; font-weight:700; background:#E2E8F0; padding:2px 6px; border-radius:3px;">${rec.paymentMode}</span></td>
-                    <td>${rec.paymentDate}</td>
-                    <td>${rec.installmentStage || 'N/A'}</td>
-                    <td style="text-align: center;">
-                        <button class="btn-ledger-print" data-receipt="${rec.receiptNo}">
-                            <i class="fa-solid fa-print"></i> Print
-                        </button>
-                    </td>
-                `;
+                tr.innerHTML = `<td><b>${rec.receiptNo}</b></td><td>${rec.studentName}</td><td>${rec.course}</td><td>₹${parseFloat(rec.paidAmount).toLocaleString('en-IN')}</td><td>${rec.paymentMode}</td>`;
                 tbody.appendChild(tr);
             });
-
-            // Bind individual click isolation print actions to the ledger buttons
-            document.querySelectorAll('.btn-ledger-print').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const TargetReceiptID = this.getAttribute('data-receipt');
-                    triggerLedgerRecordPrint(TargetReceiptID);
-                });
-            });
-        }
-
-        // Isolate input parameters from alternative entities entirely during reprint procedures
-        function triggerLedgerRecordPrint(receiptId) {
-            const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-            const matchingRecord = currentRecords.find(r => r.receiptNo === receiptId);
-
-            if (!matchingRecord) {
-                alert("Target file logs could not be parsed safely from structural storage arrays.");
-                return;
-            }
-
-            // Sync structural targets into the temporary UI input models 
-            document.getElementById('receiptNo').value = matchingRecord.receiptNo;
-            document.getElementById('receiptDate').value = matchingRecord.receiptDate || dateString;
-            document.getElementById('name').value = matchingRecord.studentName;
-            document.getElementById('regNo').value = matchingRecord.regNo || '';
-            
-            // Handle prefix stripping safely
-            if (matchingRecord.phone && matchingRecord.phone.includes(' ')) {
-                const parts = matchingRecord.phone.split(' ');
-                countryCodeSelect.value = parts[0];
-                phoneInput.value = parts.slice(1).join(' ');
-            } else {
-                phoneInput.value = matchingRecord.phone || '';
-            }
-
-            document.getElementById('course').value = matchingRecord.course;
-            document.getElementById('year').value = matchingRecord.academicYear || '';
-            document.getElementById('paidAmount').value = matchingRecord.paidAmount;
-            document.getElementById('words').value = matchingRecord.amountInWords || convertNumberToWords(matchingRecord.paidAmount);
-            document.getElementById('paymentDate').value = matchingRecord.paymentDate;
-            document.getElementById('transactionId').value = matchingRecord.transactionId === 'N/A' ? '' : matchingRecord.transactionId;
-            document.getElementById('installment').value = matchingRecord.installmentStage || '';
-            document.getElementById('remarks').value = matchingRecord.remarks === 'No Remarks' ? '' : matchingRecord.remarks;
-
-            const radioToCheck = document.querySelector(`input[name="payment"][value="${matchingRecord.paymentMode}"]`);
-            if (radioToCheck) radioToCheck.checked = true;
-
-            // Commit views to printable containers and execute native frame pipeline
-            syncPrintPreviews();
-            setTimeout(() => {
-                window.print();
-                // Safely restore next scheduled index sequence definitions once window frame closes
-                updateReceiptNumberSequence();
-            }, 150);
         }
 
         // --- SANITATION CAPABILITIES & ACTION FILTERS ---
@@ -1249,12 +1147,12 @@
             }
         });
 
-        // --- 9. INSTANT OPEN DOWNLOAD PDF ENGINE ---
+        // --- 8. INSTANT OPEN DOWNLOAD PDF ENGINE ---
         downloadBtn.addEventListener('click', async () => {
             if (!runReceiptFormValidation()) return;
 
-            const activeReceiptNo = document.getElementById('receiptNo').value;
-            if (isDuplicateRecord(activeReceiptNo)) {
+            // Block execution completely if data records flag a system duplicate match
+            if (isDuplicateRecord()) {
                 alert("Duplicate record detected. This payment has already been recorded.");
                 return;
             }
@@ -1294,6 +1192,7 @@
                 
                 const rawStudentName = document.getElementById('name').value.trim();
                 const cleanedStudentName = rawStudentName.replace(/[^a-zA-Z0-9]/g, '');
+                const activeReceiptNo = document.getElementById('receiptNo').value;
                 const lastFourDigits = activeReceiptNo.slice(-4);
                 
                 pdf.save(`${cleanedStudentName}_${lastFourDigits}.pdf`);
@@ -1305,12 +1204,11 @@
             }
         });
 
-        // --- 10. PRINT CAPABILITY CONTROLLER ENGINE ---
+        // --- 9. PRINT CAPABILITY CONTROLLER ENGINE ---
         printBtn.addEventListener('click', () => {
             if (!runReceiptFormValidation()) return;
 
-            const activeReceiptNo = document.getElementById('receiptNo').value;
-            if (isDuplicateRecord(activeReceiptNo)) {
+            if (isDuplicateRecord()) {
                 alert("Duplicate record detected. This payment has already been recorded.");
                 return;
             }
@@ -1322,14 +1220,14 @@
             }, 150);
         });
 
-        // --- 11. BATCH LEDGER EXPORT LOGIC ---
+        // --- 10. BATCH LEDGER EXPORT LOGIC & PIN SECURED WIPE HOOK ---
         document.getElementById('exportExcel').addEventListener('click', () => {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             if (currentRecords.length === 0) return alert("There are no captured ledger logs available to compile!");
             
-            let csv = "Receipt No,Receipt Date,Reg No,Student Name,Phone,Course,Academic Year,Amount Paid,Amount In Words,Payment Date,Payment Mode,Transaction ID,Installment Stage,Remarks\n";
+            let csv = "Receipt No,Student Name,Course,Amount Paid,Payment Mode\n";
             currentRecords.forEach(r => {
-                csv += `"${r.receiptNo}","${r.receiptDate || ''}","${r.regNo || ''}","${r.studentName}","${r.phone || ''}","${r.course}","${r.academicYear || ''}","${r.paidAmount}","${r.amountInWords || ''}","${r.paymentDate}","${r.paymentMode}","${r.transactionId || ''}","${r.installmentStage || ''}","${r.remarks || ''}"\n`;
+                csv += `"${r.receiptNo}","${r.studentName}","${r.course}","${r.paidAmount}","${r.paymentMode}"\n`;
             });
             
             const link = document.createElement("a");
@@ -1351,7 +1249,7 @@
             }, 300);
         });
 
-        // --- 12. STRUCTURAL ENTRY FIELD RESET ---
+        // --- 11. STRUCTURAL ENTRY FIELD RESET ---
         document.getElementById('clearForm').addEventListener('click', () => {
             if (confirm("Are you sure you want to clear the active form inputs?")) {
                 document.querySelectorAll('input, select, textarea').forEach(el => {
@@ -1363,7 +1261,7 @@
                         }
                     }
                 });
-                countryCodeSelect.value = "+91"; 
+                countryCodeSelect.value = "+91";
                 phoneError.style.display = 'none';
                 document.getElementById('paymentDate').value = dateString;
                 updateReceiptNumberSequence();
