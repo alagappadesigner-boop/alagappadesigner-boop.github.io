@@ -933,7 +933,7 @@
         lockStatus.addEventListener('click', () => {
             if(!sessionIsUnlocked) {
                 let verification = prompt("Enter Administrative Security PIN to unlock ledger clearing functions:");
-                if(verification === "1234") { 
+                if(verification === "Yaru nee") { 
                     sessionIsUnlocked = true;
                     lockStatus.className = "security-lock-status status-unlocked";
                     lockStatus.innerHTML = '<i class="fa-solid fa-lock-open"></i> <span>LEDGER WIPEOUT ALLOWED</span>';
