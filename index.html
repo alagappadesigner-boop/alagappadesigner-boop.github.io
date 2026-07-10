@@ -269,7 +269,8 @@
             cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
-            padding-right: 4px;
+            padding-right: 16px;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%232C3E50' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
         }
 
         /* --- Seamless Flex Wrapper for Country Code + Phone Number Input --- */
@@ -277,7 +278,7 @@
             display: flex;
             align-items: center;
             width: 100%;
-            gap: 6px;
+            gap: 8px;
             justify-content: flex-end;
         }
 
@@ -290,10 +291,15 @@
             color: var(--primary-navy);
             background: transparent;
             cursor: pointer;
-            padding: 2px 0;
+            padding: 2px 20px 2px 0;
             width: auto;
-            max-width: 80px;
+            min-width: 82px;
+            max-width: 95px;
             text-align: left;
+            appearance: none;
+            -webkit-appearance: none;
+            /* Injected explicit vector chevron asset to ensure indicators are never clipped or hidden */
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23003366' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
         }
 
         /* Dedicated Inline Phone Validation Styling Zone */
@@ -693,11 +699,11 @@
                         <div class="phone-input-wrapper">
                             <select id="countryCode" class="country-select">
                                 <option value="+91" data-min="10" data-max="10" selected>+91 (IN)</option>
-                                <option value="+1" data-min="10" data-max="10">+1 (US/CA)</option>
+                                <option value="+1" data-min="10" data-max="10">+1 (US)</option>
                                 <option value="+44" data-min="9" data-max="10">+44 (UK)</option>
                                 <option value="+61" data-min="9" data-max="9">+61 (AU)</option>
                                 <option value="+65" data-min="8" data-max="8">+65 (SG)</option>
-                                <option value="+971" data-min="9" data-max="9">+971 (UAE)</option>
+                                <option value="+971" data-min="9" data-max="9">+971 (AE)</option>
                             </select>
                             <input type="text" id="phone" class="doc-input" placeholder="Enter phone number" maxlength="30">
                         </div>
@@ -821,7 +827,7 @@
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
-                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:35 AM</span><br>
+                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 10:40 AM</span><br>
                     <strong>Secure Mode:</strong> Active System Gateway
                 </div>
             </div>
