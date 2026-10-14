@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alagappa Performing Arts Academy - Fee Receipt System</title>
     
+    <!-- External Dependencies for Icons, Canvas, and PDF Generation -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -21,7 +22,7 @@
             --error-red: #DC2626;
         }
 
-        /* Global Reset to eliminate unwanted click/tap outlines or selection bands on non-interactive zones */
+        /* Global Reset to eliminate unwanted click/tap outlines */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -29,7 +30,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Suppress persistent focus highlight outlines or random text dragging flags on structural parent tags */
+        /* Suppress persistent focus highlight outlines on non-interactive structural elements */
         body, div, header, footer, table, tbody, thead, tr, th, td, h1, h2, h3, span, label, p, i {
             outline: none !important;
             -webkit-user-select: none;
@@ -200,7 +201,6 @@
             border-bottom-color: var(--brand-gold);
         }
 
-        /* Non-editable system field adjustments */
         .system-locked-field {
             cursor: default;
             user-select: none;
@@ -238,7 +238,6 @@
             margin-bottom: 15px;
         }
 
-        /* Document-style Input Lines Component */
         .data-row {
             display: flex;
             justify-content: space-between;
@@ -265,7 +264,6 @@
             position: relative;
         }
 
-        /* Dedicated container spacing adjustments for fields containing inline tracking text blocks */
         .field-container-stack {
             flex-direction: column;
             align-items: flex-end;
@@ -298,7 +296,6 @@
             background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%232C3E50' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
         }
 
-        /* --- Seamless Flex Wrapper for Country Code + Phone Number Input --- */
         .phone-input-wrapper {
             display: flex;
             align-items: center;
@@ -326,7 +323,6 @@
             background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23003366' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
         }
 
-        /* Dedicated Inline Phone Validation Styling Zone */
         .inline-error-msg {
             display: none;
             color: var(--error-red);
@@ -337,14 +333,12 @@
             width: 100%;
         }
 
-        /* Custom Focal Points */
         .amount-highlight-input {
             font-size: 18px !important;
             font-weight: 700 !important;
             color: var(--primary-navy) !important;
         }
 
-        /* Radio Group Alignment Panel */
         .mode-radio-group {
             display: flex;
             gap: 10px;
@@ -397,7 +391,6 @@
             height: 40px;
         }
 
-        /* Fixed Academy Declaration Block styling */
         .academy-declaration-clause {
             background-color: #FFFDF4;
             border: 1px dashed #E9D5A1;
@@ -631,7 +624,159 @@
             display: none;
         }
 
-        /* --- Responsive Printing Execution Rule Overrides --- */
+        /* ==========================================================================
+           ELEGANT RECEIPT ANIMATIONS & ACCESSIBLE UI TRANSITIONS
+           ========================================================================== */
+
+        /* Keyframes for Entrances */
+        @keyframes receiptPageEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseHighlightGold {
+            0% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+            }
+        }
+
+        @keyframes subtleValuePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); color: var(--primary-navy); }
+            100% { transform: scale(1); }
+        }
+
+        /* Staggered Section Entrances */
+        .container {
+            animation: receiptPageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards;
+        }
+
+        .receipt-header,
+        .title-meta-section,
+        .receipt-grid .info-card:nth-child(1),
+        .receipt-grid .info-card:nth-child(2),
+        .remarks-box,
+        .academy-declaration-clause,
+        .closing-area,
+        .receipt-footer {
+            animation: receiptPageEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) ease-out both;
+        }
+
+        .receipt-header { animation-delay: 0.05s; }
+        .title-meta-section { animation-delay: 0.10s; }
+        .receipt-grid .info-card:nth-child(1) { animation-delay: 0.15s; }
+        .receipt-grid .info-card:nth-child(2) { animation-delay: 0.20s; }
+        .remarks-box { animation-delay: 0.25s; }
+        .academy-declaration-clause { animation-delay: 0.28s; }
+        .closing-area { animation-delay: 0.31s; }
+        .receipt-footer { animation-delay: 0.35s; }
+
+        /* Gold-Border Focus Transitions for Form Fields */
+        .doc-input, 
+        .doc-select, 
+        .meta-inline-input, 
+        .country-select, 
+        .remarks-textarea {
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
+        }
+
+        .doc-input:focus, 
+        .doc-select:focus, 
+        .remarks-textarea:focus {
+            border-bottom-color: var(--brand-gold) !important;
+            box-shadow: 0 2px 8px -2px rgba(212, 175, 55, 0.25);
+        }
+
+        /* Action Button Hover, Glow & Press Effects */
+        .btn {
+            transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), 
+                        box-shadow 0.2s ease, 
+                        background-color 0.2s ease, 
+                        opacity 0.2s ease;
+            will-change: transform, box-shadow;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Field Value Update Highlights */
+        .value-updated-highlight {
+            animation: subtleValuePulse 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .field-active-change {
+            animation: pulseHighlightGold 0.45s ease-out;
+        }
+
+        .radio-label {
+            transition: color 0.2s ease, transform 0.15s ease;
+        }
+
+        .radio-label:hover {
+            color: var(--primary-navy);
+            transform: translateY(-1px);
+        }
+
+        .security-lock-status,
+        .inline-error-msg {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn.btn-loading {
+            pointer-events: none;
+            opacity: 0.75;
+        }
+
+        .btn.btn-loading i {
+            animation: spinIcon 0.8s linear infinite;
+        }
+
+        @keyframes spinIcon {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Reduced-Motion Accessibility Override */
+        @media (prefers-reduced-motion: reduce) {
+            .container,
+            .receipt-header,
+            .title-meta-section,
+            .receipt-grid .info-card,
+            .remarks-box,
+            .academy-declaration-clause,
+            .closing-area,
+            .receipt-footer,
+            .btn,
+            .doc-input,
+            .doc-select,
+            .value-updated-highlight,
+            .field-active-change {
+                animation: none !important;
+                transition: none !important;
+                transform: none !important;
+            }
+        }
+
+        /* --- Responsive Printing Execution Overrides --- */
         @media print {
             body {
                 background-color: #FFFFFF;
@@ -660,6 +805,17 @@
                 font-weight: 700 !important;
                 color: var(--primary-navy) !important;
             }
+            .container,
+            .receipt-header,
+            .title-meta-section,
+            .receipt-grid .info-card,
+            .remarks-box,
+            .academy-declaration-clause,
+            .closing-area,
+            .receipt-footer {
+                animation: none !important;
+                transform: none !important;
+            }
         }
     </style>
 </head>
@@ -667,8 +823,10 @@
 
 <div class="container">
     
+    <!-- MAIN RECEIPT FORM LAYOUT PANEL -->
     <div id="receiptBlock" class="receipt-card">
         
+        <!-- Header -->
         <header class="receipt-header">
             <div class="logo-container">
                 <img src="Logo.png" alt="Logo" onerror="this.style.display='none';">
@@ -692,6 +850,7 @@
             </div>
         </header>
 
+        <!-- Document Identifier -->
         <div class="title-meta-section">
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
@@ -700,8 +859,10 @@
             </div>
         </div>
 
+        <!-- Symmetrical Card Grid Layout -->
         <div class="receipt-grid">
             
+            <!-- Left Card Component: Student & Course Particulars -->
             <div class="info-card">
                 <h3 class="card-heading">Student & Course Details</h3>
                 
@@ -762,6 +923,7 @@
 
             </div>
 
+            <!-- Right Card Component: Financial Summary Parameters -->
             <div class="info-card">
                 <h3 class="card-heading">Payment Information</h3>
                 
@@ -827,12 +989,14 @@
             </div>
         </div>
 
+        <!-- Enclosed Information Remarks Box Component -->
         <div class="remarks-box">
             <span class="remarks-inner-label">Remarks & Extra Declarations:</span>
             <textarea id="remarks" class="remarks-textarea" placeholder="Enter payment references, cheque details, UPI transaction IDs, installment notes, or instructions..."></textarea>
             <span id="print_remarks" class="print-preview-label" style="text-align: left; width: 100%;"></span>
         </div>
 
+        <!-- System Institutional Declaration Standard Notice -->
         <div class="academy-declaration-clause">
             <i class="fa-solid fa-circle-info"></i>
             <div>
@@ -840,6 +1004,7 @@
             </div>
         </div>
 
+        <!-- Closing Diagnostics & Sign-off Layout Block -->
         <div class="closing-area">
             <div class="verification-zone">
                 <div class="qr-placeholder">
@@ -847,7 +1012,7 @@
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
-                    <strong>Generated On:</strong> <span id="lblTimestamp">10-Jul-2026 11:31 AM</span><br>
+                    <strong>Generated On:</strong> <span id="lblTimestamp">14-Oct-2026 04:24 PM</span><br>
                     <strong>Secure Mode:</strong> Active System Gateway
                 </div>
             </div>
@@ -860,6 +1025,7 @@
             </div>
         </div>
 
+        <!-- Institutional Fine-Print Footer -->
         <footer class="receipt-footer">
             <div class="thank-you">Thank You!</div>
             <div class="system-generated-text">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
@@ -867,6 +1033,7 @@
 
     </div>
 
+    <!-- CONTROL GATEWAY UTILITY PANEL -->
     <div class="secure-controller-gateway">
         <div class="gateway-header">
             <div class="gateway-title">
@@ -885,6 +1052,7 @@
         </div>
     </div>
 
+    <!-- LIVE DATABASE BATCH VISUAL LEDGER TABLE -->
     <div class="ledger-container">
         <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger</div>
         <table class="ledger-table">
@@ -898,12 +1066,14 @@
                 </tr>
             </thead>
             <tbody id="ledgerBody">
-                </tbody>
+                <!-- Data storage rows get populated here instantly -->
+            </tbody>
         </table>
     </div>
 
 </div>
 
+<!-- JAVASCRIPT ENGINE -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const downloadBtn = document.getElementById('download');
@@ -912,21 +1082,23 @@
         const phoneInput = document.getElementById('phone');
         const countryCodeSelect = document.getElementById('countryCode');
         const phoneError = document.getElementById('phoneError');
+        const paidAmountInput = document.getElementById('paidAmount');
+        const wordsInput = document.getElementById('words');
+        const installmentSelect = document.getElementById('installment');
         
         let sessionIsUnlocked = false; 
 
-        // Current real-time clock parsing setup for pre-filling manual fields
+        // System Date and Clock Parsing Setup
         const now = new Date();
         const dateString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
         
-        // Receipt Date is fully assigned and systematically managed here
         document.getElementById('receiptDate').value = dateString;
         document.getElementById('paymentDate').value = dateString;
 
         const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
         document.getElementById('lblTimestamp').innerText = now.toLocaleString('en-US', options).replace(/,/g, '');
 
-        // Click security badge widget to toggle ledger clearing configurations
+        // Security Lock Toggle
         lockStatus.addEventListener('click', () => {
             if(!sessionIsUnlocked) {
                 let verification = prompt("Enter Administrative Security PIN to unlock ledger clearing functions:");
@@ -944,7 +1116,7 @@
             }
         });
 
-        // --- 1. DYNAMIC RECEIPT GENERATION COUNTER ---
+        // 1. Dynamic Receipt Number Sequence Counter
         function updateReceiptNumberSequence() {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             const nextSequenceNumber = currentRecords.length + 1;
@@ -952,7 +1124,7 @@
             document.getElementById('receiptNo').value = `APA-2026-${formattedNumber}`;
         }
 
-        // --- 2. NUMBER TO WORDS TRANSLATION CONVERTER ---
+        // 2. Number to Words Converter
         function convertNumberToWords(amount) {
             if (amount === 0) return 'Zero Only';
             const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
@@ -972,25 +1144,20 @@
             return str.trim() + ' Only';
         }
 
-        // --- 3. DYNAMIC SANITIZED COUNTRY PHONE VALIDATION ENGINE ---
+        // 3. Country Phone Validation Engine
         function runLivePhoneVerification() {
             const rawValue = phoneInput.value;
-            
-            // Strip away formatting definitions (plus signs, spaces, hyphens, brackets) to extract only raw index digits
             const sanitizedDigits = rawValue.replace(/[\+\s\-\(\)]/g, '');
             
-            // If completely empty, hide message layer but intercept submit states
             if (rawValue.trim().length === 0) {
                 phoneError.style.display = 'none';
                 return false;
             }
 
-            // Extract validation length constraints from attributes
             const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
             const minLength = parseInt(selectedOption.getAttribute('data-min'), 10);
             const maxLength = parseInt(selectedOption.getAttribute('data-max'), 10);
 
-            // Validate numeric structural integrity
             if (sanitizedDigits.length < minLength || sanitizedDigits.length > maxLength) {
                 phoneError.style.display = 'block';
                 return false;
@@ -1000,7 +1167,7 @@
             }
         }
 
-        // --- 4. FORM INPUT MASTER VALIDATION ENGINE ---
+        // 4. Master Form Validation
         function runReceiptFormValidation() {
             const name = document.getElementById('name').value.trim();
             const course = document.getElementById('course').value;
@@ -1010,13 +1177,11 @@
             const receiptDate = document.getElementById('receiptDate').value.trim();
             const installment = document.getElementById('installment').value;
 
-            // 1. Mandatory Field Presence Check
             if (!name || !course || !year || !paidAmount || !paymentDate || !receiptDate || !installment) {
                 alert("Please complete all mandatory fields before printing or downloading the receipt.");
                 return false;
             }
 
-            // 2. Strict global phone verification checkout interceptor
             if (!runLivePhoneVerification()) {
                 return false;
             }
@@ -1024,17 +1189,15 @@
             return true;
         }
 
-        // --- 5. SYNC INTERACTIVE FIELD LAYOUT VALUES TO PURE TEXT PRINT TAGS ---
+        // 5. Print Previews Value Synchronizer
         function syncPrintPreviews() {
             document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
             document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
             document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
             
-            // Capture typed field layouts safely for document presentation output
             const rawPhoneValue = phoneInput.value.trim();
             const selectedPrefix = countryCodeSelect.value;
             
-            // Clean up to prevent duplicate country prefix if user manually entered it inside the input box
             let formattedPhoneOutput = rawPhoneValue;
             if (rawPhoneValue.startsWith(selectedPrefix)) {
                 formattedPhoneOutput = rawPhoneValue.slice(selectedPrefix.length).trim();
@@ -1058,7 +1221,7 @@
             document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
         }
 
-        // --- 6. ADVANCED COMPREHENSIVE DUPLICATE RECORD IDENTIFIER ---
+        // 6. Multi-Criteria Duplicate Record Checker
         function isDuplicateRecord() {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             
@@ -1069,13 +1232,8 @@
             const activePhone = phoneInput.value.replace(/[\+\s\-\(\)]/g, '');
 
             return currentRecords.some(record => {
-                // Criteria 1: Receipt Number Match
                 const receiptMatch = (record.receiptNo === activeReceiptNo);
-                
-                // Criteria 2: Matching unique student phone payload
                 const phoneMatch = (activePhone && record.phoneRaw === activePhone);
-                
-                // Criteria 3: Duplicate Student Payment Event Match (Same Name + Same Class Track + Same Payment Milestone Stage)
                 const paymentInstanceMatch = (
                     record.studentName.trim().toLowerCase() === activeName &&
                     record.course === activeCourse &&
@@ -1086,7 +1244,7 @@
             });
         }
 
-        // --- 7. DATA LOGGING FOR BATCH TRACKING ---
+        // 7. Ledger Logging
         function logReceiptData() {
             if (isDuplicateRecord()) {
                 return false;
@@ -1128,7 +1286,39 @@
             });
         }
 
-        // --- SANITATION CAPABILITIES & ACTION FILTERS ---
+        // UI Animation Feedback Controllers
+        paidAmountInput.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value, 10);
+            if (!isNaN(val) && val >= 0) {
+                wordsInput.value = convertNumberToWords(val);
+            } else {
+                wordsInput.value = '';
+            }
+
+            paidAmountInput.classList.remove('value-updated-highlight');
+            wordsInput.classList.remove('value-updated-highlight');
+            void paidAmountInput.offsetWidth;
+            paidAmountInput.classList.add('value-updated-highlight');
+            wordsInput.classList.add('value-updated-highlight');
+        });
+
+        installmentSelect.addEventListener('change', () => {
+            installmentSelect.classList.remove('field-active-change');
+            void installmentSelect.offsetWidth;
+            installmentSelect.classList.add('field-active-change');
+        });
+
+        document.querySelectorAll('input[name="payment"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const parentCard = e.target.closest('.info-card');
+                if (parentCard) {
+                    parentCard.classList.remove('field-active-change');
+                    void parentCard.offsetWidth;
+                    parentCard.classList.add('field-active-change');
+                }
+            });
+        });
+
         phoneInput.addEventListener('input', (e) => {
             e.target.value = e.target.value.replace(/[^0-9\s\-\(\)\+]/g, '');
             runLivePhoneVerification();
@@ -1138,20 +1328,10 @@
             runLivePhoneVerification();
         });
 
-        document.getElementById('paidAmount').addEventListener('input', (e) => {
-            const val = parseInt(e.target.value, 10);
-            if (!isNaN(val) && val >= 0) {
-                document.getElementById('words').value = convertNumberToWords(val);
-            } else {
-                document.getElementById('words').value = '';
-            }
-        });
-
-        // --- 8. INSTANT OPEN DOWNLOAD PDF ENGINE ---
+        // 8. Download PDF Handler
         downloadBtn.addEventListener('click', async () => {
             if (!runReceiptFormValidation()) return;
 
-            // Block execution completely if data records flag a system duplicate match
             if (isDuplicateRecord()) {
                 alert("Duplicate record detected. This payment has already been recorded.");
                 return;
@@ -1161,6 +1341,10 @@
             const targetElement = document.getElementById('receiptBlock');
 
             try {
+                downloadBtn.classList.add('btn-loading');
+                const icon = downloadBtn.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-spinner';
+
                 const inputs = targetElement.querySelectorAll('input, select, textarea, .mode-radio-group, .country-select');
                 const previews = targetElement.querySelectorAll('.print-preview-label');
                 
@@ -1201,10 +1385,14 @@
             } catch (err) {
                 console.error(err);
                 alert("PDF rendering framework execution breakdown.");
+            } finally {
+                downloadBtn.classList.remove('btn-loading');
+                const icon = downloadBtn.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-file-pdf';
             }
         });
 
-        // --- 9. PRINT CAPABILITY CONTROLLER ENGINE ---
+        // 9. Print Receipt Handler
         printBtn.addEventListener('click', () => {
             if (!runReceiptFormValidation()) return;
 
@@ -1220,7 +1408,7 @@
             }, 150);
         });
 
-        // --- 10. BATCH LEDGER EXPORT LOGIC & PIN SECURED WIPE HOOK ---
+        // 10. Batch Ledger CSV Export & Wipe
         document.getElementById('exportExcel').addEventListener('click', () => {
             const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
             if (currentRecords.length === 0) return alert("There are no captured ledger logs available to compile!");
@@ -1249,7 +1437,7 @@
             }, 300);
         });
 
-        // --- 11. STRUCTURAL ENTRY FIELD RESET ---
+        // 11. Reset Form
         document.getElementById('clearForm').addEventListener('click', () => {
             if (confirm("Are you sure you want to clear the active form inputs?")) {
                 document.querySelectorAll('input, select, textarea').forEach(el => {
@@ -1268,7 +1456,7 @@
             }
         });
 
-        // Bootstrapping Initial Sequence Metrics
+        // Initial Boot sequence
         updateLiveLedgerDisplay();
         updateReceiptNumberSequence();
     });
