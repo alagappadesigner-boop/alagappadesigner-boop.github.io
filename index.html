@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alagappa Performing Arts Academy - Fee Receipt System</title>
     
-    <!-- External Dependencies for Icons, Canvas, and PDF Generation -->
+    <!-- External Dependencies for Icons, Canvas, PDF Generation, and Supabase -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -22,7 +23,7 @@
             --error-red: #DC2626;
         }
 
-        /* Global Reset to eliminate unwanted click/tap outlines */
+        /* Global Reset */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -30,7 +31,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Suppress persistent focus highlight outlines on non-interactive structural elements */
         body, div, header, footer, table, tbody, thead, tr, th, td, h1, h2, h3, span, label, p, i {
             outline: none !important;
             -webkit-user-select: none;
@@ -39,7 +39,6 @@
             user-select: none;
         }
 
-        /* Explicitly allow data selection inside input frameworks only */
         input, select, textarea {
             -webkit-user-select: text;
             -moz-user-select: text;
@@ -78,7 +77,6 @@
             width: 100%;
         }
 
-        /* Faint Institutional Watermark Component */
         .receipt-card::before {
             content: '';
             position: absolute;
@@ -524,30 +522,6 @@
             gap: 6px;
         }
 
-        .security-lock-status {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .status-locked {
-            background-color: #FEF2F2;
-            color: #DC2626;
-            border: 1px solid #FEE2E2;
-        }
-
-        .status-unlocked {
-            background-color: #F0FDF4;
-            color: #16A34A;
-            border: 1px solid #DCFCE7;
-        }
-
         .action-toolbar {
             display: flex;
             gap: 12px;
@@ -566,16 +540,25 @@
             font-weight: 600;
             cursor: pointer;
             color: #FFFFFF;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
         }
 
-        .btn:hover { opacity: 0.9; }
+        .btn:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
         #download { background-color: var(--primary-navy); }
         #printBtn { background-color: var(--brand-gold); color: #000000; }
         #exportExcel { background-color: #16A34A; }
         #clearForm { background-color: #DC2626; }
 
-        /* --- Live Batch Recovery Ledger Table --- */
+        /* --- Shared Supabase Batch Recovery Ledger Table --- */
         .ledger-container {
             background-color: #FFFFFF;
             border-radius: 8px;
@@ -619,37 +602,14 @@
             color: var(--text-dark);
         }
 
-        /* Pure Text Element Previews Container */
         .print-preview-label {
             display: none;
         }
 
-        /* ==========================================================================
-           ELEGANT RECEIPT ANIMATIONS & ACCESSIBLE UI TRANSITIONS
-           ========================================================================== */
-
-        /* Keyframes for Entrances */
+        /* --- Entrance Animations --- */
         @keyframes receiptPageEntrance {
-            0% {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulseHighlightGold {
-            0% {
-                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
-            }
+            0% { opacity: 0; transform: translateY(16px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes subtleValuePulse {
@@ -658,88 +618,9 @@
             100% { transform: scale(1); }
         }
 
-        /* Staggered Section Entrances */
-        .container {
-            animation: receiptPageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards;
-        }
-
-        .receipt-header,
-        .title-meta-section,
-        .receipt-grid .info-card:nth-child(1),
-        .receipt-grid .info-card:nth-child(2),
-        .remarks-box,
-        .academy-declaration-clause,
-        .closing-area,
-        .receipt-footer {
-            animation: receiptPageEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) ease-out both;
-        }
-
-        .receipt-header { animation-delay: 0.05s; }
-        .title-meta-section { animation-delay: 0.10s; }
-        .receipt-grid .info-card:nth-child(1) { animation-delay: 0.15s; }
-        .receipt-grid .info-card:nth-child(2) { animation-delay: 0.20s; }
-        .remarks-box { animation-delay: 0.25s; }
-        .academy-declaration-clause { animation-delay: 0.28s; }
-        .closing-area { animation-delay: 0.31s; }
-        .receipt-footer { animation-delay: 0.35s; }
-
-        /* Gold-Border Focus Transitions for Form Fields */
-        .doc-input, 
-        .doc-select, 
-        .meta-inline-input, 
-        .country-select, 
-        .remarks-textarea {
-            transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease;
-        }
-
-        .doc-input:focus, 
-        .doc-select:focus, 
-        .remarks-textarea:focus {
-            border-bottom-color: var(--brand-gold) !important;
-            box-shadow: 0 2px 8px -2px rgba(212, 175, 55, 0.25);
-        }
-
-        /* Action Button Hover, Glow & Press Effects */
-        .btn {
-            transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), 
-                        box-shadow 0.2s ease, 
-                        background-color 0.2s ease, 
-                        opacity 0.2s ease;
-            will-change: transform, box-shadow;
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-        }
-
-        .btn:active:not(:disabled) {
-            transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Field Value Update Highlights */
-        .value-updated-highlight {
-            animation: subtleValuePulse 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .field-active-change {
-            animation: pulseHighlightGold 0.45s ease-out;
-        }
-
-        .radio-label {
-            transition: color 0.2s ease, transform 0.15s ease;
-        }
-
-        .radio-label:hover {
-            color: var(--primary-navy);
-            transform: translateY(-1px);
-        }
-
-        .security-lock-status,
-        .inline-error-msg {
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .container { animation: receiptPageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards; }
+        
+        .value-updated-highlight { animation: subtleValuePulse 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
         .btn.btn-loading {
             pointer-events: none;
@@ -755,28 +636,15 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Reduced-Motion Accessibility Override */
         @media (prefers-reduced-motion: reduce) {
-            .container,
-            .receipt-header,
-            .title-meta-section,
-            .receipt-grid .info-card,
-            .remarks-box,
-            .academy-declaration-clause,
-            .closing-area,
-            .receipt-footer,
-            .btn,
-            .doc-input,
-            .doc-select,
-            .value-updated-highlight,
-            .field-active-change {
+            .container, .btn, .value-updated-highlight {
                 animation: none !important;
                 transition: none !important;
                 transform: none !important;
             }
         }
 
-        /* --- Responsive Printing Execution Overrides --- */
+        /* --- Responsive Printing Overrides --- */
         @media print {
             body {
                 background-color: #FFFFFF;
@@ -805,17 +673,7 @@
                 font-weight: 700 !important;
                 color: var(--primary-navy) !important;
             }
-            .container,
-            .receipt-header,
-            .title-meta-section,
-            .receipt-grid .info-card,
-            .remarks-box,
-            .academy-declaration-clause,
-            .closing-area,
-            .receipt-footer {
-                animation: none !important;
-                transform: none !important;
-            }
+            .container { animation: none !important; }
         }
     </style>
 </head>
@@ -1012,7 +870,7 @@
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
-                    <strong>Generated On:</strong> <span id="lblTimestamp">14-Oct-2026 04:24 PM</span><br>
+                    <strong>Generated On:</strong> <span id="lblTimestamp">--</span><br>
                     <strong>Secure Mode:</strong> Active System Gateway
                 </div>
             </div>
@@ -1039,8 +897,14 @@
             <div class="gateway-title">
                 <i class="fa-solid fa-shield-halved"></i> Isolated Processing Controller Gateway
             </div>
-            <div id="lockStatus" class="security-lock-status status-locked">
-                <i class="fa-solid fa-lock"></i> <span>LEDGER WIPEOUT LOCKED</span>
+        </div>
+
+        <!-- Staff Authentication Control Bar -->
+        <div class="staff-auth-bar" style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 12px;">
+            <div id="authStatus"><i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In</span></div>
+            <div id="authActions">
+                <button type="button" id="btnLogin" class="btn" style="background-color: var(--primary-navy); padding: 5px 12px; font-size: 11px;"><i class="fa-solid fa-right-to-bracket"></i> Staff Login</button>
+                <button type="button" id="btnLogout" class="btn" style="background-color: var(--text-muted); padding: 5px 12px; font-size: 11px; display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
             </div>
         </div>
         
@@ -1052,9 +916,9 @@
         </div>
     </div>
 
-    <!-- LIVE DATABASE BATCH VISUAL LEDGER TABLE -->
+    <!-- SHARED SUPABASE CENTRALIZED LEDGER TABLE -->
     <div class="ledger-container">
-        <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger</div>
+        <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger (Shared Database)</div>
         <table class="ledger-table">
             <thead>
                 <tr>
@@ -1066,65 +930,109 @@
                 </tr>
             </thead>
             <tbody id="ledgerBody">
-                <!-- Data storage rows get populated here instantly -->
+                <!-- Data storage rows from Supabase get populated here dynamically -->
             </tbody>
         </table>
     </div>
 
 </div>
 
-<!-- JAVASCRIPT ENGINE -->
+<!-- JAVASCRIPT SUPABASE DATABASE ENGINE -->
 <script>
+    // --- 1. SUPABASE DATABASE CONFIGURATION ---
+    // REPLACE THESE VALUES WITH YOUR SUPABASE PROJECT KEYS
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_ID.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentStaffUser = null;
+
     document.addEventListener('DOMContentLoaded', () => {
         const downloadBtn = document.getElementById('download');
         const printBtn = document.getElementById('printBtn');
-        const lockStatus = document.getElementById('lockStatus');
         const phoneInput = document.getElementById('phone');
         const countryCodeSelect = document.getElementById('countryCode');
         const phoneError = document.getElementById('phoneError');
         const paidAmountInput = document.getElementById('paidAmount');
         const wordsInput = document.getElementById('words');
-        const installmentSelect = document.getElementById('installment');
-        
-        let sessionIsUnlocked = false; 
 
-        // System Date and Clock Parsing Setup
+        // Clock & Pre-filled Date Formats
         const now = new Date();
         const dateString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
-        
         document.getElementById('receiptDate').value = dateString;
         document.getElementById('paymentDate').value = dateString;
 
         const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
         document.getElementById('lblTimestamp').innerText = now.toLocaleString('en-US', options).replace(/,/g, '');
 
-        // Security Lock Toggle
-        lockStatus.addEventListener('click', () => {
-            if(!sessionIsUnlocked) {
-                let verification = prompt("Enter Administrative Security PIN to unlock ledger clearing functions:");
-                if(verification === "1234") { 
-                    sessionIsUnlocked = true;
-                    lockStatus.className = "security-lock-status status-unlocked";
-                    lockStatus.innerHTML = '<i class="fa-solid fa-lock-open"></i> <span>LEDGER WIPEOUT ALLOWED</span>';
-                } else {
-                    alert("Invalid Admin PIN. Access Denied.");
-                }
+        // --- 2. AUTHENTICATION CONTROLLER ---
+        async function initStaffAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            updateAuthUI(session ? session.user : null);
+
+            supabaseClient.auth.onAuthStateChange((_event, session) => {
+                updateAuthUI(session ? session.user : null);
+            });
+        }
+
+        function updateAuthUI(user) {
+            currentStaffUser = user;
+            const authStatus = document.getElementById('authStatus');
+            const btnLogin = document.getElementById('btnLogin');
+            const btnLogout = document.getElementById('btnLogout');
+
+            if (user) {
+                authStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#16A34A;"></i> <span>Signed in as: <b>${user.email}</b></span>`;
+                btnLogin.style.display = 'none';
+                btnLogout.style.display = 'inline-flex';
             } else {
-                sessionIsUnlocked = false;
-                lockStatus.className = "security-lock-status status-locked";
-                lockStatus.innerHTML = '<i class="fa-solid fa-lock"></i> <span>LEDGER WIPEOUT LOCKED</span>';
+                authStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#DC2626;"></i> <span>Status: Signed Out (Sign in required to save)</span>`;
+                btnLogin.style.display = 'inline-flex';
+                btnLogout.style.display = 'none';
+            }
+        }
+
+        document.getElementById('btnLogin').addEventListener('click', async () => {
+            const email = prompt("Enter Staff Email:");
+            const password = prompt("Enter Staff Password:");
+            if (email && password) {
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) alert("Authentication Failed: " + error.message);
             }
         });
 
-        // 1. Dynamic Receipt Number Sequence Counter
-        function updateReceiptNumberSequence() {
-            const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-            const nextSequenceNumber = currentRecords.length + 1;
-            const formattedNumber = String(nextSequenceNumber).padStart(4, '0');
-            document.getElementById('receiptNo').value = `APA-2026-${formattedNumber}`;
+        document.getElementById('btnLogout').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            alert("Logged out successfully.");
+        });
+
+        // --- 3. FETCH NEXT RECEIPT NUMBER PREVIEW ---
+        async function fetchNextReceiptNumberPreview() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('receipts')
+                    .select('receipt_no')
+                    .order('id', { ascending: false })
+                    .limit(1);
+
+                if (error) throw error;
+
+                let nextNum = 1;
+                if (data && data.length > 0) {
+                    const lastNo = data[0].receipt_no;
+                    const match = lastNo.match(/APA-2026-(\d+)/);
+                    if (match) {
+                        nextNum = parseInt(match[1], 10) + 1;
+                    }
+                }
+                const formattedNumber = `APA-2026-${String(nextNum).padStart(4, '0')}`;
+                document.getElementById('receiptNo').value = formattedNumber;
+            } catch (err) {
+                console.error("Sequence fetch error:", err);
+            }
         }
 
-        // 2. Number to Words Converter
+        // --- 4. NUMBER TO WORDS CONVERTER ---
         function convertNumberToWords(amount) {
             if (amount === 0) return 'Zero Only';
             const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
@@ -1144,7 +1052,7 @@
             return str.trim() + ' Only';
         }
 
-        // 3. Country Phone Validation Engine
+        // --- 5. PHONE NUMBER VALIDATION ENGINE ---
         function runLivePhoneVerification() {
             const rawValue = phoneInput.value;
             const sanitizedDigits = rawValue.replace(/[\+\s\-\(\)]/g, '');
@@ -1167,7 +1075,7 @@
             }
         }
 
-        // 4. Master Form Validation
+        // --- 6. MASTER FORM VALIDATION ---
         function runReceiptFormValidation() {
             const name = document.getElementById('name').value.trim();
             const course = document.getElementById('course').value;
@@ -1189,7 +1097,7 @@
             return true;
         }
 
-        // 5. Print Previews Value Synchronizer
+        // --- 7. PRINT PREVIEWS VALUE SYNCHRONIZER ---
         function syncPrintPreviews() {
             document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
             document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
@@ -1221,72 +1129,138 @@
             document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
         }
 
-        // 6. Multi-Criteria Duplicate Record Checker
-        function isDuplicateRecord() {
-            const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-            
+        // --- 8. DATABASE DUPLICATE RECORD CHECKER ---
+        async function checkDuplicateInDatabase() {
             const activeReceiptNo = document.getElementById('receiptNo').value;
-            const activeName = document.getElementById('name').value.trim().toLowerCase();
+            const activeName = document.getElementById('name').value.trim();
             const activeCourse = document.getElementById('course').value;
             const activeInstallment = document.getElementById('installment').value;
-            const activePhone = phoneInput.value.replace(/[\+\s\-\(\)]/g, '');
 
-            return currentRecords.some(record => {
-                const receiptMatch = (record.receiptNo === activeReceiptNo);
-                const phoneMatch = (activePhone && record.phoneRaw === activePhone);
-                const paymentInstanceMatch = (
-                    record.studentName.trim().toLowerCase() === activeName &&
-                    record.course === activeCourse &&
-                    record.installmentStage === activeInstallment
-                );
+            // 1. Check Receipt Number Conflict
+            const { data: numMatch } = await supabaseClient
+                .from('receipts')
+                .select('id')
+                .eq('receipt_no', activeReceiptNo);
 
-                return receiptMatch || phoneMatch || paymentInstanceMatch;
-            });
+            if (numMatch && numMatch.length > 0) return true;
+
+            // 2. Check Student Milestone Payment Duplicate
+            const { data: recordMatch } = await supabaseClient
+                .from('receipts')
+                .select('id')
+                .ilike('student_name', activeName)
+                .eq('course', activeCourse)
+                .eq('installment_stage', activeInstallment);
+
+            if (recordMatch && recordMatch.length > 0) return true;
+
+            return false;
         }
 
-        // 7. Ledger Logging
-        function logReceiptData() {
-            if (isDuplicateRecord()) {
-                return false;
+        // --- 9. ATOMIC RECEIPT SAVE TO SUPABASE ---
+        async function saveReceiptToSupabase() {
+            if (!currentStaffUser) {
+                alert("Authentication Required: Please sign in as staff before creating receipts.");
+                return null;
             }
 
-            const activeReceiptNo = document.getElementById('receiptNo').value;
-            const rawPhoneValue = phoneInput.value.replace(/[\+\s\-\(\)]/g, '');
+            const isDuplicate = await checkDuplicateInDatabase();
+            if (isDuplicate) {
+                alert("Duplicate record detected. This payment has already been recorded.");
+                return null;
+            }
 
-            const record = {
-                receiptNo: activeReceiptNo,
-                studentName: document.getElementById('name').value || 'N/A',
-                phoneRaw: rawPhoneValue || '',
-                course: document.getElementById('course').value || 'N/A',
-                installmentStage: document.getElementById('installment').value || 'N/A',
-                paidAmount: document.getElementById('paidAmount').value || '0',
-                paymentMode: document.querySelector('input[name="payment"]:checked')?.value || 'Cash'
+            // Execute atomic receipt sequence generator from database
+            const { data: seqData, error: seqError } = await supabaseClient.rpc('generate_next_receipt_number');
+            
+            let finalReceiptNo = document.getElementById('receiptNo').value;
+            if (!seqError && seqData) {
+                finalReceiptNo = seqData;
+            }
+
+            const payload = {
+                receipt_no: finalReceiptNo,
+                receipt_date: document.getElementById('receiptDate').value.split('/').reverse().join('-'),
+                student_name: document.getElementById('name').value.trim(),
+                country_code: countryCodeSelect.value,
+                phone_number: phoneInput.value.trim(),
+                phone_raw: phoneInput.value.replace(/[\+\s\-\(\)]/g, ''),
+                course: document.getElementById('course').value,
+                academic_year: document.getElementById('year').value,
+                paid_amount: parseFloat(document.getElementById('paidAmount').value),
+                amount_in_words: document.getElementById('words').value,
+                payment_date: document.getElementById('paymentDate').value.split('/').reverse().join('-'),
+                payment_mode: document.querySelector('input[name="payment"]:checked').value,
+                transaction_id: document.getElementById('transactionId').value.trim() || 'N/A',
+                installment_stage: document.getElementById('installment').value,
+                remarks: document.getElementById('remarks').value.trim() || 'No Remarks'
             };
 
-            let currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-            currentRecords.push(record);
-            localStorage.setItem('receiptLogs', JSON.stringify(currentRecords));
-            
-            updateLiveLedgerDisplay();
-            updateReceiptNumberSequence();
-            return true;
+            const { data, error } = await supabaseClient
+                .from('receipts')
+                .insert([payload])
+                .select();
+
+            if (error) {
+                console.error("Database Insert Error:", error);
+                alert("Save Operation Failed: " + error.message);
+                return null;
+            }
+
+            document.getElementById('receiptNo').value = finalReceiptNo;
+            await loadSharedLedgerFromSupabase();
+            await fetchNextReceiptNumberPreview();
+
+            return data[0];
         }
 
-        function updateLiveLedgerDisplay() {
-            const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
+        // --- 10. FETCH SHARED LEDGER FROM DATABASE ---
+        async function loadSharedLedgerFromSupabase() {
             const tbody = document.getElementById('ledgerBody');
             if (!tbody) return;
-            
-            tbody.innerHTML = currentRecords.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No records captured yet.</td></tr>' : '';
-            
-            currentRecords.forEach((rec) => {
+
+            const { data: records, error } = await supabaseClient
+                .from('receipts')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                console.error("Ledger Fetch Error:", error);
+                return;
+            }
+
+            tbody.innerHTML = records.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No captured records in shared database.</td></tr>' : '';
+
+            records.forEach((rec) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td><b>${rec.receiptNo}</b></td><td>${rec.studentName}</td><td>${rec.course}</td><td>₹${parseFloat(rec.paidAmount).toLocaleString('en-IN')}</td><td>${rec.paymentMode}</td>`;
+                tr.innerHTML = `<td><b>${rec.receipt_no}</b></td><td>${rec.student_name}</td><td>${rec.course}</td><td>₹${parseFloat(rec.paid_amount).toLocaleString('en-IN')}</td><td>${rec.payment_mode}</td>`;
                 tbody.appendChild(tr);
             });
         }
 
-        // UI Animation Feedback Controllers
+        // --- 11. EXPORT SHARED LEDGER TO CSV ---
+        document.getElementById('exportExcel').addEventListener('click', async () => {
+            const { data: records, error } = await supabaseClient
+                .from('receipts')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error || !records || records.length === 0) {
+                return alert("There are no captured database logs available to export!");
+            }
+
+            let csv = "Receipt No,Student Name,Course,Amount Paid,Payment Mode,Payment Date,Transaction ID\n";
+            records.forEach(r => {
+                csv += `"${r.receipt_no}","${r.student_name}","${r.course}","${r.paid_amount}","${r.payment_mode}","${r.payment_date}","${r.transaction_id}"\n`;
+            });
+
+            const link = document.createElement("a");
+            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+            link.download = "Academy_Shared_Ledger_Records.csv";
+            link.click();
+        });
+
+        // Input Listeners
         paidAmountInput.addEventListener('input', (e) => {
             const val = parseInt(e.target.value, 10);
             if (!isNaN(val) && val >= 0) {
@@ -1302,23 +1276,6 @@
             wordsInput.classList.add('value-updated-highlight');
         });
 
-        installmentSelect.addEventListener('change', () => {
-            installmentSelect.classList.remove('field-active-change');
-            void installmentSelect.offsetWidth;
-            installmentSelect.classList.add('field-active-change');
-        });
-
-        document.querySelectorAll('input[name="payment"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const parentCard = e.target.closest('.info-card');
-                if (parentCard) {
-                    parentCard.classList.remove('field-active-change');
-                    void parentCard.offsetWidth;
-                    parentCard.classList.add('field-active-change');
-                }
-            });
-        });
-
         phoneInput.addEventListener('input', (e) => {
             e.target.value = e.target.value.replace(/[^0-9\s\-\(\)\+]/g, '');
             runLivePhoneVerification();
@@ -1328,14 +1285,12 @@
             runLivePhoneVerification();
         });
 
-        // 8. Download PDF Handler
+        // --- 12. DOWNLOAD PDF HANDLER ---
         downloadBtn.addEventListener('click', async () => {
             if (!runReceiptFormValidation()) return;
 
-            if (isDuplicateRecord()) {
-                alert("Duplicate record detected. This payment has already been recorded.");
-                return;
-            }
+            const savedRecord = await saveReceiptToSupabase();
+            if (!savedRecord) return;
 
             syncPrintPreviews();
             const targetElement = document.getElementById('receiptBlock');
@@ -1347,18 +1302,13 @@
 
                 const inputs = targetElement.querySelectorAll('input, select, textarea, .mode-radio-group, .country-select');
                 const previews = targetElement.querySelectorAll('.print-preview-label');
-                
+
                 inputs.forEach(el => el.style.setProperty('display', 'none', 'important'));
                 previews.forEach(el => el.style.setProperty('display', 'inline-block', 'important'));
 
                 await new Promise(resolve => setTimeout(resolve, 150));
 
-                const canvas = await html2canvas(targetElement, { 
-                    scale: 2.5, 
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    logging: false
-                });
+                const canvas = await html2canvas(targetElement, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false });
 
                 inputs.forEach(el => el.style.removeProperty('display'));
                 previews.forEach(el => el.style.removeProperty('display'));
@@ -1366,25 +1316,22 @@
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const imgData = canvas.toDataURL('image/png');
-                
+
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const paddingSpace = 10;
                 const useWidth = pdfWidth - (paddingSpace * 2);
                 const pdfHeight = (canvas.height * useWidth) / canvas.width;
 
                 pdf.addImage(imgData, 'PNG', paddingSpace, paddingSpace, useWidth, pdfHeight);
-                
+
                 const rawStudentName = document.getElementById('name').value.trim();
                 const cleanedStudentName = rawStudentName.replace(/[^a-zA-Z0-9]/g, '');
-                const activeReceiptNo = document.getElementById('receiptNo').value;
-                const lastFourDigits = activeReceiptNo.slice(-4);
-                
-                pdf.save(`${cleanedStudentName}_${lastFourDigits}.pdf`);
+                const lastFourDigits = savedRecord.receipt_no.slice(-4);
 
-                logReceiptData();
+                pdf.save(`${cleanedStudentName}_${lastFourDigits}.pdf`);
             } catch (err) {
                 console.error(err);
-                alert("PDF rendering framework execution breakdown.");
+                alert("PDF rendering framework error.");
             } finally {
                 downloadBtn.classList.remove('btn-loading');
                 const icon = downloadBtn.querySelector('i');
@@ -1392,52 +1339,20 @@
             }
         });
 
-        // 9. Print Receipt Handler
-        printBtn.addEventListener('click', () => {
+        // --- 13. PRINT RECEIPT HANDLER ---
+        printBtn.addEventListener('click', async () => {
             if (!runReceiptFormValidation()) return;
 
-            if (isDuplicateRecord()) {
-                alert("Duplicate record detected. This payment has already been recorded.");
-                return;
-            }
+            const savedRecord = await saveReceiptToSupabase();
+            if (!savedRecord) return;
 
             syncPrintPreviews();
-            logReceiptData();
             setTimeout(() => {
                 window.print();
             }, 150);
         });
 
-        // 10. Batch Ledger CSV Export & Wipe
-        document.getElementById('exportExcel').addEventListener('click', () => {
-            const currentRecords = JSON.parse(localStorage.getItem('receiptLogs')) || [];
-            if (currentRecords.length === 0) return alert("There are no captured ledger logs available to compile!");
-            
-            let csv = "Receipt No,Student Name,Course,Amount Paid,Payment Mode\n";
-            currentRecords.forEach(r => {
-                csv += `"${r.receiptNo}","${r.studentName}","${r.course}","${r.paidAmount}","${r.paymentMode}"\n`;
-            });
-            
-            const link = document.createElement("a");
-            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
-            link.download = "Academy_Batch_Ledger_Records.csv";
-            link.click();
-            
-            setTimeout(() => {
-                if (confirm("Do you want to clear and wipe out the ledger database tables?")) {
-                    if (!sessionIsUnlocked) {
-                        alert("Action Blocked: Dropping batch data tables requires security authorization. Click the security status badge at the top to clear.");
-                    } else {
-                        localStorage.removeItem('receiptLogs');
-                        updateLiveLedgerDisplay();
-                        updateReceiptNumberSequence();
-                        alert("Database records dropped successfully.");
-                    }
-                }
-            }, 300);
-        });
-
-        // 11. Reset Form
+        // --- 14. RESET FORM HANDLER ---
         document.getElementById('clearForm').addEventListener('click', () => {
             if (confirm("Are you sure you want to clear the active form inputs?")) {
                 document.querySelectorAll('input, select, textarea').forEach(el => {
@@ -1452,13 +1367,14 @@
                 countryCodeSelect.value = "+91";
                 phoneError.style.display = 'none';
                 document.getElementById('paymentDate').value = dateString;
-                updateReceiptNumberSequence();
+                fetchNextReceiptNumberPreview();
             }
         });
 
-        // Initial Boot sequence
-        updateLiveLedgerDisplay();
-        updateReceiptNumberSequence();
+        // Initializing Sequence Engine
+        initStaffAuth();
+        loadSharedLedgerFromSupabase();
+        fetchNextReceiptNumberPreview();
     });
 </script>
 </body>
