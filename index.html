@@ -841,26 +841,17 @@
     <div class="secure-controller-gateway">
         <div class="gateway-header">
             <div class="gateway-title">
-                <i class="fa-solid fa-shield-halved"></i> Isolated Processing Controller Gateway
+                <i class="fa-solid fa-shield-halved"></i> Processing Controller Gateway
             </div>
             <button type="button" id="btnDarkMode" class="btn" style="padding: 4px 8px; font-size: 10.5px;"><i class="fa-solid fa-moon"></i> Dark Mode</button>
         </div>
 
-        <!-- Staff Authentication Control Bar -->
-        <div class="staff-auth-bar" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-light); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 11.5px;">
-            <div id="authStatus"><i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In (Actions Locked)</span></div>
-            <div id="authActions">
-                <button type="button" id="btnLogin" class="btn" style="background-color: var(--primary-navy); padding: 4px 10px; font-size: 10.5px;"><i class="fa-solid fa-right-to-bracket"></i> Staff Login</button>
-                <button type="button" id="btnLogout" class="btn" style="background-color: var(--error-red); padding: 4px 10px; font-size: 10.5px; display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-            </div>
-        </div>
-
         <div class="action-toolbar">
-            <button type="button" id="download" class="btn action-btn" disabled><i class="fa-solid fa-download"></i> Download PDF</button>
-            <button type="button" id="printBtn" class="btn action-btn" disabled><i class="fa-solid fa-print"></i> Print Receipt</button>
-            <button type="button" id="exportExcel" class="btn action-btn" disabled><i class="fa-solid fa-file-excel"></i> Export Ledger</button>
-            <button type="button" id="btnBackup" class="btn action-btn" disabled><i class="fa-solid fa-cloud-arrow-down"></i> Download Backup</button>
-            <button type="button" id="btnRestore" class="btn action-btn" disabled><i class="fa-solid fa-cloud-arrow-up"></i> Restore Backup</button>
+            <button type="button" id="download" class="btn action-btn"><i class="fa-solid fa-download"></i> Download PDF</button>
+            <button type="button" id="printBtn" class="btn action-btn"><i class="fa-solid fa-print"></i> Print Receipt</button>
+            <button type="button" id="exportExcel" class="btn action-btn"><i class="fa-solid fa-file-excel"></i> Export Ledger</button>
+            <button type="button" id="btnBackup" class="btn action-btn"><i class="fa-solid fa-cloud-arrow-down"></i> Download Backup</button>
+            <button type="button" id="btnRestore" class="btn action-btn"><i class="fa-solid fa-cloud-arrow-up"></i> Restore Backup</button>
             <input type="file" id="restoreFile" style="display: none;" accept=".json">
             <button type="button" id="clearForm" class="btn" style="background-color: var(--error-red);"><i class="fa-solid fa-rotate-right"></i> Reset Form</button>
         </div>
@@ -868,40 +859,11 @@
 
 </div>
 
-<!-- Staff Login Modal -->
-<div id="loginModal" class="modal-overlay">
-    <div class="modal-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">
-            <h3 style="font-size: 13px; color: var(--primary-navy); text-transform: uppercase; font-weight: 700;">
-                <i class="fa-solid fa-user-shield"></i> Staff Authentication
-            </h3>
-            <button type="button" id="closeModal" style="background: none; border: none; font-size: 15px; cursor: pointer; color: var(--text-muted);">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        
-        <form id="staffLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
-            <div>
-                <label style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px;">Staff Email ID</label>
-                <input type="email" id="staffEmail" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 7px; border-radius: 4px; width: 100%;" placeholder="staff@alagappaarts.com">
-            </div>
-            <div>
-                <label style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px;">Password</label>
-                <input type="password" id="staffPassword" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 7px; border-radius: 4px; width: 100%;" placeholder="••••••••">
-            </div>
-            <div id="loginErrorMsg" style="display: none; color: var(--error-red); font-size: 10.5px; font-weight: 500;"></div>
-            <button type="submit" id="submitLogin" class="btn" style="background-color: var(--primary-navy); justify-content: center; width: 100%; padding: 9px;">
-                Sign In to Gateway
-            </button>
-        </form>
-    </div>
-</div>
-
 <!-- Validation Alert Modal -->
 <div id="validationModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 28px; color: var(--error-red); margin-bottom: 10px;"></i>
-        <h3 id="validationTitle" style="font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text-dark);">Incomplete Details</h3>
+        <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text-dark);">Incomplete Details</h3>
         <p id="validationMsg" style="font-size: 12px; color: var(--text-muted); margin-bottom: 18px;">Please fill out all required details before proceeding.</p>
         <button type="button" id="closeValidationModal" class="btn" style="background-color: var(--primary-navy); width: 100%; justify-content: center;">OK, Got It</button>
     </div>
@@ -915,8 +877,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
-    let isStaffAuthenticated = false;
 
     function showToast(message, isError = false) {
         const toast = document.getElementById('notificationToast');
@@ -944,7 +904,6 @@ document.addEventListener('DOMContentLoaded', () => {
             txnLabel.innerHTML = `TXN / UPI ID *`;
             transactionInput.classList.add('required-field');
         }
-        updateButtonStates();
     }
 
     paymentModeRadios.forEach(radio => {
@@ -963,34 +922,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
-    function updateButtonStates() {
-        const actionButtons = document.querySelectorAll('.action-btn');
-        const missingField = getFirstMissingField();
-        
-        actionButtons.forEach(btn => {
-            if (isStaffAuthenticated && !missingField) {
-                btn.removeAttribute('disabled');
-            } else {
-                btn.setAttribute('disabled', 'true');
-            }
-        });
-    }
-
-    document.querySelectorAll('.required-field, input, select').forEach(element => {
-        element.addEventListener('input', updateButtonStates);
-        element.addEventListener('change', updateButtonStates);
-    });
-
     function showValidationPopup() {
-        if (!isStaffAuthenticated) {
-            document.getElementById('validationMsg').textContent = "Please sign in as staff first using your official credentials.";
+        const missing = getFirstMissingField();
+        if (missing) {
+            document.getElementById('validationMsg').textContent = `Please enter the ${missing} before proceeding.`;
         } else {
-            const missing = getFirstMissingField();
-            if (missing) {
-                document.getElementById('validationMsg').textContent = `Please enter the ${missing} before proceeding.`;
-            } else {
-                document.getElementById('validationMsg').textContent = "Please fill in all required fields and transaction details.";
-            }
+            document.getElementById('validationMsg').textContent = "Please fill in all required fields and transaction details.";
         }
         document.getElementById('validationModal').style.display = 'flex';
     }
@@ -1050,7 +987,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('receiptDate').value = formattedDate;
         
-        // Default Payment Date to today if empty
         const paymentDateInput = document.getElementById('paymentDate');
         if (!paymentDateInput.value) {
             paymentDateInput.value = formattedDate;
@@ -1106,39 +1042,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('apa_fee_records', JSON.stringify(records));
     }
 
-    // --- STAFF LOGIN MODAL ---
-    const modal = document.getElementById('loginModal');
-    document.getElementById('btnLogin').addEventListener('click', () => { modal.style.display = 'flex'; });
-    document.getElementById('closeModal').addEventListener('click', () => { modal.style.display = 'none'; });
-
-    document.getElementById('staffLoginForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('staffEmail').value.trim();
-        const pwd = document.getElementById('staffPassword').value;
-        
-        if (email === 'staff@alagappaarts.com' && pwd === 'AITAdmin@2026') {
-            isStaffAuthenticated = true;
-            modal.style.display = 'none';
-            document.getElementById('authStatus').innerHTML = `<i class="fa-solid fa-user-check" style="color: var(--success-green);"></i> <span>Status: Signed In (${email})</span>`;
-            document.getElementById('btnLogin').style.display = 'none';
-            document.getElementById('btnLogout').style.display = 'inline-flex';
-            updateButtonStates();
-            showToast('Staff authenticated successfully!');
-        } else {
-            document.getElementById('loginErrorMsg').textContent = 'Invalid credentials. Use staff@alagappaarts.com and AITAdmin@2026';
-            document.getElementById('loginErrorMsg').style.display = 'block';
-        }
-    });
-
-    document.getElementById('btnLogout').addEventListener('click', () => {
-        isStaffAuthenticated = false;
-        document.getElementById('authStatus').innerHTML = `<i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In (Actions Locked)</span>`;
-        document.getElementById('btnLogout').style.display = 'none';
-        document.getElementById('btnLogin').style.display = 'inline-flex';
-        updateButtonStates();
-        showToast('Signed out successfully.');
-    });
-
     // --- DARK MODE TOGGLE ---
     const darkModeBtn = document.getElementById('btnDarkMode');
     darkModeBtn.addEventListener('click', () => {
@@ -1149,14 +1052,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- PRINT & PDF DOWNLOAD ---
     document.getElementById('printBtn').addEventListener('click', () => {
-        if (!isStaffAuthenticated || getFirstMissingField()) { showValidationPopup(); return; }
+        if (getFirstMissingField()) { showValidationPopup(); return; }
         syncPrintLabels();
         saveRecordToLocalStorage();
         window.print();
     });
 
     document.getElementById('download').addEventListener('click', async () => {
-        if (!isStaffAuthenticated || getFirstMissingField()) { showValidationPopup(); return; }
+        if (getFirstMissingField()) { showValidationPopup(); return; }
         syncPrintLabels();
         saveRecordToLocalStorage();
         
@@ -1203,7 +1106,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EXPORT LEDGER ---
     document.getElementById('exportExcel').addEventListener('click', () => {
-        if (!isStaffAuthenticated) { showValidationPopup(); return; }
         const records = JSON.parse(localStorage.getItem('apa_fee_records') || '[]');
         if (records.length === 0) { showToast('No records found in storage.', true); return; }
 
@@ -1222,7 +1124,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- BACKUP & RESTORE ---
     document.getElementById('btnBackup').addEventListener('click', () => {
-        if (!isStaffAuthenticated) { showValidationPopup(); return; }
         const data = localStorage.getItem('apa_fee_records') || '[]';
         const blob = new Blob([data], { type: 'application/json' });
         const link = document.createElement('a');
@@ -1233,7 +1134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnRestore').addEventListener('click', () => {
-        if (!isStaffAuthenticated) { showValidationPopup(); return; }
         document.getElementById('restoreFile').click();
     });
 
@@ -1264,7 +1164,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.querySelectorAll('.doc-select').forEach(select => select.selectedIndex = 0);
         document.getElementById('remarks').value = '';
-        updateButtonStates();
         showToast('Form fields reset.');
     });
 });
