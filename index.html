@@ -976,7 +976,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Synchronize inputs with print preview labels
     function syncPrintLabels() {
         const fields = ['receiptNo', 'receiptDate', 'name', 'phone', 'course', 'year', 'paidAmount', 'words', 'paymentDate', 'transactionId', 'installment', 'remarks'];
         fields.forEach(id => {
@@ -1040,7 +1039,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loginErrorMsg.style.display = 'none';
 
             try {
-                // Supabase Auth Integration Placeholder
                 setTimeout(() => {
                     modal.style.display = 'none';
                     authStatus.innerHTML = `<i class="fa-solid fa-user-check" style="color: #16A34A;"></i> <span>Status: Signed In (${email})</span>`;
@@ -1065,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. PRINT & PDF EXPORT UTILITIES ---
+    // --- 5. PRINT & SINGLE-PAGE PDF EXPORT UTILITIES ---
     const printBtn = document.getElementById('printBtn');
     if (printBtn) {
         printBtn.addEventListener('click', () => {
@@ -1092,10 +1090,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgWidth = 210;
+                
+                const pdfWidth = 210; 
+                const pdfHeight = 297; 
+                const margin = 10; 
+                
+                const availableHeight = pdfHeight - (margin * 2);
+                const imgWidth = pdfWidth - (margin * 2);
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, imgHeight);
+                let finalHeight = imgHeight;
+                let finalWidth = imgWidth;
+                
+                if (imgHeight > availableHeight) {
+                    finalHeight = availableHeight;
+                    finalWidth = (canvas.width * finalHeight) / canvas.height;
+                }
+
+                const xPos = (pdfWidth - finalWidth) / 2;
+                pdf.addImage(imgData, 'PNG', xPos, margin, finalWidth, finalHeight);
+
                 const recNo = receiptNoInput ? receiptNoInput.value : 'APA-Receipt';
                 pdf.save(`${recNo}.pdf`);
             } catch (error) {
