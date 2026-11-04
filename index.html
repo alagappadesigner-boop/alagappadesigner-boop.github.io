@@ -21,6 +21,7 @@
             --border-light: #E2E8F0;
             --bg-light: #F8FAFC;
             --error-red: #DC2626;
+            --success-green: #16A34A;
         }
 
         /* Global Reset */
@@ -562,20 +563,47 @@
             display: none;
         }
 
+        /* --- Stylish Notification Toast Styles --- */
+        #notificationToast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #FFFFFF;
+            color: var(--text-dark);
+            border-left: 4px solid var(--success-green);
+            padding: 14px 20px;
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1100;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        #notificationToast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #notificationToast i {
+            color: var(--success-green);
+            font-size: 16px;
+        }
+
         /* --- Entrance Animations --- */
         @keyframes receiptPageEntrance {
             0% { opacity: 0; transform: translateY(16px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes subtleValuePulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); color: var(--primary-navy); }
-            100% { transform: scale(1); }
-        }
-
         .container { animation: receiptPageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards; }
-        .value-updated-highlight { animation: subtleValuePulse 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
         .btn.btn-loading {
             pointer-events: none;
@@ -591,14 +619,6 @@
             to { transform: rotate(360deg); }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            .container, .btn, .value-updated-highlight {
-                animation: none !important;
-                transition: none !important;
-                transform: none !important;
-            }
-        }
-
         /* --- Responsive Printing Overrides --- */
         @media print {
             body {
@@ -606,7 +626,7 @@
                 padding: 0 !important;
                 margin: 0 !important;
             }
-            .secure-controller-gateway, .ledger-container, .inline-error-msg, #loginModal {
+            .secure-controller-gateway, .ledger-container, .inline-error-msg, #loginModal, #notificationToast {
                 display: none !important;
             }
             .receipt-card {
@@ -902,8 +922,27 @@
     </div>
 </div>
 
+<!-- Stylish Notification Toast -->
+<div id="notificationToast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMessage">PDF downloaded successfully!</span>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- TOAST NOTIFICATION HELPER ---
+    function showToast(message) {
+        const toast = document.getElementById('notificationToast');
+        const toastMsg = document.getElementById('toastMessage');
+        if (toast && toastMsg) {
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    }
 
     // --- 1. NUMBER-TO-WORDS (INDIAN RUPEES) LOGIC ---
     function convertNumberToWords(amount) {
@@ -1046,6 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btnLogout.style.display = 'inline-flex';
                     staffLoginForm.reset();
                     submitBtn.classList.remove('btn-loading');
+                    showToast('Staff authenticated successfully!');
                 }, 800);
             } catch (err) {
                 loginErrorMsg.textContent = err.message || 'Authentication failed. Please check credentials.';
@@ -1060,6 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authStatus.innerHTML = `<i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In</span>`;
             btnLogout.style.display = 'none';
             btnLogin.style.display = 'inline-flex';
+            showToast('Signed out successfully.');
         });
     }
 
@@ -1112,6 +1153,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const recNo = receiptNoInput ? receiptNoInput.value : 'APA-Receipt';
                 pdf.save(`${recNo}.pdf`);
+                
+                // Trigger the stylish notification toast
+                showToast(`Receipt ${recNo}.pdf downloaded successfully!`);
             } catch (error) {
                 alert('An error occurred while generating the PDF.');
             } finally {
@@ -1131,6 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('remarks').value = '';
             if (paidAmountInput) paidAmountInput.value = '';
             if (wordsInput) wordsInput.value = '';
+            showToast('Form fields cleared.');
         });
     }
 });
