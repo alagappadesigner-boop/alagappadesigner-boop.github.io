@@ -483,6 +483,14 @@
         .system-generated-text {
             font-size: 11px;
             color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .designer-credit {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary-navy);
+            letter-spacing: 0.5px;
         }
 
         /* --- Isolated Controller Gateway Panel --- */
@@ -825,6 +833,7 @@
         <footer class="receipt-footer">
             <div class="thank-you">Thank You!</div>
             <div class="system-generated-text">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
+            <div class="designer-credit">Designed & Developed by Easwaran Prasanth</div>
         </footer>
 
     </div>
@@ -874,11 +883,11 @@
         
         <form id="staffLoginForm" style="display: flex; flex-direction: column; gap: 15px;">
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Staff Email</label>
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Staff Email ID</label>
                 <input type="email" id="staffEmail" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px; border-radius: 4px; width: 100%;" placeholder="staff@alagappaarts.com">
             </div>
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Password (AITAdmin@2026)</label>
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Password</label>
                 <input type="password" id="staffPassword" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px; border-radius: 4px; width: 100%;" placeholder="••••••••">
             </div>
             <div id="loginErrorMsg" style="display: none; color: var(--error-red); font-size: 11px; font-weight: 500;"></div>
@@ -893,8 +902,8 @@
 <div id="validationModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
         <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: var(--error-red); margin-bottom: 12px;"></i>
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark);">Incomplete Details</h3>
-        <p id="validationMsg" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Please fill in all the required details (*) before proceeding with this action.</p>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark);">Please fill the required details</h3>
+        <p id="validationMsg" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">All mandatory fields marked with an asterisk (*) must be filled out before you can download or print the receipt.</p>
         <button type="button" id="closeValidationModal" class="btn" style="background-color: var(--primary-navy); width: 100%; justify-content: center;">OK, Got It</button>
     </div>
 </div>
@@ -944,7 +953,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Monitor input changes
     document.querySelectorAll('.required-field, input, select').forEach(element => {
         element.addEventListener('input', updateButtonStates);
         element.addEventListener('change', updateButtonStates);
@@ -1046,17 +1054,17 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('apa_fee_records', JSON.stringify(records));
     }
 
-    // --- STAFF LOGIN MODAL ---
+    // --- STAFF LOGIN MODAL (Strictly staff@alagappaarts.com & AITAdmin@2026) ---
     const modal = document.getElementById('loginModal');
     document.getElementById('btnLogin').addEventListener('click', () => { modal.style.display = 'flex'; });
     document.getElementById('closeModal').addEventListener('click', () => { modal.style.display = 'none'; });
 
     document.getElementById('staffLoginForm').addEventListener('submit', (e) => {
         e.preventDefault();
+        const email = document.getElementById('staffEmail').value.trim();
         const pwd = document.getElementById('staffPassword').value;
-        const email = document.getElementById('staffEmail').value;
         
-        if (pwd === 'AITAdmin@2026') {
+        if (email === 'staff@alagappaarts.com' && pwd === 'AITAdmin@2026') {
             isStaffAuthenticated = true;
             modal.style.display = 'none';
             document.getElementById('authStatus').innerHTML = `<i class="fa-solid fa-user-check" style="color: var(--success-green);"></i> <span>Status: Signed In (${email})</span>`;
@@ -1065,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateButtonStates();
             showToast('Staff authenticated successfully!');
         } else {
-            document.getElementById('loginErrorMsg').textContent = 'Invalid password. Hint: AITAdmin@2026';
+            document.getElementById('loginErrorMsg').textContent = 'Invalid credentials. Use staff@alagappaarts.com and AITAdmin@2026';
             document.getElementById('loginErrorMsg').style.display = 'block';
         }
     });
@@ -1125,7 +1133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- EXPORT LEDGER (CSV/Excel compatible) ---
+    // --- EXPORT LEDGER ---
     document.getElementById('exportExcel').addEventListener('click', () => {
         if (!isStaffAuthenticated) { showValidationPopup(); return; }
         const records = JSON.parse(localStorage.getItem('apa_fee_records') || '[]');
