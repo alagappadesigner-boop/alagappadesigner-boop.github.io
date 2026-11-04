@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alagappa Performing Arts Academy - Fee Receipt System</title>
     
-    <!-- External Dependencies for Icons, Canvas, PDF Generation, and Supabase -->
+    <!-- External Dependencies for Icons, Canvas, and PDF Generation -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -18,7 +17,7 @@
             --brand-gold: #D4AF37;
             --text-dark: #2C3E50;
             --text-muted: #7F8C8D;
-            --border-light: #E2E8F0;
+            --border-light: #CBD5E1;
             --bg-light: #F1F5F9;
             --card-bg: #FFFFFF;
             --error-red: #DC2626;
@@ -37,27 +36,11 @@
             --success-green: #4ADE80;
         }
 
-        /* Global Reset */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-        }
-
-        body, div, header, footer, table, tbody, thead, tr, th, td, h1, h2, h3, span, label, p, i {
-            outline: none !important;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        input, select, textarea {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
         }
 
         body {
@@ -75,7 +58,7 @@
 
         .container {
             width: 100%;
-            max-width: 950px;
+            max-width: 900px;
             display: flex;
             flex-direction: column;
             gap: 25px;
@@ -85,12 +68,11 @@
         .receipt-card {
             background: var(--card-bg);
             border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 35px;
             position: relative;
             overflow: hidden;
             width: 100%;
-            transition: background-color 0.3s ease;
         }
 
         .receipt-card::before {
@@ -99,20 +81,26 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 320px;
-            height: 320px;
+            width: 400px;
+            height: 400px;
             background: url('Logo.png') no-repeat center/contain;
-            opacity: 0.03;
+            opacity: 0.07;
             pointer-events: none;
+            z-index: 0;
+        }
+
+        .receipt-header, .title-meta-section, .receipt-grid, .remarks-box, .academy-declaration-clause, .closing-area, .receipt-footer {
+            position: relative;
+            z-index: 1;
         }
 
         /* --- Header Alignment --- */
         .receipt-header {
             display: grid;
-            grid-template-columns: 130px 1fr 240px;
+            grid-template-columns: 120px 1fr 230px;
             align-items: center;
-            gap: 20px;
-            padding-bottom: 18px;
+            gap: 15px;
+            padding-bottom: 15px;
             border-bottom: 3px solid var(--brand-gold);
         }
 
@@ -128,7 +116,7 @@
 
         .branding-container h1 {
             color: var(--primary-navy);
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -139,60 +127,57 @@
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 1px;
-            margin-top: 3px;
+            margin-top: 2px;
             text-transform: uppercase;
         }
 
         .contact-container {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
             text-align: right;
             border-left: 1px solid var(--border-light);
-            padding-left: 20px;
+            padding-left: 15px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .contact-item {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 6px;
-            line-height: 1.4;
+            gap: 5px;
         }
 
         .contact-item i {
             color: var(--brand-gold);
-            width: 12px;
-            text-align: center;
         }
 
         /* --- Document Title Row --- */
         .title-meta-section {
             text-align: center;
-            margin-top: 25px;
-            margin-bottom: 25px;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         .receipt-title {
-            font-size: 24px;
+            font-size: 22px;
             color: var(--primary-navy);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .meta-row {
             display: flex;
             justify-content: center;
-            gap: 40px;
-            font-size: 13px;
+            gap: 35px;
+            font-size: 12.5px;
             color: var(--text-dark);
             font-weight: 500;
             border-bottom: 1px solid var(--border-light);
-            padding-bottom: 15px;
+            padding-bottom: 12px;
         }
 
         .meta-row strong {
@@ -201,13 +186,12 @@
 
         .meta-inline-input {
             border: none;
-            border-bottom: 1px solid transparent;
             outline: none;
             background: transparent;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             color: var(--text-dark);
-            width: 120px;
+            width: 110px;
         }
 
         .system-locked-field {
@@ -217,39 +201,38 @@
             color: var(--text-muted);
         }
 
-        /* --- Structural Input Cards Grid Layout --- */
+        /* --- Grid Layout --- */
         .receipt-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .info-card {
             border: 1px solid var(--border-light);
             border-radius: 6px;
-            padding: 20px;
+            padding: 16px;
             background-color: var(--card-bg);
         }
 
         .card-heading {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--primary-navy);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--border-light);
-            padding-bottom: 8px;
-            margin-bottom: 15px;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
         }
 
         .data-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            font-size: 13px;
-            flex-wrap: wrap;
+            margin-bottom: 10px;
+            font-size: 12.5px;
         }
 
         .data-row:last-child {
@@ -262,7 +245,7 @@
         }
 
         .field-container {
-            width: 65%;
+            width: 62%;
             text-align: right;
             display: flex;
             justify-content: flex-end;
@@ -280,13 +263,12 @@
             border-bottom: 1px solid var(--border-light);
             outline: none;
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             color: var(--text-dark);
             text-align: right;
             padding: 2px 0;
             background: transparent;
-            transition: border-color 0.2s;
         }
 
         .doc-input:focus, .doc-select:focus {
@@ -297,15 +279,15 @@
             cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
-            padding-right: 16px;
-            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%237F8C8D' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
+            padding-right: 14px;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%237F8C8D' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 2px center;
         }
 
         .phone-input-wrapper {
             display: flex;
             align-items: center;
             width: 100%;
-            gap: 8px;
+            gap: 6px;
             justify-content: flex-end;
         }
 
@@ -313,29 +295,23 @@
             border: none;
             outline: none;
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--primary-navy);
             background: transparent;
             cursor: pointer;
-            padding: 2px 20px 2px 0;
             width: auto;
-            min-width: 82px;
-            max-width: 95px;
-            text-align: left;
-            appearance: none;
-            -webkit-appearance: none;
         }
 
         .amount-highlight-input {
-            font-size: 18px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
             color: var(--primary-navy) !important;
         }
 
         .mode-radio-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: flex-end;
             flex-wrap: wrap;
         }
@@ -343,8 +319,8 @@
         .radio-label {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            font-size: 11px;
+            gap: 3px;
+            font-size: 10.5px;
             font-weight: 600;
             cursor: pointer;
             color: var(--text-dark);
@@ -354,22 +330,21 @@
             accent-color: var(--primary-navy);
         }
 
-        /* --- Enclosed Remarks Info Box --- */
+        /* --- Remarks & Notices --- */
         .remarks-box {
             background-color: var(--bg-light);
             border-left: 4px solid var(--brand-gold);
-            padding: 16px 20px;
+            padding: 12px 16px;
             border-radius: 0 6px 6px 0;
-            margin-bottom: 25px;
-            font-size: 13px;
-            color: var(--text-dark);
+            margin-bottom: 20px;
+            font-size: 12px;
         }
 
         .remarks-inner-label {
             font-weight: 600;
             color: var(--primary-navy);
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .remarks-textarea {
@@ -379,22 +354,21 @@
             outline: none;
             resize: none;
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-dark);
-            height: 40px;
+            height: 35px;
         }
 
         .academy-declaration-clause {
             background-color: rgba(212, 175, 55, 0.08);
             border: 1px dashed var(--brand-gold);
-            padding: 12px 18px;
+            padding: 10px 14px;
             border-radius: 6px;
-            margin-bottom: 30px;
-            font-size: 11.5px;
-            color: var(--text-dark);
+            margin-bottom: 25px;
+            font-size: 11px;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 8px;
         }
 
         .academy-declaration-clause i {
@@ -402,23 +376,23 @@
             margin-top: 2px;
         }
 
-        /* --- Closing Zone Layout --- */
+        /* --- Closing Area --- */
         .closing-area {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .verification-zone {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .qr-placeholder {
-            width: 75px;
-            height: 75px;
+            width: 65px;
+            height: 65px;
             border: 1px solid var(--border-light);
             border-radius: 4px;
             display: flex;
@@ -426,83 +400,81 @@
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
-            font-size: 9px;
+            font-size: 8.5px;
             background: var(--bg-light);
             font-weight: 500;
         }
 
         .timestamp-note {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
-            line-height: 1.4;
+            line-height: 1.35;
         }
 
         .signature-wrap {
             text-align: center;
-            width: 240px;
+            width: 220px;
         }
 
         .signature-line {
             border-bottom: 1px solid var(--text-dark);
-            margin-bottom: 6px;
-            height: 45px;
+            margin-bottom: 5px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .signature-line img {
-            max-height: 40px;
+            max-height: 35px;
             object-fit: contain;
         }
 
         .signature-title {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
             color: var(--primary-navy);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* --- Footer Styles --- */
         .receipt-footer {
             border-top: 1px solid var(--border-light);
-            padding-top: 15px;
+            padding-top: 12px;
             text-align: center;
         }
 
         .thank-you {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--brand-gold);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .system-generated-text {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .designer-credit {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 600;
             color: var(--primary-navy);
-            letter-spacing: 0.5px;
         }
 
-        /* --- Isolated Controller Gateway Panel --- */
+        /* --- Controller Gateway --- */
         .secure-controller-gateway {
             background-color: var(--card-bg);
             border-radius: 8px;
-            padding: 20px;
+            padding: 18px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border-light);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .gateway-header {
@@ -510,11 +482,11 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-light);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .gateway-title {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             color: var(--text-dark);
             text-transform: uppercase;
@@ -526,7 +498,7 @@
 
         .action-toolbar {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -534,11 +506,11 @@
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
+            gap: 6px;
+            padding: 9px 14px;
             border: none;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 600;
             cursor: pointer;
             color: #FFFFFF;
@@ -547,11 +519,11 @@
 
         .btn:hover:not(:disabled) { 
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
         }
         
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.45;
             cursor: not-allowed;
         }
 
@@ -580,31 +552,31 @@
         .modal-card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             border-radius: 8px;
-            padding: 25px;
+            padding: 22px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             border: 1px solid var(--border-light);
         }
 
         #notificationToast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 25px;
+            right: 25px;
             background: var(--card-bg);
             color: var(--text-dark);
             border-left: 4px solid var(--success-green);
-            padding: 14px 20px;
+            padding: 12px 18px;
             border-radius: 6px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 13px;
+            gap: 10px;
+            font-size: 12px;
             font-weight: 500;
             z-index: 1100;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(15px);
             transition: opacity 0.3s ease, transform 0.3s ease;
             pointer-events: none;
             border: 1px solid var(--border-light);
@@ -615,12 +587,37 @@
             transform: translateY(0);
         }
 
+        /* STRICT SINGLE-PAGE PRINT & PDF RULES */
         @media print {
-            body { background-color: #FFFFFF !important; color: #000000 !important; padding: 0 !important; }
-            .secure-controller-gateway, .modal-overlay, #notificationToast { display: none !important; }
-            .receipt-card { box-shadow: none !important; padding: 20px !important; width: 100% !important; background: #FFFFFF !important; }
-            .doc-input, .doc-select, .mode-radio-group, .remarks-textarea, .meta-inline-input, .country-select { display: none !important; }
-            .print-preview-label { display: inline-block !important; font-weight: 600; color: #000000; text-align: right; }
+            body {
+                background-color: #FFFFFF !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+            .secure-controller-gateway, .modal-overlay, #notificationToast {
+                display: none !important;
+            }
+            .receipt-card {
+                box-shadow: none !important;
+                padding: 15px !important;
+                width: 100% !important;
+                background: #FFFFFF !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .doc-input, .doc-select, .mode-radio-group, .remarks-textarea, .meta-inline-input, .country-select {
+                display: none !important;
+            }
+            .print-preview-label {
+                display: inline-block !important;
+                font-weight: 600;
+                color: #000000;
+                text-align: right;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
         }
     </style>
 </head>
@@ -639,7 +636,7 @@
             <div class="branding-container">
                 <h1>ALAGAPPA</h1>
                 <div class="tagline">Performing Arts Academy</div>
-                <div style="font-size: 9px; color: var(--text-muted); margin-top: 3px; font-weight: 500; letter-spacing: 0.5px;">
+                <div style="font-size: 8.5px; color: var(--text-muted); margin-top: 2px; font-weight: 500; letter-spacing: 0.5px;">
                     BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM
                 </div>
             </div>
@@ -660,7 +657,7 @@
             <h2 class="receipt-title">Fee Receipt</h2>
             <div class="meta-row">
                 <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
-                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input system-locked-field" style="width:110px;" placeholder="DD/MM/YYYY" readonly tabindex="-1"><span id="print_receiptDate" class="print-preview-label"></span></span>
+                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input system-locked-field" style="width:100px;" placeholder="DD/MM/YYYY" readonly tabindex="-1"><span id="print_receiptDate" class="print-preview-label"></span></span>
             </div>
         </div>
 
@@ -674,7 +671,7 @@
                 <div class="data-row">
                     <span class="label">Student Name *</span>
                     <div class="field-container">
-                        <input type="text" id="name" class="doc-input required-field" placeholder="Enter Name">
+                        <input type="text" id="name" data-fieldname="Student Name" class="doc-input required-field" placeholder="Enter Name">
                         <span id="print_name" class="print-preview-label"></span>
                     </div>
                 </div>
@@ -691,7 +688,8 @@
                                 <option value="+65">+65 (SG)</option>
                                 <option value="+971">+971 (AE)</option>
                             </select>
-                            <input type="text" id="phone" class="doc-input required-field" placeholder="Enter phone" maxlength="15">
+                            <!-- Strict numbers-only phone input restriction -->
+                            <input type="text" id="phone" data-fieldname="Phone Number" class="doc-input required-field" placeholder="Enter phone" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                         </div>
                         <span id="print_phone" class="print-preview-label"></span>
                     </div>
@@ -700,7 +698,7 @@
                 <div class="data-row">
                     <span class="label">Course Registered *</span>
                     <div class="field-container">
-                        <select id="course" class="doc-select required-field">
+                        <select id="course" data-fieldname="Course Registered" class="doc-select required-field">
                             <option value="" disabled selected hidden>Select Course</option>
                             <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
                             <option value="Carnatic Vocal">Carnatic Vocal</option>
@@ -715,7 +713,7 @@
                 <div class="data-row">
                     <span class="label">Academic Year *</span>
                     <div class="field-container">
-                        <select id="year" class="doc-select required-field">
+                        <select id="year" data-fieldname="Academic Year" class="doc-select required-field">
                             <option value="" disabled selected hidden>Select Year</option>
                             <option value="1st Year">1st Year</option>
                             <option value="2nd Year">2nd Year</option>
@@ -734,7 +732,7 @@
                 <div class="data-row">
                     <span class="label">Amount Paid *</span>
                     <div class="field-container">
-                        <input type="number" id="paidAmount" class="doc-input amount-highlight-input required-field" placeholder="₹ 0">
+                        <input type="number" id="paidAmount" data-fieldname="Amount Paid" class="doc-input amount-highlight-input required-field" placeholder="₹ 0">
                         <span id="print_paidAmount" class="print-preview-label"></span>
                     </div>
                 </div>
@@ -750,7 +748,8 @@
                 <div class="data-row">
                     <span class="label">Payment Date *</span>
                     <div class="field-container">
-                        <input type="text" id="paymentDate" class="doc-input required-field" placeholder="DD/MM/YYYY">
+                        <!-- Manual Payment Date Input -->
+                        <input type="text" id="paymentDate" data-fieldname="Payment Date" class="doc-input required-field" placeholder="DD/MM/YYYY">
                         <span id="print_paymentDate" class="print-preview-label"></span>
                     </div>
                 </div>
@@ -769,9 +768,9 @@
                 </div>
 
                 <div class="data-row">
-                    <span class="label">TXN / UPI ID</span>
+                    <span class="label" id="txnLabel">TXN / UPI ID</span>
                     <div class="field-container">
-                        <input type="text" id="transactionId" class="doc-input" placeholder="N/A">
+                        <input type="text" id="transactionId" data-fieldname="TXN / UPI ID" class="doc-input" placeholder="N/A">
                         <span id="print_transactionId" class="print-preview-label"></span>
                     </div>
                 </div>
@@ -779,7 +778,7 @@
                 <div class="data-row">
                     <span class="label">Installment Stage *</span>
                     <div class="field-container">
-                        <select id="installment" class="doc-select required-field">
+                        <select id="installment" data-fieldname="Installment Stage" class="doc-select required-field">
                             <option value="" disabled selected hidden>Select Stage</option>
                             <option value="Full Payment">Full Payment</option>
                             <option value="First Installment">First Installment</option>
@@ -796,7 +795,7 @@
         <!-- Enclosed Information Remarks Box Component -->
         <div class="remarks-box">
             <span class="remarks-inner-label">Remarks & Extra Declarations:</span>
-            <textarea id="remarks" class="remarks-textarea" placeholder="Enter payment references, cheque details, UPI transaction IDs, installment notes, or instructions..."></textarea>
+            <textarea id="remarks" class="remarks-textarea" placeholder="Enter payment references, cheque details, installment notes, or instructions..."></textarea>
             <span id="print_remarks" class="print-preview-label" style="text-align: left; width: 100%;"></span>
         </div>
 
@@ -812,7 +811,7 @@
         <div class="closing-area">
             <div class="verification-zone">
                 <div class="qr-placeholder">
-                    <i class="fa-solid fa-qrcode" style="font-size: 24px; color: #BDC3C7; margin-bottom: 4px;"></i>
+                    <i class="fa-solid fa-qrcode" style="font-size: 22px; color: #BDC3C7; margin-bottom: 3px;"></i>
                     <span>Verified Slip</span>
                 </div>
                 <div class="timestamp-note">
@@ -844,15 +843,15 @@
             <div class="gateway-title">
                 <i class="fa-solid fa-shield-halved"></i> Isolated Processing Controller Gateway
             </div>
-            <button type="button" id="btnDarkMode" class="btn" style="padding: 5px 10px; font-size: 11px;"><i class="fa-solid fa-moon"></i> Dark Mode</button>
+            <button type="button" id="btnDarkMode" class="btn" style="padding: 4px 8px; font-size: 10.5px;"><i class="fa-solid fa-moon"></i> Dark Mode</button>
         </div>
 
         <!-- Staff Authentication Control Bar -->
-        <div class="staff-auth-bar" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-light); padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 12px;">
+        <div class="staff-auth-bar" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-light); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 11.5px;">
             <div id="authStatus"><i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In (Actions Locked)</span></div>
             <div id="authActions">
-                <button type="button" id="btnLogin" class="btn" style="background-color: var(--primary-navy); padding: 5px 12px; font-size: 11px;"><i class="fa-solid fa-right-to-bracket"></i> Staff Login</button>
-                <button type="button" id="btnLogout" class="btn" style="background-color: var(--error-red); padding: 5px 12px; font-size: 11px; display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                <button type="button" id="btnLogin" class="btn" style="background-color: var(--primary-navy); padding: 4px 10px; font-size: 10.5px;"><i class="fa-solid fa-right-to-bracket"></i> Staff Login</button>
+                <button type="button" id="btnLogout" class="btn" style="background-color: var(--error-red); padding: 4px 10px; font-size: 10.5px; display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
             </div>
         </div>
 
@@ -872,26 +871,26 @@
 <!-- Staff Login Modal -->
 <div id="loginModal" class="modal-overlay">
     <div class="modal-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">
-            <h3 style="font-size: 14px; color: var(--primary-navy); text-transform: uppercase; font-weight: 700;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">
+            <h3 style="font-size: 13px; color: var(--primary-navy); text-transform: uppercase; font-weight: 700;">
                 <i class="fa-solid fa-user-shield"></i> Staff Authentication
             </h3>
-            <button type="button" id="closeModal" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--text-muted);">
+            <button type="button" id="closeModal" style="background: none; border: none; font-size: 15px; cursor: pointer; color: var(--text-muted);">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         
-        <form id="staffLoginForm" style="display: flex; flex-direction: column; gap: 15px;">
+        <form id="staffLoginForm" style="display: flex; flex-direction: column; gap: 12px;">
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Staff Email ID</label>
-                <input type="email" id="staffEmail" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px; border-radius: 4px; width: 100%;" placeholder="staff@alagappaarts">
+                <label style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px;">Staff Email ID</label>
+                <input type="email" id="staffEmail" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 7px; border-radius: 4px; width: 100%;" placeholder="staff@alagappaarts.com">
             </div>
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Password</label>
-                <input type="password" id="staffPassword" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px; border-radius: 4px; width: 100%;" placeholder="••••••••">
+                <label style="display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px;">Password</label>
+                <input type="password" id="staffPassword" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 7px; border-radius: 4px; width: 100%;" placeholder="••••••••">
             </div>
-            <div id="loginErrorMsg" style="display: none; color: var(--error-red); font-size: 11px; font-weight: 500;"></div>
-            <button type="submit" id="submitLogin" class="btn" style="background-color: var(--primary-navy); justify-content: center; width: 100%; padding: 10px;">
+            <div id="loginErrorMsg" style="display: none; color: var(--error-red); font-size: 10.5px; font-weight: 500;"></div>
+            <button type="submit" id="submitLogin" class="btn" style="background-color: var(--primary-navy); justify-content: center; width: 100%; padding: 9px;">
                 Sign In to Gateway
             </button>
         </form>
@@ -901,9 +900,9 @@
 <!-- Validation Alert Modal -->
 <div id="validationModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
-        <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: var(--error-red); margin-bottom: 12px;"></i>
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark);">Please fill the required details</h3>
-        <p id="validationMsg" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">All mandatory fields marked with an asterisk (*) must be filled out before you can download or print the receipt.</p>
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 28px; color: var(--error-red); margin-bottom: 10px;"></i>
+        <h3 id="validationTitle" style="font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text-dark);">Incomplete Details</h3>
+        <p id="validationMsg" style="font-size: 12px; color: var(--text-muted); margin-bottom: 18px;">Please fill out all required details before proceeding.</p>
         <button type="button" id="closeValidationModal" class="btn" style="background-color: var(--primary-navy); width: 100%; justify-content: center;">OK, Got It</button>
     </div>
 </div>
@@ -930,22 +929,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function checkFormValidity() {
+    // Dynamic Payment Mode handling (making TXN ID mandatory for UPI, Card, Bank)
+    const paymentModeRadios = document.querySelectorAll('input[name="payment"]');
+    const transactionInput = document.getElementById('transactionId');
+    const txnLabel = document.getElementById('txnLabel');
+
+    function updatePaymentModeRequirements() {
+        const selectedMode = document.querySelector('input[name="payment"]:checked').value;
+        if (selectedMode === 'Cash') {
+            txnLabel.innerHTML = 'TXN / UPI ID';
+            transactionInput.classList.remove('required-field');
+            if(!transactionInput.value) transactionInput.value = '';
+        } else {
+            txnLabel.innerHTML = `TXN / UPI ID *`;
+            transactionInput.classList.add('required-field');
+        }
+        updateButtonStates();
+    }
+
+    paymentModeRadios.forEach(radio => {
+        radio.addEventListener('change', updatePaymentModeRequirements);
+    });
+
+    // Check specific missing fields and return precise field name for popup
+    function getFirstMissingField() {
         const requiredFields = document.querySelectorAll('.required-field');
         for (let field of requiredFields) {
-            if (!field.value || field.value.trim() === '') {
-                return false;
+            if (!field.value || field.value.trim() === '' || field.value.trim() === 'N/A') {
+                const fieldName = field.getAttribute('data-fieldname') || 'Required Field';
+                return fieldName;
             }
         }
-        return true;
+        return null;
     }
 
     function updateButtonStates() {
         const actionButtons = document.querySelectorAll('.action-btn');
-        const isValid = checkFormValidity();
+        const missingField = getFirstMissingField();
         
         actionButtons.forEach(btn => {
-            if (isStaffAuthenticated && isValid) {
+            if (isStaffAuthenticated && !missingField) {
                 btn.removeAttribute('disabled');
             } else {
                 btn.setAttribute('disabled', 'true');
@@ -959,6 +982,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function showValidationPopup() {
+        if (!isStaffAuthenticated) {
+            document.getElementById('validationMsg').textContent = "Please sign in as staff first using your official credentials.";
+        } else {
+            const missing = getFirstMissingField();
+            if (missing) {
+                document.getElementById('validationMsg').textContent = `Please enter the ${missing} before proceeding.`;
+            } else {
+                document.getElementById('validationMsg').textContent = "Please fill in all required fields and transaction details.";
+            }
+        }
         document.getElementById('validationModal').style.display = 'flex';
     }
 
@@ -1000,17 +1033,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return res.trim() + ' Rupees Only';
     }
 
-    // --- METADATA INIT ---
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-    const currentDateFormatted = `${dd}/${mm}/${yyyy}`;
+    // --- REAL-TIME TIMESTAMP & METADATA INIT ---
+    function updateRealTimeClock() {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const formattedDate = `${dd}/${mm}/${yyyy}`;
+        
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const formattedTime = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
 
-    document.getElementById('receiptDate').value = currentDateFormatted;
-    document.getElementById('paymentDate').value = currentDateFormatted;
-    document.getElementById('receiptNo').value = 'APA-' + yyyy + '-0001';
-    document.getElementById('lblTimestamp').textContent = currentDateFormatted + ' ' + today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('receiptDate').value = formattedDate;
+        
+        // Default Payment Date to today if empty
+        const paymentDateInput = document.getElementById('paymentDate');
+        if (!paymentDateInput.value) {
+            paymentDateInput.value = formattedDate;
+        }
+
+        document.getElementById('lblTimestamp').textContent = `${formattedDate} ${formattedTime}`;
+    }
+
+    updateRealTimeClock();
+    setInterval(updateRealTimeClock, 60000);
+
+    document.getElementById('receiptNo').value = 'APA-' + new Date().getFullYear() + '-0001';
 
     const paidAmountInput = document.getElementById('paidAmount');
     const wordsInput = document.getElementById('words');
@@ -1054,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('apa_fee_records', JSON.stringify(records));
     }
 
-    // --- STAFF LOGIN MODAL (Strictly staff@alagappaarts.com & AITAdmin@2026) ---
+    // --- STAFF LOGIN MODAL ---
     const modal = document.getElementById('loginModal');
     document.getElementById('btnLogin').addEventListener('click', () => { modal.style.display = 'flex'; });
     document.getElementById('closeModal').addEventListener('click', () => { modal.style.display = 'none'; });
@@ -1097,14 +1149,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- PRINT & PDF DOWNLOAD ---
     document.getElementById('printBtn').addEventListener('click', () => {
-        if (!isStaffAuthenticated || !checkFormValidity()) { showValidationPopup(); return; }
+        if (!isStaffAuthenticated || getFirstMissingField()) { showValidationPopup(); return; }
         syncPrintLabels();
         saveRecordToLocalStorage();
         window.print();
     });
 
     document.getElementById('download').addEventListener('click', async () => {
-        if (!isStaffAuthenticated || !checkFormValidity()) { showValidationPopup(); return; }
+        if (!isStaffAuthenticated || getFirstMissingField()) { showValidationPopup(); return; }
         syncPrintLabels();
         saveRecordToLocalStorage();
         
@@ -1112,18 +1164,34 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadBtn.classList.add('btn-loading');
 
         try {
-            const canvas = await html2canvas(document.getElementById('receiptBlock'), { scale: 2, useCORS: true, backgroundColor: null });
+            const canvas = await html2canvas(document.getElementById('receiptBlock'), { 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: '#FFFFFF',
+                logging: false 
+            });
             const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             
-            const pdfWidth = 210, pdfHeight = 297, margin = 10;
+            const pdfWidth = 210;
+            const pdfHeight = 297;
+            const margin = 8;
             const availableHeight = pdfHeight - (margin * 2);
-            const imgWidth = pdfWidth - (margin * 2);
+            const availableWidth = pdfWidth - (margin * 2);
+            
+            let imgWidth = availableWidth;
             let imgHeight = (canvas.height * imgWidth) / canvas.width;
-            if (imgHeight > availableHeight) imgHeight = availableHeight;
 
-            pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+            if (imgHeight > availableHeight) {
+                imgHeight = availableHeight;
+                imgWidth = (canvas.width * imgHeight) / canvas.height;
+            }
+
+            const xPos = (pdfWidth - imgWidth) / 2;
+            const yPos = margin;
+
+            pdf.addImage(imgData, 'PNG', xPos, yPos, imgWidth, imgHeight);
             pdf.save(`${document.getElementById('receiptNo').value}.pdf`);
             showToast('PDF downloaded & record saved successfully!');
         } catch (err) {
