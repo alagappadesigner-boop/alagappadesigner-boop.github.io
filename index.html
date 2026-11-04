@@ -19,9 +19,22 @@
             --text-dark: #2C3E50;
             --text-muted: #7F8C8D;
             --border-light: #E2E8F0;
-            --bg-light: #F8FAFC;
+            --bg-light: #F1F5F9;
+            --card-bg: #FFFFFF;
             --error-red: #DC2626;
             --success-green: #16A34A;
+        }
+
+        [data-theme="dark"] {
+            --primary-navy: #60A5FA;
+            --brand-gold: #FACC15;
+            --text-dark: #F1F5F9;
+            --text-muted: #94A3B8;
+            --border-light: #334155;
+            --bg-light: #0F172A;
+            --card-bg: #1E293B;
+            --error-red: #F87171;
+            --success-green: #4ADE80;
         }
 
         /* Global Reset */
@@ -49,7 +62,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F1F5F9;
+            background-color: var(--bg-light);
             color: var(--text-dark);
             line-height: 1.5;
             padding: 40px 20px;
@@ -57,6 +70,7 @@
             flex-direction: column;
             align-items: center;
             gap: 25px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -69,13 +83,14 @@
 
         /* --- Premium Receipt Card Document --- */
         .receipt-card {
-            background: #FFFFFF;
+            background: var(--card-bg);
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             padding: 40px;
             position: relative;
             overflow: hidden;
             width: 100%;
+            transition: background-color 0.3s ease;
         }
 
         .receipt-card::before {
@@ -193,11 +208,6 @@
             font-weight: 600;
             color: var(--text-dark);
             width: 120px;
-            transition: border-color 0.2s;
-        }
-
-        .meta-inline-input:focus {
-            border-bottom-color: var(--brand-gold);
         }
 
         .system-locked-field {
@@ -205,10 +215,6 @@
             user-select: none;
             pointer-events: none;
             color: var(--text-muted);
-        }
-
-        .system-locked-field:focus {
-            border-bottom-color: transparent !important;
         }
 
         /* --- Structural Input Cards Grid Layout --- */
@@ -223,7 +229,7 @@
             border: 1px solid var(--border-light);
             border-radius: 6px;
             padding: 20px;
-            background-color: #FFFFFF;
+            background-color: var(--card-bg);
         }
 
         .card-heading {
@@ -271,7 +277,7 @@
         .doc-input, .doc-select {
             width: 100%;
             border: none;
-            border-bottom: 1px solid transparent;
+            border-bottom: 1px solid var(--border-light);
             outline: none;
             font-family: 'Inter', sans-serif;
             font-size: 13px;
@@ -292,7 +298,7 @@
             appearance: none;
             -webkit-appearance: none;
             padding-right: 16px;
-            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%232C3E50' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%237F8C8D' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
         }
 
         .phone-input-wrapper {
@@ -319,17 +325,6 @@
             text-align: left;
             appearance: none;
             -webkit-appearance: none;
-            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23003366' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
-        }
-
-        .inline-error-msg {
-            display: none;
-            color: var(--error-red);
-            font-size: 11px;
-            font-weight: 500;
-            margin-top: 4px;
-            text-align: right;
-            width: 100%;
         }
 
         .amount-highlight-input {
@@ -368,7 +363,6 @@
             margin-bottom: 25px;
             font-size: 13px;
             color: var(--text-dark);
-            line-height: 1.6;
         }
 
         .remarks-inner-label {
@@ -391,14 +385,13 @@
         }
 
         .academy-declaration-clause {
-            background-color: #FFFDF4;
-            border: 1px dashed #E9D5A1;
+            background-color: rgba(212, 175, 55, 0.08);
+            border: 1px dashed var(--brand-gold);
             padding: 12px 18px;
             border-radius: 6px;
             margin-bottom: 30px;
             font-size: 11.5px;
-            color: #5C5236;
-            line-height: 1.5;
+            color: var(--text-dark);
             display: flex;
             align-items: flex-start;
             gap: 10px;
@@ -494,7 +487,7 @@
 
         /* --- Isolated Controller Gateway Panel --- */
         .secure-controller-gateway {
-            background-color: #FFFFFF;
+            background-color: var(--card-bg);
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -525,7 +518,7 @@
 
         .action-toolbar {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -534,46 +527,68 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 10px 16px;
             border: none;
             border-radius: 4px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             color: #FFFFFF;
-            transition: opacity 0.2s, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+            transition: opacity 0.2s, transform 0.18s ease;
         }
 
         .btn:hover:not(:disabled) { 
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
-        .btn:active:not(:disabled) {
-            transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         #download { background-color: var(--primary-navy); }
         #printBtn { background-color: var(--brand-gold); color: #000000; }
-        #exportExcel { background-color: #16A34A; }
-        #clearForm { background-color: #DC2626; }
+        #exportExcel { background-color: var(--success-green); }
+        #clearForm { background-color: var(--error-red); }
+        #btnBackup, #btnRestore { background-color: #6366F1; }
+        #btnDarkMode { background-color: #475569; }
 
         .print-preview-label {
             display: none;
         }
 
-        /* --- Stylish Notification Toast Styles --- */
+        /* --- Modals & Toasts --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-light);
+        }
+
         #notificationToast {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: #FFFFFF;
+            background: var(--card-bg);
             color: var(--text-dark);
             border-left: 4px solid var(--success-green);
             padding: 14px 20px;
             border-radius: 6px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -582,73 +597,22 @@
             z-index: 1100;
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
             pointer-events: none;
+            border: 1px solid var(--border-light);
         }
 
         #notificationToast.show {
             opacity: 1;
             transform: translateY(0);
-            pointer-events: auto;
         }
 
-        #notificationToast i {
-            color: var(--success-green);
-            font-size: 16px;
-        }
-
-        /* --- Entrance Animations --- */
-        @keyframes receiptPageEntrance {
-            0% { opacity: 0; transform: translateY(16px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .container { animation: receiptPageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards; }
-
-        .btn.btn-loading {
-            pointer-events: none;
-            opacity: 0.75;
-        }
-
-        .btn.btn-loading i {
-            animation: spinIcon 0.8s linear infinite;
-        }
-
-        @keyframes spinIcon {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* --- Responsive Printing Overrides --- */
         @media print {
-            body {
-                background-color: #FFFFFF;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .secure-controller-gateway, .ledger-container, .inline-error-msg, #loginModal, #notificationToast {
-                display: none !important;
-            }
-            .receipt-card {
-                box-shadow: none !important;
-                padding: 20px !important;
-                width: 100% !important;
-            }
-            .doc-input, .doc-select, .mode-radio-group, .remarks-textarea, .meta-inline-input, .country-select {
-                display: none !important;
-            }
-            .print-preview-label {
-                display: inline-block !important;
-                font-weight: 600;
-                color: #000000;
-                text-align: right;
-            }
-            .amount-highlight-input + .print-preview-label {
-                font-size: 18px !important;
-                font-weight: 700 !important;
-                color: var(--primary-navy) !important;
-            }
-            .container { animation: none !important; }
+            body { background-color: #FFFFFF !important; color: #000000 !important; padding: 0 !important; }
+            .secure-controller-gateway, .modal-overlay, #notificationToast { display: none !important; }
+            .receipt-card { box-shadow: none !important; padding: 20px !important; width: 100% !important; background: #FFFFFF !important; }
+            .doc-input, .doc-select, .mode-radio-group, .remarks-textarea, .meta-inline-input, .country-select { display: none !important; }
+            .print-preview-label { display: inline-block !important; font-weight: 600; color: #000000; text-align: right; }
         }
     </style>
 </head>
@@ -702,7 +666,7 @@
                 <div class="data-row">
                     <span class="label">Student Name *</span>
                     <div class="field-container">
-                        <input type="text" id="name" class="doc-input" placeholder="Enter Name">
+                        <input type="text" id="name" class="doc-input required-field" placeholder="Enter Name">
                         <span id="print_name" class="print-preview-label"></span>
                     </div>
                 </div>
@@ -712,24 +676,23 @@
                     <div class="field-container field-container-stack">
                         <div class="phone-input-wrapper">
                             <select id="countryCode" class="country-select">
-                                <option value="+91" data-min="10" data-max="10" selected>+91 (IN)</option>
-                                <option value="+1" data-min="10" data-max="10">+1 (US)</option>
-                                <option value="+44" data-min="9" data-max="10">+44 (UK)</option>
-                                <option value="+61" data-min="9" data-max="9">+61 (AU)</option>
-                                <option value="+65" data-min="8" data-max="8">+65 (SG)</option>
-                                <option value="+971" data-min="9" data-max="9">+971 (AE)</option>
+                                <option value="+91" selected>+91 (IN)</option>
+                                <option value="+1">+1 (US)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+61">+61 (AU)</option>
+                                <option value="+65">+65 (SG)</option>
+                                <option value="+971">+971 (AE)</option>
                             </select>
-                            <input type="text" id="phone" class="doc-input" placeholder="Enter phone number" maxlength="30">
+                            <input type="text" id="phone" class="doc-input required-field" placeholder="Enter phone" maxlength="15">
                         </div>
                         <span id="print_phone" class="print-preview-label"></span>
-                        <div id="phoneError" class="inline-error-msg">Please enter a valid phone number for the selected country.</div>
                     </div>
                 </div>
 
                 <div class="data-row">
                     <span class="label">Course Registered *</span>
                     <div class="field-container">
-                        <select id="course" class="doc-select">
+                        <select id="course" class="doc-select required-field">
                             <option value="" disabled selected hidden>Select Course</option>
                             <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
                             <option value="Carnatic Vocal">Carnatic Vocal</option>
@@ -744,7 +707,7 @@
                 <div class="data-row">
                     <span class="label">Academic Year *</span>
                     <div class="field-container">
-                        <select id="year" class="doc-select">
+                        <select id="year" class="doc-select required-field">
                             <option value="" disabled selected hidden>Select Year</option>
                             <option value="1st Year">1st Year</option>
                             <option value="2nd Year">2nd Year</option>
@@ -763,7 +726,7 @@
                 <div class="data-row">
                     <span class="label">Amount Paid *</span>
                     <div class="field-container">
-                        <input type="number" id="paidAmount" class="doc-input amount-highlight-input" placeholder="₹ 0">
+                        <input type="number" id="paidAmount" class="doc-input amount-highlight-input required-field" placeholder="₹ 0">
                         <span id="print_paidAmount" class="print-preview-label"></span>
                     </div>
                 </div>
@@ -779,7 +742,7 @@
                 <div class="data-row">
                     <span class="label">Payment Date *</span>
                     <div class="field-container">
-                        <input type="text" id="paymentDate" class="doc-input" placeholder="DD/MM/YYYY">
+                        <input type="text" id="paymentDate" class="doc-input required-field" placeholder="DD/MM/YYYY">
                         <span id="print_paymentDate" class="print-preview-label"></span>
                     </div>
                 </div>
@@ -808,7 +771,7 @@
                 <div class="data-row">
                     <span class="label">Installment Stage *</span>
                     <div class="field-container">
-                        <select id="installment" class="doc-select">
+                        <select id="installment" class="doc-select required-field">
                             <option value="" disabled selected hidden>Select Stage</option>
                             <option value="Full Payment">Full Payment</option>
                             <option value="First Installment">First Installment</option>
@@ -872,11 +835,12 @@
             <div class="gateway-title">
                 <i class="fa-solid fa-shield-halved"></i> Isolated Processing Controller Gateway
             </div>
+            <button type="button" id="btnDarkMode" class="btn" style="padding: 5px 10px; font-size: 11px;"><i class="fa-solid fa-moon"></i> Dark Mode</button>
         </div>
 
         <!-- Staff Authentication Control Bar -->
-        <div class="staff-auth-bar" style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 12px;">
-            <div id="authStatus"><i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In</span></div>
+        <div class="staff-auth-bar" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-light); padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 12px;">
+            <div id="authStatus"><i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In (Actions Locked)</span></div>
             <div id="authActions">
                 <button type="button" id="btnLogin" class="btn" style="background-color: var(--primary-navy); padding: 5px 12px; font-size: 11px;"><i class="fa-solid fa-right-to-bracket"></i> Staff Login</button>
                 <button type="button" id="btnLogout" class="btn" style="background-color: var(--error-red); padding: 5px 12px; font-size: 11px; display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
@@ -884,20 +848,23 @@
         </div>
 
         <div class="action-toolbar">
-            <button type="button" id="download" class="btn"><i class="fa-solid fa-download"></i> Download PDF</button>
-            <button type="button" id="printBtn" class="btn"><i class="fa-solid fa-print"></i> Print Receipt</button>
-            <button type="button" id="exportExcel" class="btn"><i class="fa-solid fa-file-excel"></i> Export Ledger</button>
-            <button type="button" id="clearForm" class="btn"><i class="fa-solid fa-rotate-right"></i> Reset Form</button>
+            <button type="button" id="download" class="btn action-btn" disabled><i class="fa-solid fa-download"></i> Download PDF</button>
+            <button type="button" id="printBtn" class="btn action-btn" disabled><i class="fa-solid fa-print"></i> Print Receipt</button>
+            <button type="button" id="exportExcel" class="btn action-btn" disabled><i class="fa-solid fa-file-excel"></i> Export Ledger</button>
+            <button type="button" id="btnBackup" class="btn action-btn" disabled><i class="fa-solid fa-cloud-arrow-down"></i> Download Backup</button>
+            <button type="button" id="btnRestore" class="btn action-btn" disabled><i class="fa-solid fa-cloud-arrow-up"></i> Restore Backup</button>
+            <input type="file" id="restoreFile" style="display: none;" accept=".json">
+            <button type="button" id="clearForm" class="btn" style="background-color: var(--error-red);"><i class="fa-solid fa-rotate-right"></i> Reset Form</button>
         </div>
     </div>
 
 </div>
 
 <!-- Staff Login Modal -->
-<div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
-    <div style="background: #FFFFFF; width: 100%; max-width: 400px; border-radius: 8px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative;">
+<div id="loginModal" class="modal-overlay">
+    <div class="modal-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">
-            <h3 style="font-size: 14px; color: var(--primary-navy); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">
+            <h3 style="font-size: 14px; color: var(--primary-navy); text-transform: uppercase; font-weight: 700;">
                 <i class="fa-solid fa-user-shield"></i> Staff Authentication
             </h3>
             <button type="button" id="closeModal" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--text-muted);">
@@ -907,70 +874,109 @@
         
         <form id="staffLoginForm" style="display: flex; flex-direction: column; gap: 15px;">
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-dark); margin-bottom: 5px;">Staff Email</label>
-                <input type="email" id="staffEmail" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px 12px; border-radius: 4px; width: 100%; font-size: 13px;" placeholder="staff@alagappaarts.com">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Staff Email</label>
+                <input type="email" id="staffEmail" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px; border-radius: 4px; width: 100%;" placeholder="staff@alagappaarts.com">
             </div>
             <div>
-                <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-dark); margin-bottom: 5px;">Password</label>
-                <input type="password" id="staffPassword" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px 12px; border-radius: 4px; width: 100%; font-size: 13px;" placeholder="••••••••">
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px;">Password (AITAdmin@2026)</label>
+                <input type="password" id="staffPassword" required class="doc-input" style="text-align: left; border: 1px solid var(--border-light); padding: 8px; border-radius: 4px; width: 100%;" placeholder="••••••••">
             </div>
             <div id="loginErrorMsg" style="display: none; color: var(--error-red); font-size: 11px; font-weight: 500;"></div>
-            <button type="submit" id="submitLogin" class="btn" style="background-color: var(--primary-navy); justify-content: center; width: 100%; margin-top: 5px; padding: 10px;">
+            <button type="submit" id="submitLogin" class="btn" style="background-color: var(--primary-navy); justify-content: center; width: 100%; padding: 10px;">
                 Sign In to Gateway
             </button>
         </form>
     </div>
 </div>
 
+<!-- Validation Alert Modal -->
+<div id="validationModal" class="modal-overlay">
+    <div class="modal-card" style="text-align: center;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: var(--error-red); margin-bottom: 12px;"></i>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark);">Incomplete Details</h3>
+        <p id="validationMsg" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Please fill in all the required details (*) before proceeding with this action.</p>
+        <button type="button" id="closeValidationModal" class="btn" style="background-color: var(--primary-navy); width: 100%; justify-content: center;">OK, Got It</button>
+    </div>
+</div>
+
 <!-- Stylish Notification Toast -->
 <div id="notificationToast">
     <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMessage">PDF downloaded successfully!</span>
+    <span id="toastMessage">Action completed successfully!</span>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- TOAST NOTIFICATION HELPER ---
-    function showToast(message) {
+    let isStaffAuthenticated = false;
+
+    function showToast(message, isError = false) {
         const toast = document.getElementById('notificationToast');
         const toastMsg = document.getElementById('toastMessage');
         if (toast && toastMsg) {
             toastMsg.textContent = message;
+            toast.style.borderLeftColor = isError ? 'var(--error-red)' : 'var(--success-green)';
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
+            setTimeout(() => { toast.classList.remove('show'); }, 3500);
         }
     }
 
-    // --- 1. NUMBER-TO-WORDS (INDIAN RUPEES) LOGIC ---
+    function checkFormValidity() {
+        const requiredFields = document.querySelectorAll('.required-field');
+        for (let field of requiredFields) {
+            if (!field.value || field.value.trim() === '') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function updateButtonStates() {
+        const actionButtons = document.querySelectorAll('.action-btn');
+        const isValid = checkFormValidity();
+        
+        actionButtons.forEach(btn => {
+            if (isStaffAuthenticated && isValid) {
+                btn.removeAttribute('disabled');
+            } else {
+                btn.setAttribute('disabled', 'true');
+            }
+        });
+    }
+
+    // Monitor input changes
+    document.querySelectorAll('.required-field, input, select').forEach(element => {
+        element.addEventListener('input', updateButtonStates);
+        element.addEventListener('change', updateButtonStates);
+    });
+
+    function showValidationPopup() {
+        document.getElementById('validationModal').style.display = 'flex';
+    }
+
+    document.getElementById('closeValidationModal').addEventListener('click', () => {
+        document.getElementById('validationModal').style.display = 'none';
+    });
+
+    // --- NUMBER TO WORDS CONVERTER ---
     function convertNumberToWords(amount) {
         if (!amount || isNaN(amount) || amount <= 0) return 'Zero Only';
-        
         const single = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
         const double = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
         const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
         function numToWords(n) {
             let str = '';
-            if (n > 19) {
-                str += tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + single[n % 10] : '');
-            } else if (n > 9) {
-                str += double[n - 10];
-            } else if (n > 0) {
-                str += single[n];
-            }
+            if (n > 19) str += tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + single[n % 10] : '');
+            else if (n > 9) str += double[n - 10];
+            else if (n > 0) str += single[n];
             return str;
         }
 
         let num = Math.floor(amount);
-        let crore = Math.floor(num / 10000000);
-        num %= 10000000;
-        let lakh = Math.floor(num / 100000);
-        num %= 100000;
-        let thousand = Math.floor(num / 1000);
-        num %= 1000;
+        let crore = Math.floor(num / 10000000); num %= 10000000;
+        let lakh = Math.floor(num / 100000); num %= 100000;
+        let thousand = Math.floor(num / 1000); num %= 1000;
         let hundred = Math.floor(num / 100);
         let rest = num % 100;
 
@@ -983,37 +989,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res !== '') res += 'and ';
             res += numToWords(rest) + ' ';
         }
-
         return res.trim() + ' Rupees Only';
     }
 
-    // --- 2. AUTOMATIC METADATA INITIALIZATION ---
+    // --- METADATA INIT ---
     const today = new Date();
     const dd = String(today.getDate()).padStart(2, '0');
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy = today.getFullYear();
     const currentDateFormatted = `${dd}/${mm}/${yyyy}`;
 
-    const receiptDateInput = document.getElementById('receiptDate');
-    const paymentDateInput = document.getElementById('paymentDate');
-    const receiptNoInput = document.getElementById('receiptNo');
-    const lblTimestamp = document.getElementById('lblTimestamp');
+    document.getElementById('receiptDate').value = currentDateFormatted;
+    document.getElementById('paymentDate').value = currentDateFormatted;
+    document.getElementById('receiptNo').value = 'APA-' + yyyy + '-0001';
+    document.getElementById('lblTimestamp').textContent = currentDateFormatted + ' ' + today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    if (receiptDateInput) receiptDateInput.value = currentDateFormatted;
-    if (paymentDateInput) paymentDateInput.value = currentDateFormatted;
-    if (receiptNoInput) receiptNoInput.value = 'APA-' + yyyy + '-0001';
-    if (lblTimestamp) lblTimestamp.textContent = currentDateFormatted + ' ' + today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // --- 3. DYNAMIC FORM LISTENERS & SYNC ---
     const paidAmountInput = document.getElementById('paidAmount');
     const wordsInput = document.getElementById('words');
-
-    if (paidAmountInput && wordsInput) {
-        paidAmountInput.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            wordsInput.value = convertNumberToWords(val);
-        });
-    }
+    paidAmountInput.addEventListener('input', (e) => {
+        wordsInput.value = convertNumberToWords(parseFloat(e.target.value));
+    });
 
     function syncPrintLabels() {
         const fields = ['receiptNo', 'receiptDate', 'name', 'phone', 'course', 'year', 'paidAmount', 'words', 'paymentDate', 'transactionId', 'installment', 'remarks'];
@@ -1021,163 +1016,181 @@ document.addEventListener('DOMContentLoaded', () => {
             const input = document.getElementById(id);
             const printLbl = document.getElementById('print_' + id);
             if (input && printLbl) {
-                if (id === 'paidAmount' && input.value) {
-                    printLbl.textContent = '₹ ' + input.value;
-                } else {
-                    printLbl.textContent = input.value || '';
-                }
+                printLbl.textContent = (id === 'paidAmount' && input.value) ? '₹ ' + input.value : (input.value || '');
             }
         });
-
         const selectedMode = document.querySelector('input[name="payment"]:checked');
-        const printModeLbl = document.getElementById('print_paymentMode');
-        if (selectedMode && printModeLbl) {
-            printModeLbl.textContent = selectedMode.value;
-        }
+        if (selectedMode) document.getElementById('print_paymentMode').textContent = selectedMode.value;
     }
 
-    // --- 4. STAFF AUTH MODAL LOGIC ---
+    // --- LOCAL STORAGE RECORD SAVING ---
+    function saveRecordToLocalStorage() {
+        const record = {
+            receiptNo: document.getElementById('receiptNo').value,
+            receiptDate: document.getElementById('receiptDate').value,
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            course: document.getElementById('course').value,
+            year: document.getElementById('year').value,
+            paidAmount: document.getElementById('paidAmount').value,
+            paymentDate: document.getElementById('paymentDate').value,
+            paymentMode: document.querySelector('input[name="payment"]:checked').value,
+            transactionId: document.getElementById('transactionId').value || 'N/A',
+            installment: document.getElementById('installment').value,
+            remarks: document.getElementById('remarks').value,
+            timestamp: new Date().toISOString()
+        };
+
+        let records = JSON.parse(localStorage.getItem('apa_fee_records') || '[]');
+        records.push(record);
+        localStorage.setItem('apa_fee_records', JSON.stringify(records));
+    }
+
+    // --- STAFF LOGIN MODAL ---
     const modal = document.getElementById('loginModal');
-    const btnLogin = document.getElementById('btnLogin');
-    const btnLogout = document.getElementById('btnLogout');
-    const closeModal = document.getElementById('closeModal');
-    const staffLoginForm = document.getElementById('staffLoginForm');
-    const loginErrorMsg = document.getElementById('loginErrorMsg');
-    const authStatus = document.getElementById('authStatus');
+    document.getElementById('btnLogin').addEventListener('click', () => { modal.style.display = 'flex'; });
+    document.getElementById('closeModal').addEventListener('click', () => { modal.style.display = 'none'; });
 
-    if (btnLogin) {
-        btnLogin.addEventListener('click', () => {
-            modal.style.display = 'flex';
-        });
-    }
-
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
+    document.getElementById('staffLoginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const pwd = document.getElementById('staffPassword').value;
+        const email = document.getElementById('staffEmail').value;
+        
+        if (pwd === 'AITAdmin@2026') {
+            isStaffAuthenticated = true;
             modal.style.display = 'none';
-            loginErrorMsg.style.display = 'none';
-            staffLoginForm.reset();
-        });
-    }
-
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-            loginErrorMsg.style.display = 'none';
-            staffLoginForm.reset();
+            document.getElementById('authStatus').innerHTML = `<i class="fa-solid fa-user-check" style="color: var(--success-green);"></i> <span>Status: Signed In (${email})</span>`;
+            document.getElementById('btnLogin').style.display = 'none';
+            document.getElementById('btnLogout').style.display = 'inline-flex';
+            updateButtonStates();
+            showToast('Staff authenticated successfully!');
+        } else {
+            document.getElementById('loginErrorMsg').textContent = 'Invalid password. Hint: AITAdmin@2026';
+            document.getElementById('loginErrorMsg').style.display = 'block';
         }
     });
 
-    if (staffLoginForm) {
-        staffLoginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('staffEmail').value.trim();
-            const password = document.getElementById('staffPassword').value;
-            const submitBtn = document.getElementById('submitLogin');
+    document.getElementById('btnLogout').addEventListener('click', () => {
+        isStaffAuthenticated = false;
+        document.getElementById('authStatus').innerHTML = `<i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In (Actions Locked)</span>`;
+        document.getElementById('btnLogout').style.display = 'none';
+        document.getElementById('btnLogin').style.display = 'inline-flex';
+        updateButtonStates();
+        showToast('Signed out successfully.');
+    });
 
-            submitBtn.classList.add('btn-loading');
-            loginErrorMsg.style.display = 'none';
+    // --- DARK MODE TOGGLE ---
+    const darkModeBtn = document.getElementById('btnDarkMode');
+    darkModeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+        darkModeBtn.innerHTML = isDark ? '<i class="fa-solid fa-moon"></i> Dark Mode' : '<i class="fa-solid fa-sun"></i> Light Mode';
+    });
 
+    // --- PRINT & PDF DOWNLOAD ---
+    document.getElementById('printBtn').addEventListener('click', () => {
+        if (!isStaffAuthenticated || !checkFormValidity()) { showValidationPopup(); return; }
+        syncPrintLabels();
+        saveRecordToLocalStorage();
+        window.print();
+    });
+
+    document.getElementById('download').addEventListener('click', async () => {
+        if (!isStaffAuthenticated || !checkFormValidity()) { showValidationPopup(); return; }
+        syncPrintLabels();
+        saveRecordToLocalStorage();
+        
+        const downloadBtn = document.getElementById('download');
+        downloadBtn.classList.add('btn-loading');
+
+        try {
+            const canvas = await html2canvas(document.getElementById('receiptBlock'), { scale: 2, useCORS: true, backgroundColor: null });
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const pdfWidth = 210, pdfHeight = 297, margin = 10;
+            const availableHeight = pdfHeight - (margin * 2);
+            const imgWidth = pdfWidth - (margin * 2);
+            let imgHeight = (canvas.height * imgWidth) / canvas.width;
+            if (imgHeight > availableHeight) imgHeight = availableHeight;
+
+            pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+            pdf.save(`${document.getElementById('receiptNo').value}.pdf`);
+            showToast('PDF downloaded & record saved successfully!');
+        } catch (err) {
+            showToast('Error generating PDF.', true);
+        } finally {
+            downloadBtn.classList.remove('btn-loading');
+        }
+    });
+
+    // --- EXPORT LEDGER (CSV/Excel compatible) ---
+    document.getElementById('exportExcel').addEventListener('click', () => {
+        if (!isStaffAuthenticated) { showValidationPopup(); return; }
+        const records = JSON.parse(localStorage.getItem('apa_fee_records') || '[]');
+        if (records.length === 0) { showToast('No records found in storage.', true); return; }
+
+        let csv = 'Receipt No,Date,Student Name,Phone,Course,Year,Amount Paid,Payment Mode,TXN ID,Installment\n';
+        records.forEach(r => {
+            csv += `"${r.receiptNo}","${r.receiptDate}","${r.name}","${r.phone}","${r.course}","${r.year}","${r.paidAmount}","${r.paymentMode}","${r.transactionId}","${r.installment}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `APA_Fee_Ledger_${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
+        showToast('Ledger exported successfully!');
+    });
+
+    // --- BACKUP & RESTORE ---
+    document.getElementById('btnBackup').addEventListener('click', () => {
+        if (!isStaffAuthenticated) { showValidationPopup(); return; }
+        const data = localStorage.getItem('apa_fee_records') || '[]';
+        const blob = new Blob([data], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `APA_Backup_${new Date().toISOString().slice(0,10)}.json`;
+        link.click();
+        showToast('Backup downloaded successfully!');
+    });
+
+    document.getElementById('btnRestore').addEventListener('click', () => {
+        if (!isStaffAuthenticated) { showValidationPopup(); return; }
+        document.getElementById('restoreFile').click();
+    });
+
+    document.getElementById('restoreFile').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
             try {
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    authStatus.innerHTML = `<i class="fa-solid fa-user-check" style="color: #16A34A;"></i> <span>Status: Signed In (${email})</span>`;
-                    btnLogin.style.display = 'none';
-                    btnLogout.style.display = 'inline-flex';
-                    staffLoginForm.reset();
-                    submitBtn.classList.remove('btn-loading');
-                    showToast('Staff authenticated successfully!');
-                }, 800);
-            } catch (err) {
-                loginErrorMsg.textContent = err.message || 'Authentication failed. Please check credentials.';
-                loginErrorMsg.style.display = 'block';
-                submitBtn.classList.remove('btn-loading');
-            }
-        });
-    }
-
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
-            authStatus.innerHTML = `<i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In</span>`;
-            btnLogout.style.display = 'none';
-            btnLogin.style.display = 'inline-flex';
-            showToast('Signed out successfully.');
-        });
-    }
-
-    // --- 5. PRINT & SINGLE-PAGE PDF EXPORT UTILITIES ---
-    const printBtn = document.getElementById('printBtn');
-    if (printBtn) {
-        printBtn.addEventListener('click', () => {
-            syncPrintLabels();
-            window.print();
-        });
-    }
-
-    const downloadBtn = document.getElementById('download');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', async () => {
-            syncPrintLabels();
-            downloadBtn.classList.add('btn-loading');
-
-            const receiptElement = document.getElementById('receiptBlock');
-            try {
-                const canvas = await html2canvas(receiptElement, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#FFFFFF'
-                });
-
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const pdfWidth = 210; 
-                const pdfHeight = 297; 
-                const margin = 10; 
-                
-                const availableHeight = pdfHeight - (margin * 2);
-                const imgWidth = pdfWidth - (margin * 2);
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                let finalHeight = imgHeight;
-                let finalWidth = imgWidth;
-                
-                if (imgHeight > availableHeight) {
-                    finalHeight = availableHeight;
-                    finalWidth = (canvas.width * finalHeight) / canvas.height;
+                const parsed = JSON.parse(event.target.result);
+                if (Array.isArray(parsed)) {
+                    localStorage.setItem('apa_fee_records', JSON.stringify(parsed));
+                    showToast('Backup restored successfully!');
+                } else {
+                    throw new Error();
                 }
-
-                const xPos = (pdfWidth - finalWidth) / 2;
-                pdf.addImage(imgData, 'PNG', xPos, margin, finalWidth, finalHeight);
-
-                const recNo = receiptNoInput ? receiptNoInput.value : 'APA-Receipt';
-                pdf.save(`${recNo}.pdf`);
-                
-                // Trigger the stylish notification toast
-                showToast(`Receipt ${recNo}.pdf downloaded successfully!`);
-            } catch (error) {
-                alert('An error occurred while generating the PDF.');
-            } finally {
-                downloadBtn.classList.remove('btn-loading');
+            } catch (err) {
+                showToast('Invalid backup file format.', true);
             }
-        });
-    }
+        };
+        reader.readAsText(file);
+    });
 
-    // Clear Form Button
-    const clearFormBtn = document.getElementById('clearForm');
-    if (clearFormBtn) {
-        clearFormBtn.addEventListener('click', () => {
-            document.querySelectorAll('.doc-input').forEach(input => {
-                if (!input.classList.contains('system-locked-field')) input.value = '';
-            });
-            document.querySelectorAll('.doc-select').forEach(select => select.selectedIndex = 0);
-            document.getElementById('remarks').value = '';
-            if (paidAmountInput) paidAmountInput.value = '';
-            if (wordsInput) wordsInput.value = '';
-            showToast('Form fields cleared.');
+    // --- RESET FORM ---
+    document.getElementById('clearForm').addEventListener('click', () => {
+        document.querySelectorAll('.doc-input').forEach(input => {
+            if (!input.classList.contains('system-locked-field')) input.value = '';
         });
-    }
+        document.querySelectorAll('.doc-select').forEach(select => select.selectedIndex = 0);
+        document.getElementById('remarks').value = '';
+        updateButtonStates();
+        showToast('Form fields reset.');
+    });
 });
 </script>
 
