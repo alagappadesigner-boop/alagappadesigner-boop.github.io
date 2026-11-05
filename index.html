@@ -165,13 +165,13 @@
             border: 1px solid var(--border-light);
             border-radius: 5px;
             outline: none;
-            transition: all 0.2s;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
             background-color: #FFFFFF;
         }
 
         .form-control:focus {
-            border-color: var(--brand-gold);
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+            border-color: var(--brand-gold) !important;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18) !important;
         }
 
         .form-control.is-invalid {
@@ -194,12 +194,13 @@
             border-radius: 6px;
             text-align: center;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
             position: relative;
         }
 
         .file-import-dropzone:hover {
             background-color: #FFF8E1;
+            border-color: var(--brand-gold-dark);
         }
 
         .file-import-dropzone input[type="file"] {
@@ -226,8 +227,19 @@
             font-weight: 600;
             cursor: pointer;
             border: none;
-            transition: all 0.2s;
+            transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            will-change: transform, box-shadow;
             color: #FFFFFF;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         }
 
         .btn:disabled {
@@ -268,6 +280,13 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            will-change: transform;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
         }
 
         .metric-card .val {
@@ -444,10 +463,46 @@
             font-weight: 500;
         }
 
+        /* --- Keyframe Entrance Animations & Reduced Motion --- */
+        @keyframes panelFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel-card,
+        .card-preview-viewport {
+            animation: panelFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards;
+            will-change: opacity, transform;
+        }
+
+        .dashboard-grid > div:nth-child(1) .panel-card:nth-child(1) { animation-delay: 0.05s; }
+        .dashboard-grid > div:nth-child(1) .panel-card:nth-child(2) { animation-delay: 0.12s; }
+        .dashboard-grid > div:nth-child(1) .panel-card:nth-child(3) { animation-delay: 0.18s; }
+        .dashboard-grid > div:nth-child(2) { animation-delay: 0.22s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .panel-card,
+            .card-preview-viewport,
+            .btn,
+            .form-control,
+            .metric-card,
+            .file-import-dropzone {
+                animation: none !important;
+                transition: none !important;
+                transform: none !important;
+            }
+        }
+
         /* --- Printing Rules --- */
         @media print {
             body { background: #FFFFFF; padding: 0; }
-            .dashboard-grid, .app-header, .secure-gateway, .app-footer, .btn-group, .validation-panel {
+            .dashboard-grid, .app-header, .app-footer, .btn-group, .validation-panel {
                 display: none !important;
             }
             .bulk-preview-grid {
@@ -705,11 +760,9 @@
         // --- 1. DATE FORMATTING & VALIDATION HELPER FUNCTIONS ---
         const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-        // Parses multiple date formats and returns an object: { isValid: boolean, dobStr: string, dojStr: string, errorReason: string }
         function processDateValue(rawVal, isDOJ = false) {
             if (rawVal === undefined || rawVal === null || String(rawVal).trim() === '') {
                 if (isDOJ) {
-                    // Default rule: Use 'Aug 2026' only when record has no joining date
                     return { isValid: true, formatted: 'Aug 2026', raw: '' };
                 }
                 return { isValid: false, formatted: '', errorReason: 'Date is missing' };
@@ -718,7 +771,6 @@
             let dateObj = null;
             let strVal = String(rawVal).trim();
 
-            // Handle Excel Numeric Serial Date Values
             if (!isNaN(strVal) && Number(strVal) > 25000) {
                 const serial = Number(strVal);
                 const utcDays = Math.floor(serial - 25569);
@@ -729,7 +781,6 @@
                 }
             }
 
-            // Standard Delimiter Matching (DD/MM/YYYY, D/M/YYYY, YYYY-MM-DD)
             if (!dateObj) {
                 if (strVal.includes('/')) {
                     const parts = strVal.split('/');
@@ -738,12 +789,10 @@
                         const p2 = parseInt(parts[1], 10);
                         const p3 = parseInt(parts[2], 10);
                         
-                        // Check if YYYY/MM/DD vs DD/MM/YYYY
                         if (p1 > 1000) {
                             dateObj = new Date(p1, p2 - 1, p3);
                         } else {
                             dateObj = new Date(p3, p2 - 1, p1);
-                            // Verify day bounding
                             if (dateObj.getDate() !== p1) dateObj = null; 
                         }
                     }
@@ -760,7 +809,6 @@
                         }
                     }
                 } else {
-                    // Try direct Date construction for string representations (e.g. "August 2026", "12 May 2004")
                     const parsedDirect = new Date(strVal);
                     if (!isNaN(parsedDirect.getTime())) {
                         dateObj = parsedDirect;
@@ -777,7 +825,6 @@
             const year = dateObj.getFullYear();
             const now = new Date();
 
-            // Reject impossible dates and future Date of Births
             if (!isDOJ && dateObj > now) {
                 return { isValid: false, formatted: strVal, errorReason: 'Future Date of Birth is impossible' };
             }
@@ -787,11 +834,9 @@
             }
 
             if (isDOJ) {
-                // Display DOJ as MMM YYYY (e.g., Aug 2026)
                 const monthName = MONTH_NAMES[dateObj.getMonth()];
                 return { isValid: true, formatted: `${monthName} ${year}` };
             } else {
-                // Display DOB as DD/MM/YYYY
                 return { isValid: true, formatted: `${day}/${month}/${year}` };
             }
         }
@@ -803,10 +848,8 @@
             }
 
             let strVal = String(rawVal).trim();
-            // Extract numeric digits only
             const digitsOnly = strVal.replace(/\D/g, '');
 
-            // For Indian numbers: expect 10 digits (or 12 if including '91' country prefix)
             if (digitsOnly.length === 10) {
                 return { isValid: true, digits: digitsOnly, original: strVal };
             } else if (digitsOnly.length === 12 && digitsOnly.startsWith('91')) {
@@ -821,11 +864,10 @@
             validationDiagnostics = [];
             validatedRecords = [];
 
-            const idTracker = new Map(); // Tracks duplicate Student IDs and their respective row indices
+            const idTracker = new Map();
 
-            // Step A: Map Student ID duplicates
             dataset.forEach((row, index) => {
-                const excelRow = index + 2; // Row number in spreadsheet (accounting for header)
+                const excelRow = index + 2;
                 const rawId = row['Student ID'] || row['StudentID'] || row['ID'] || row['Enrollment No'] || '';
                 const cleanId = String(rawId).trim().toUpperCase();
 
@@ -838,7 +880,6 @@
                 }
             });
 
-            // Step B: Comprehensive row-by-row field diagnostics
             let validCount = 0;
             let errorCount = 0;
             let warningCount = 0;
@@ -846,9 +887,7 @@
             dataset.forEach((row, index) => {
                 const excelRow = index + 2;
                 let rowHasError = false;
-                let rowHasWarning = false;
 
-                // Extract Fields with multi-header alias support
                 const rawId = row['Student ID'] || row['StudentID'] || row['ID'] || row['Enrollment No'] || '';
                 const rawName = row['Full Name'] || row['Student Name'] || row['Name'] || '';
                 const rawCourse = row['Course'] || row['Program'] || 'Bharatanatyam';
@@ -860,7 +899,6 @@
                 const cleanId = String(rawId).trim();
                 const cleanName = String(rawName).trim();
 
-                // Validation 1: Student ID Presence & Uniqueness
                 if (!cleanId) {
                     rowHasError = true;
                     validationDiagnostics.push({ row: excelRow, id: 'N/A', field: 'Student ID', type: 'ERROR', msg: 'Missing Student ID' });
@@ -870,34 +908,29 @@
                     validationDiagnostics.push({ row: excelRow, id: cleanId, field: 'Student ID', type: 'ERROR', msg: `Duplicate ID found on Excel Rows: [${rowsList}]` });
                 }
 
-                // Validation 2: Missing Student Name
                 if (!cleanName) {
                     rowHasError = true;
                     validationDiagnostics.push({ row: excelRow, id: cleanId || 'N/A', field: 'Full Name', type: 'ERROR', msg: 'Student name is missing or contains only spaces' });
                 }
 
-                // Validation 3: Date of Birth Checks
                 const dobResult = processDateValue(rawDOB, false);
                 if (!dobResult.isValid) {
                     rowHasError = true;
                     validationDiagnostics.push({ row: excelRow, id: cleanId || 'N/A', field: 'Date of Birth', type: 'ERROR', msg: dobResult.errorReason });
                 }
 
-                // Validation 4: Date of Joining Checks
                 const dojResult = processDateValue(rawDOJ, true);
                 if (!dojResult.isValid) {
                     rowHasError = true;
                     validationDiagnostics.push({ row: excelRow, id: cleanId || 'N/A', field: 'Date of Joining', type: 'ERROR', msg: dojResult.errorReason });
                 }
 
-                // Validation 5: Phone Number Rules
                 const phoneResult = processPhoneNumber(rawPhone);
                 if (!phoneResult.isValid) {
                     rowHasError = true;
                     validationDiagnostics.push({ row: excelRow, id: cleanId || 'N/A', field: 'Phone Number', type: 'ERROR', msg: phoneResult.errorReason });
                 }
 
-                // Record Assembly
                 const processedRecord = {
                     excelRow: excelRow,
                     studentId: cleanId,
@@ -919,7 +952,6 @@
                 validatedRecords.push(processedRecord);
             });
 
-            // Step C: Render UI Validation Metrics & Report
             document.getElementById('m_total').innerText = dataset.length;
             document.getElementById('m_valid').innerText = validCount;
             document.getElementById('m_errors').innerText = errorCount;
@@ -928,7 +960,6 @@
 
             renderDiagnosticsTable();
 
-            // Enable card generation ONLY if valid records exist
             btnGenerate.disabled = (validCount === 0);
             btnPdfBulk.style.display = (validCount > 0) ? 'inline-flex' : 'none';
 
@@ -975,12 +1006,10 @@
             document.getElementById('preview_phone').innerText = sPhone;
         }
 
-        // Form Event Listeners for real-time live preview updates
         [studentIdEl, studentNameEl, courseEl, dobEl, dojEl, phoneEl].forEach(element => {
             element.addEventListener('input', updateLivePreviewFromForm);
         });
 
-        // Photo Upload Handler
         photoInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -1005,7 +1034,6 @@
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    // Parse sheet to JSON array
                     const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
                     if (!jsonRows || jsonRows.length === 0) {
@@ -1015,7 +1043,6 @@
 
                     rawImportedData = jsonRows;
 
-                    // Populate Dropdown Search Menu
                     studentSearch.innerHTML = '<option value="">-- Manual Entry / Select Loaded Student --</option>';
                     rawImportedData.forEach((row, idx) => {
                         const id = row['Student ID'] || row['StudentID'] || row['ID'] || `REC-${idx+1}`;
@@ -1026,7 +1053,6 @@
                         studentSearch.appendChild(opt);
                     });
 
-                    // Automatically Trigger Data Validation
                     runMasterValidation(rawImportedData);
 
                 } catch (err) {
@@ -1037,7 +1063,6 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // Dropdown menu selection listener
         studentSearch.addEventListener('change', (e) => {
             const idx = e.target.value;
             if (idx === '') return;
@@ -1067,7 +1092,6 @@
                     alert('Validation completed with issues. Please review the detailed exception log below.');
                 }
             } else {
-                // Validate individual manual entry form
                 const manualRecord = [{
                     'Student ID': studentIdEl.value,
                     'Full Name': studentNameEl.value,
@@ -1093,7 +1117,6 @@
             const bulkContainer = document.getElementById('bulkContainer');
             bulkContainer.innerHTML = '';
 
-            // Render batch preview grid excluding records with errors
             validOnly.forEach(rec => {
                 const cardClone = document.getElementById('idCardNode').cloneNode(true);
                 cardClone.removeAttribute('id');
@@ -1117,14 +1140,13 @@
         });
 
         // --- 7. PDF DOWNLOAD & PRINT EXPORT LOGIC ---
-        // Download Single Live Preview PDF
         document.getElementById('btnPdfSingle').addEventListener('click', async () => {
             const cardNode = document.getElementById('idCardNode');
             try {
                 const canvas = await html2canvas(cardNode, { scale: 3, useCORS: true, backgroundColor: null });
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', [54, 85.6]); // Standard CR80 Card Dimension
+                const pdf = new jsPDF('p', 'mm', [54, 85.6]);
                 pdf.addImage(imgData, 'PNG', 0, 0, 54, 85.6);
                 
                 const rawName = studentNameEl.value.trim() || 'Student';
@@ -1136,12 +1158,10 @@
             }
         });
 
-        // Print Single Live Preview
         document.getElementById('btnPrintSingle').addEventListener('click', () => {
             window.print();
         });
 
-        // Download Bulk Validated PDF
         btnPdfBulk.addEventListener('click', async () => {
             const validOnly = validatedRecords.filter(r => r.isValid);
             if (validOnly.length === 0) return alert('No valid records to export.');
@@ -1161,7 +1181,6 @@
                 const imgData = canvas.toDataURL('image/png');
                 
                 if (i > 0) pdf.addPage();
-                // Render centered on A4
                 pdf.addImage(imgData, 'PNG', 55, 40, 100, 156.25);
             }
 
