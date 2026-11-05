@@ -514,7 +514,7 @@
             font-weight: 600;
             cursor: pointer;
             color: #FFFFFF;
-            transition: opacity 0.2s, transform 0.18s ease;
+            transition: opacity 0.2s, transform 0.18s ease, filter 0.2s;
         }
 
         .btn:hover:not(:disabled) { 
@@ -523,8 +523,9 @@
         }
         
         .btn:disabled {
-            opacity: 0.45;
+            opacity: 0.5;
             cursor: not-allowed;
+            filter: grayscale(30%);
         }
 
         #download { background-color: var(--primary-navy); }
@@ -847,8 +848,8 @@
         </div>
 
         <div class="action-toolbar">
-            <button type="button" id="download" class="btn action-btn"><i class="fa-solid fa-download"></i> Download PDF</button>
-            <button type="button" id="printBtn" class="btn action-btn"><i class="fa-solid fa-print"></i> Print Receipt</button>
+            <button type="button" id="download" class="btn action-btn" disabled><i class="fa-solid fa-download"></i> Download PDF</button>
+            <button type="button" id="printBtn" class="btn action-btn" disabled><i class="fa-solid fa-print"></i> Print Receipt</button>
             <button type="button" id="exportExcel" class="btn action-btn"><i class="fa-solid fa-file-excel"></i> Export Ledger</button>
             <button type="button" id="btnBackup" class="btn action-btn"><i class="fa-solid fa-cloud-arrow-down"></i> Download Backup</button>
             <button type="button" id="btnRestore" class="btn action-btn"><i class="fa-solid fa-cloud-arrow-up"></i> Restore Backup</button>
@@ -904,6 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
             txnLabel.innerHTML = `TXN / UPI ID *`;
             transactionInput.classList.add('required-field');
         }
+        validateFormState();
     }
 
     paymentModeRadios.forEach(radio => {
@@ -922,18 +924,50 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
+    function validateFormState() {
+        const missingField = getFirstMissingField();
+        const downloadBtn = document.getElementById('download');
+        const printBtn = document.getElementById('printBtn');
+
+        if (!missingField) {
+            downloadBtn.removeAttribute('disabled');
+            printBtn.removeAttribute('disabled');
+        } else {
+            downloadBtn.setAttribute('disabled', 'true');
+            printBtn.setAttribute('disabled', 'true');
+        }
+    }
+
+    document.querySelectorAll('.required-field, input, select').forEach(element => {
+        element.addEventListener('input', validateFormState);
+        element.addEventListener('change', validateFormState);
+    });
+
     function showValidationPopup() {
         const missing = getFirstMissingField();
         if (missing) {
             document.getElementById('validationMsg').textContent = `Please enter the ${missing} before proceeding.`;
         } else {
-            document.getElementById('validationMsg').textContent = "Please fill in all required fields and transaction details.";
+            document.getElementById('validationMsg').textContent = "Please fill in all required details before proceeding.";
         }
         document.getElementById('validationModal').style.display = 'flex';
     }
 
     document.getElementById('closeValidationModal').addEventListener('click', () => {
         document.getElementById('validationModal').style.display = 'none';
+    });
+
+    // Enable validation popups even if buttons are clicked while visually disabled
+    document.getElementById('download').parentNode.addEventListener('click', (e) => {
+        if (e.target.closest('#download') && document.getElementById('download').hasAttribute('disabled')) {
+            showValidationPopup();
+        }
+    });
+
+    document.getElementById('printBtn').parentNode.addEventListener('click', (e) => {
+        if (e.target.closest('#printBtn') && document.getElementById('printBtn').hasAttribute('disabled')) {
+            showValidationPopup();
+        }
     });
 
     // --- NUMBER TO WORDS CONVERTER ---
@@ -1064,7 +1098,6 @@ document.addEventListener('DOMContentLoaded', () => {
         saveRecordToLocalStorage();
         
         const downloadBtn = document.getElementById('download');
-        downloadBtn.classList.add('btn-loading');
 
         try {
             const canvas = await html2canvas(document.getElementById('receiptBlock'), { 
@@ -1099,8 +1132,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('PDF downloaded & record saved successfully!');
         } catch (err) {
             showToast('Error generating PDF.', true);
-        } finally {
-            downloadBtn.classList.remove('btn-loading');
         }
     });
 
@@ -1164,8 +1195,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.querySelectorAll('.doc-select').forEach(select => select.selectedIndex = 0);
         document.getElementById('remarks').value = '';
+        validateFormState();
         showToast('Form fields reset.');
     });
+
+    validateFormState();
 });
 </script>
 
