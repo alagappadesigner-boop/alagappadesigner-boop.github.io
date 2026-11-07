@@ -55,14 +55,12 @@
         
         <!-- LOGO (Left) -->
         <div class="md:col-span-4 flex items-center space-x-2">
-          <div class="text-[#0F3661] font-bold text-3xl tracking-tighter flex items-center font-serif">
-            <span class="text-4xl text-[#0F3661]">AP</span>
-            <span class="text-4xl text-[#0F3661] -ml-1">AA</span>
-          </div>
-          <div class="border-l border-slate-300 pl-2">
-            <span class="text-[11px] font-bold text-[#0F3661] block leading-tight">Alagappa</span>
-            <span class="text-[9px] text-slate-500 block uppercase leading-none">Performing Arts Academy</span>
-          </div>
+          <img 
+            src="Logo.png" 
+            alt="APAA Logo" 
+            class="h-14 w-auto object-contain" 
+            onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'text-[#0F3661] font-bold text-3xl tracking-tighter flex items-center font-serif\'><span class=\'text-4xl text-[#0F3661]\'>AP</span><span class=\'text-4xl text-[#0F3661] -ml-1\'>AA</span></div><div class=\'border-l border-slate-300 pl-2\'><span class=\'text-[11px] font-bold text-[#0F3661] block leading-tight\'>Alagappa</span><span class=\'text-[9px] text-slate-500 block uppercase leading-none\'>Performing Arts Academy</span></div>';"
+          />
         </div>
 
         <!-- TITLE (Center) -->
@@ -311,12 +309,13 @@
 
         <!-- AUTHORIZED SIGNATURE -->
         <div class="text-right">
-          <div class="inline-block text-center border-b border-slate-800 pb-1 px-6">
-            <!-- Visual SVG Digital Signature -->
-            <svg class="w-36 h-10 mx-auto" viewBox="0 0 200 50">
-              <path d="M 10 35 Q 30 10, 50 25 T 90 15 T 130 30 T 170 10" fill="none" stroke="#0F3661" stroke-width="2.5" stroke-linecap="round" />
-              <path d="M 40 40 Q 80 45, 150 35" fill="none" stroke="#0F3661" stroke-width="1.5" />
-            </svg>
+          <div class="inline-block text-center border-b border-slate-800 pb-1 px-6 min-h-[40px] flex items-end justify-center">
+            <img 
+              src="signature.png" 
+              alt="Authorized Signature" 
+              class="h-10 w-auto object-contain mx-auto" 
+              onerror="this.onerror=null; this.parentElement.innerHTML='<svg class=\'w-36 h-10 mx-auto\' viewBox=\'0 0 200 50\'><path d=\'M 10 35 Q 30 10, 50 25 T 90 15 T 130 30 T 170 10\' fill=\'none\' stroke=\'#0F3661\' stroke-width=\'2.5\' stroke-linecap=\'round\' /><path d=\'M 40 40 Q 80 45, 150 35\' fill=\'none\' stroke=\'#0F3661\' stroke-width=\'1.5\' /></svg>';"
+            />
           </div>
           <p class="text-[10px] font-bold text-[#0F3661] uppercase tracking-wider mt-1">
             AUTHORIZED SIGNATURE
