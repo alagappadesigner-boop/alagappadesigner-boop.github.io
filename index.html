@@ -4,21 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alagappa Performing Arts Academy | Fee Receipt Generator</title>
-<!-- External Libraries for Export & Functionality -->
+
+<!-- External Script Libraries for PNG, PDF and Excel Export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- Google Fonts for Premium Typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+
 <style>
 :root {
+  --navy-dark: #0b1d3a;
   --navy: #12345b;
-  --blue: #1e4f83;
+  --blue-royal: #1e4f83;
   --gold: #d6a629;
-  --ink: #26364a;
-  --muted: #718096;
-  --line: #dce5ef;
+  --gold-dark: #b8860b;
+  --gold-light: #fdf9ee;
+  --ink: #1e293b;
+  --muted: #64748b;
+  --line: #e2e8f0;
   --paper: #ffffff;
-  --bg: #f3f6fa;
-  --green: #087f5b;
+  --bg: #f0f4f9;
+  --green-emerald: #059669;
+  --green-bg: #ecfdf5;
+  --shadow-sm: 0 2px 8px rgba(11, 29, 58, 0.04);
+  --shadow-md: 0 10px 30px rgba(11, 29, 58, 0.08);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
 
 * {
@@ -27,186 +43,289 @@
 
 body {
   margin: 0;
-  background: var(--bg);
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  background-color: var(--bg);
+  background-image: radial-gradient(rgba(18, 52, 91, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: var(--ink);
-  padding: 28px 16px;
+  padding: 32px 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 .wrap {
-  max-width: 1050px;
-  margin: auto;
+  max-width: 1040px;
+  margin: 0 auto;
 }
 
+/* ==========================================================================
+   Topbar / Action Header
+   ========================================================================== */
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
-  gap: 14px;
+  margin-bottom: 24px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
-.topbar h1 {
-  font-size: 22px;
-  color: var(--navy);
-  margin: 0;
+.topbar-brand h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin: 0 0 2px 0;
+  letter-spacing: -0.2px;
 }
 
-.topbar p {
-  margin: 4px 0 0;
+.topbar-brand p {
+  margin: 0;
   color: var(--muted);
   font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e6f4ea;
+  color: var(--green-emerald);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #b7e4c7;
+}
+
+.saved-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green-emerald);
 }
 
 .actions {
   display: flex;
-  gap: 9px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .btn {
-  border: 0;
-  border-radius: 9px;
-  padding: 11px 16px;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 9px 15px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s ease;
+  font-size: 12.5px;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+}
+
+.btn svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.2;
 }
 
 .btn-primary {
   background: var(--navy);
-  color: #fff;
+  color: #ffffff;
+  border-color: var(--navy-dark);
+}
+
+.btn-primary:hover {
+  background: var(--navy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(11, 29, 58, 0.2);
+}
+
+.btn-accent {
+  background: var(--gold-dark);
+  color: #ffffff;
+}
+
+.btn-accent:hover {
+  background: #a07409;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.25);
 }
 
 .btn-light {
-  background: #fff;
+  background: #ffffff;
   color: var(--navy);
-  border: 1px solid var(--line);
+  border-color: var(--line);
 }
 
-.btn:hover {
-  filter: brightness(0.94);
+.btn-light:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: var(--navy-dark);
   transform: translateY(-1px);
 }
 
+/* ==========================================================================
+   Receipt Canvas Container (.sheet)
+   ========================================================================== */
 .sheet {
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: 0 12px 35px rgba(26, 54, 80, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-}
-
-.brand {
-  padding: 26px 34px 22px;
-  border-bottom: 1px solid var(--line);
   position: relative;
+}
+
+/* Header & Academy Banner */
+.brand {
+  padding: 32px 36px 24px;
   text-align: center;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  background: linear-gradient(180deg, #fbfcfd 0%, #ffffff 100%);
+  position: relative;
 }
 
-.brand::after {
-  content: "";
-  position: absolute;
-  left: 34px;
-  right: 34px;
-  bottom: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--navy), var(--gold), var(--navy));
-}
-
-/* Academy Logo Styles */
 .brand-logo-wrap {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .brand-logo {
-  max-height: 85px;
+  max-height: 82px;
   width: auto;
   object-fit: contain;
 }
 
 .brand h2 {
-  font-family: Georgia, serif;
-  letter-spacing: 3px;
-  color: var(--navy);
-  font-size: 30px;
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: 4px;
+  color: var(--navy-dark);
+  font-size: 32px;
   margin: 0;
-  font-weight: 700;
+  font-weight: 800;
+  line-height: 1.1;
 }
 
 .brand .academy {
-  font-size: 15px;
-  letter-spacing: 3px;
+  font-size: 14px;
+  letter-spacing: 3.5px;
   font-weight: 800;
-  color: var(--blue);
-  margin: 3px 0 8px;
+  color: var(--blue-royal);
+  margin: 6px 0 10px;
 }
 
 .brand .courses {
   font-size: 11px;
-  letter-spacing: 1.4px;
-  color: #9a7418;
+  letter-spacing: 1.6px;
+  color: var(--gold-dark);
   font-weight: 800;
+  text-transform: uppercase;
 }
 
 .brand .contact {
   font-size: 12px;
-  color: #627186;
+  color: var(--muted);
   margin-top: 10px;
   line-height: 1.6;
+  font-weight: 500;
 }
 
+.luxury-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 18px 36px 0;
+  position: relative;
+}
+
+.luxury-divider::before {
+  content: "";
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--gold) 50%, var(--line) 80%, transparent);
+}
+
+.luxury-divider::after {
+  content: "◆";
+  position: absolute;
+  color: var(--gold);
+  font-size: 10px;
+  background: #fff;
+  padding: 0 10px;
+}
+
+/* Sub-Header Bar (Fee Receipt Title & Number) */
 .receipt-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 22px 34px 8px;
+  padding: 22px 36px 12px;
   gap: 16px;
 }
 
 .receipt-head h3 {
   margin: 0;
-  color: var(--navy);
-  font-size: 19px;
-  letter-spacing: 2px;
+  color: var(--navy-dark);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 21px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
 }
 
 .receipt-tag {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1.4px;
-  color: #9a7418;
-  border: 1px solid #ead9a8;
-  padding: 7px 11px;
+  color: var(--gold-dark);
+  border: 1px solid #f0e6c8;
+  padding: 5px 12px;
   border-radius: 30px;
-  background: #fffdf5;
+  background: var(--gold-light);
+  display: inline-block;
 }
 
 .receipt-no {
-  font-size: 11px;
-  color: #718096;
+  font-size: 11.5px;
+  color: var(--muted);
   text-align: right;
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
+.receipt-no strong {
+  color: var(--navy);
+  font-family: monospace, sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.5px;
+}
+
+/* Form Layout Grid */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  padding: 14px 28px 24px;
+  gap: 20px;
+  padding: 12px 36px 28px;
 }
 
 .panel {
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 18px 19px;
-  background: linear-gradient(180deg, #fbfcfe, #ffffff);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.015);
+  transition: border-color 0.2s ease;
+}
+
+.panel:hover {
+  border-color: #cbd5e1;
 }
 
 .panel-title {
@@ -214,26 +333,27 @@ body {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 12px;
-  margin-bottom: 13px;
+  margin-bottom: 16px;
   border-bottom: 1px solid var(--line);
-  font-size: 12px;
-  letter-spacing: 0.7px;
+  font-size: 11.5px;
+  letter-spacing: 1px;
   font-weight: 800;
   color: var(--navy);
+  text-transform: uppercase;
 }
 
-.panel-title span:last-child {
-  color: var(--gold);
-  font-size: 16px;
+.panel-title span.icon {
+  color: var(--gold-dark);
+  font-size: 14px;
 }
 
 .field {
   display: grid;
-  grid-template-columns: 42% 58%;
+  grid-template-columns: 40% 60%;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 13px;
-  min-height: 27px;
+  gap: 10px;
+  margin-bottom: 14px;
+  min-height: 32px;
 }
 
 .field:last-child {
@@ -242,35 +362,40 @@ body {
 
 label {
   font-size: 12px;
-  color: #58677c;
-  font-weight: 650;
+  color: #475569;
+  font-weight: 600;
 }
 
 .required {
-  color: #c0392b;
+  color: #e11d48;
   font-style: normal;
+  font-weight: 700;
 }
 
 input, select {
   width: 100%;
   border: 0;
-  border-bottom: 1px solid #cbd6e3;
-  padding: 7px 2px;
+  border-bottom: 1.5px solid #cbd5e1;
+  padding: 6px 4px;
   background: transparent;
-  color: #26364a;
-  font: 600 12px "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
   outline: none;
   text-align: right;
   border-radius: 0;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 input:focus, select:focus {
-  border-bottom: 2px solid var(--gold);
+  border-bottom-color: var(--gold-dark);
+  background: rgba(214, 166, 41, 0.03);
 }
 
 input::placeholder {
-  color: #a5afbd;
-  font-weight: 500;
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 input[type=date] {
@@ -281,91 +406,123 @@ select {
   cursor: pointer;
 }
 
+/* Custom Phone Prefix Field */
 .phone-wrap {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  border-bottom: 1.5px solid #cbd5e1;
+  transition: border-color 0.2s ease;
+}
+
+.phone-wrap:focus-within {
+  border-bottom-color: var(--gold-dark);
 }
 
 .phone-wrap span {
   font-size: 12px;
-  color: #58677c;
-  font-weight: 600;
-  margin-right: 4px;
+  color: var(--muted);
+  font-weight: 700;
+  padding-right: 4px;
 }
 
 .phone-wrap input {
-  text-align: right;
+  border-bottom: 0;
+  padding: 6px 2px;
 }
 
+/* Prominent Amount Box */
 .amount-wrap {
   display: flex;
   align-items: center;
-  border: 1px solid #9be3c9;
-  background: #effcf6;
-  border-radius: 7px;
-  padding: 0 9px;
+  border: 1.5px solid #a7f3d0;
+  background: var(--green-bg);
+  border-radius: var(--radius-sm);
+  padding: 2px 10px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
 }
 
 .amount-wrap b {
-  color: var(--green);
-  font-size: 13px;
+  color: var(--green-emerald);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .amount-wrap input {
   border: 0;
   text-align: right;
-  color: #075f47;
-  font-size: 16px;
+  color: #047857;
+  font-size: 17px;
   font-weight: 800;
+  background: transparent;
 }
 
+.amount-wrap input:focus {
+  background: transparent;
+}
+
+/* Amount in Words Styling */
+.words {
+  font-style: italic;
+  color: #64748b;
+  text-align: right;
+  font-size: 12px;
+  min-height: 28px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #cbd5e1;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* Segmented Payment Mode Radio Pills */
 .radio-row {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
 .radio-row label {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   font-size: 11px;
-  font-weight: 600;
-  color: #46566b;
+  font-weight: 700;
+  color: #475569;
   cursor: pointer;
+  padding: 3px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.radio-row label:has(input:checked) {
+  background: var(--navy);
+  color: #ffffff;
+  border-color: var(--navy-dark);
 }
 
 .radio-row input {
   width: auto;
-  accent-color: var(--blue);
-  cursor: pointer;
+  margin: 0;
+  display: none;
 }
 
-.words {
-  font-style: italic;
-  color: #65758a;
-  text-align: right;
-  font-size: 12px;
-  min-height: 24px;
-  padding: 6px 0;
-  border-bottom: 1px dashed #cbd6e3;
-  word-break: break-word;
-}
-
+/* Disclaimer Note */
 .note {
-  padding: 0 34px 22px;
-  color: #8a96a6;
-  font-size: 10px;
+  padding: 0 36px 20px;
+  color: #94a3b8;
+  font-size: 10.5px;
   text-align: center;
+  font-style: italic;
 }
 
-/* Footer & Signature Section */
+/* Footer & Signature Layout */
 .footer {
   border-top: 1px dashed var(--line);
-  margin: 0 34px;
-  padding: 18px 0 24px;
+  margin: 0 36px;
+  padding: 20px 0 28px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
@@ -373,14 +530,18 @@ select {
 }
 
 .footer p {
-  font-size: 11px;
-  color: #6f7d8f;
+  font-size: 11.5px;
+  color: #64748b;
   line-height: 1.6;
   margin: 0;
 }
 
+.footer p strong {
+  color: var(--navy-dark);
+}
+
 .sign-container {
-  width: 200px;
+  width: 220px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -389,121 +550,158 @@ select {
 }
 
 .signature-img {
-  max-width: 130px;
-  max-height: 55px;
+  max-width: 140px;
+  max-height: 52px;
   object-fit: contain;
   margin-bottom: 4px;
 }
 
 .sign-line {
-  border-top: 1px solid #9aa8b8;
+  border-top: 1.5px solid #94a3b8;
   width: 100%;
   padding-top: 6px;
   font-size: 11px;
-  color: #526176;
+  color: #475569;
+  line-height: 1.35;
 }
 
-/* Modal / Alert Notification Box */
+.sign-line strong {
+  color: var(--navy-dark);
+  font-size: 11.5px;
+}
+
+/* Toast Message Overlay */
 .toast-msg {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--navy);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy-dark);
+  color: #ffffff;
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
   font-size: 13px;
   font-weight: 600;
   z-index: 1000;
   display: none;
-  animation: fadeIn 0.3s ease-in-out;
+  animation: slideUp 0.25s ease-out;
+  border-left: 4px solid var(--gold);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive Styling */
-@media(max-width: 700px) {
-  .actions .btn {
-    padding: 9px 11px;
-    font-size: 11px;
-  }
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media(max-width: 768px) {
   body {
-    padding: 12px 8px;
+    padding: 16px 10px;
+  }
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .btn {
+    flex: 1 1 calc(50% - 8px);
+    justify-content: center;
+    padding: 10px;
   }
   .brand {
-    padding: 22px 16px;
+    padding: 24px 18px 18px;
   }
   .brand h2 {
-    font-size: 24px;
+    font-size: 26px;
+    letter-spacing: 2px;
   }
   .brand .academy {
     font-size: 12px;
     letter-spacing: 2px;
   }
   .brand .courses {
-    font-size: 9px;
-    letter-spacing: 0.8px;
+    font-size: 9.5px;
+    letter-spacing: 1px;
   }
   .form-grid {
     grid-template-columns: 1fr;
-    padding: 12px 14px 20px;
+    padding: 12px 18px 20px;
+    gap: 16px;
   }
   .receipt-head {
-    padding: 18px 18px 5px;
+    padding: 18px 18px 6px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .receipt-no {
+    text-align: left;
+    margin-top: 4px;
+  }
+  .field {
+    grid-template-columns: 42% 58%;
   }
   .footer {
     margin: 0 18px;
+    padding: 18px 0 24px;
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
-  .field {
-    grid-template-columns: 40% 60%;
-  }
-  .topbar {
-    padding: 0 4px;
+  .sign-container {
+    width: 100%;
+    max-width: 200px;
+    margin-top: 10px;
   }
 }
 
-/* Print Optimization */
+/* ==========================================================================
+   Print Optimization (Strict A4 Layout)
+   ========================================================================== */
 @media print {
   body {
-    background: #ffffff;
-    padding: 0;
+    background: #ffffff !important;
+    padding: 0 !important;
+    color: #000000 !important;
   }
   .wrap {
-    max-width: none;
-    width: 100%;
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
   }
   .topbar, .toast-msg {
     display: none !important;
   }
   .sheet {
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
   .panel {
     break-inside: avoid;
+    border: 1px solid #cbd5e1 !important;
+    background: #ffffff !important;
   }
   .brand {
-    padding-top: 18px;
+    padding-top: 10px !important;
+    background: transparent !important;
   }
-  .form-grid {
-    padding-bottom: 12px;
+  .radio-row label {
+    border: none !important;
+    padding: 0 !important;
   }
-  .note {
-    padding-bottom: 12px;
-  }
-  .footer {
-    padding-bottom: 12px;
+  .radio-row label:has(input:checked) {
+    background: transparent !important;
+    color: #000 !important;
+    font-weight: 800 !important;
   }
   input, select {
-    border-bottom: 1px solid #333 !important;
+    border-bottom: 1px solid #000000 !important;
+    color: #000000 !important;
   }
 }
 </style>
@@ -511,31 +709,54 @@ select {
 <body>
 
 <div class="wrap">
-  <!-- Top Navigation / Action Bar -->
+  <!-- Top Application Control Bar -->
   <header class="topbar">
-    <div>
+    <div class="topbar-brand">
       <h1>Fee Receipt Generator</h1>
-      <p>Alagappa Performing Arts Academy · Chennai</p>
-      <p id="savedCount" style="font-weight:700; color:#087f5b; margin-top:2px;">Saved receipts: 0</p>
+      <p>
+        <span>Alagappa Performing Arts Academy · Chennai</span>
+        <span class="saved-pill">
+          <span class="saved-pill-dot"></span>
+          <span id="savedCount">Saved: 0</span>
+        </span>
+      </p>
     </div>
     <div class="actions">
-      <button class="btn btn-light" type="button" onclick="resetForm()">Reset</button>
-      <button class="btn btn-light" type="button" onclick="printReceipt()">Print</button>
-      <button class="btn btn-light" type="button" onclick="downloadImage()">Download Image</button>
-      <button class="btn btn-light" type="button" onclick="downloadPDF()">Download PDF</button>
-      <button class="btn btn-primary" type="button" onclick="savePaidReceipt()">Save Paid Receipt</button>
-      <button class="btn btn-primary" type="button" onclick="downloadExcel()">Download Excel</button>
+      <button class="btn btn-light" type="button" onclick="resetForm()" title="Clear form details">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        Reset
+      </button>
+      <button class="btn btn-light" type="button" onclick="printReceipt()" title="Print receipt on A4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+        Print
+      </button>
+      <button class="btn btn-light" type="button" onclick="downloadImage()" title="Download PNG Image">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        Download Image
+      </button>
+      <button class="btn btn-light" type="button" onclick="downloadPDF()" title="Download PDF document">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        Download PDF
+      </button>
+      <button class="btn btn-accent" type="button" onclick="savePaidReceipt()" title="Save paid record to browser storage">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+        Save Paid Receipt
+      </button>
+      <button class="btn btn-primary" type="button" onclick="downloadExcel()" title="Export all saved receipts to Excel">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        Download Excel
+      </button>
     </div>
   </header>
 
-  <!-- Fee Receipt Printable Sheet -->
+  <!-- Main Fee Receipt Sheet -->
   <main class="sheet" id="receiptSheet">
     
-    <!-- Header Section with Logo & Academy Info -->
+    <!-- Institutional Header -->
     <header class="brand">
       <div class="brand-logo-wrap">
-        <!-- Main Logo with Canvas/CORS Support and Fallback -->
-        <img id="academyLogo" src="Logo.png" alt="Alagappa Performing Arts Academy Logo" class="brand-logo" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'70\' viewBox=\'0 0 120 70\'><rect width=\'120\' height=\'70\' fill=\'%2312345b\' rx=\'8\'/><text x=\'50%\' y=\'45%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23d6a629\' font-family=\'Georgia, serif\' font-size=\'22\' font-weight=\'bold\'>APAA</text><text x=\'50%\' y=\'72%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'sans-serif\' font-size=\'8\'>ACADEMY LOGO</text></svg>';">
+        <!-- Logo with inline SVG fallback for canvas/CORS protection -->
+        <img id="academyLogo" src="Logo.png" alt="Alagappa Performing Arts Academy Logo" class="brand-logo" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'70\' viewBox=\'0 0 120 70\'><rect width=\'120\' height=\'70\' fill=\'%230b1d3a\' rx=\'8\'/><text x=\'50%\' y=\'45%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23d6a629\' font-family=\'Georgia, serif\' font-size=\'22\' font-weight=\'bold\'>APAA</text><text x=\'50%\' y=\'72%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'sans-serif\' font-size=\'8\'>ACADEMY LOGO</text></svg>';">
       </div>
       <h2>ALAGAPPA</h2>
       <div class="academy">PERFORMING ARTS ACADEMY</div>
@@ -544,9 +765,10 @@ select {
         49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084<br>
         Vaishnavi@alagappaarts.com
       </div>
+      <div class="luxury-divider"></div>
     </header>
 
-    <!-- Receipt Sub-header -->
+    <!-- Receipt Header Sub-bar -->
     <div class="receipt-head">
       <h3>FEE RECEIPT</h3>
       <div>
@@ -555,7 +777,7 @@ select {
       </div>
     </div>
 
-    <!-- Interactive Form -->
+    <!-- Receipt Form Content -->
     <form id="feeForm" onsubmit="return false">
       <div class="form-grid">
         
@@ -563,12 +785,12 @@ select {
         <section class="panel">
           <div class="panel-title">
             <span>STUDENT &amp; COURSE DETAILS</span>
-            <span>♙</span>
+            <span class="icon">♙</span>
           </div>
           
           <div class="field">
             <label for="student">Student Name <i class="required">*</i></label>
-            <input id="student" placeholder="Enter student name" required>
+            <input id="student" placeholder="Enter full name" required>
           </div>
           
           <div class="field">
@@ -606,7 +828,7 @@ select {
         <section class="panel">
           <div class="panel-title">
             <span>PAYMENT INFORMATION</span>
-            <span>▣</span>
+            <span class="icon">▣</span>
           </div>
           
           <div class="field">
@@ -660,7 +882,7 @@ select {
     <!-- Disclaimer Note -->
     <div class="note">This receipt is valid subject to successful realization of the payment. Please retain it for your records.</div>
 
-    <!-- Footer with Signature -->
+    <!-- Footer & Signature Section -->
     <footer class="footer">
       <p>
         <strong>Thank you for your payment.</strong><br>
@@ -669,7 +891,7 @@ select {
       
       <div class="sign-container">
         <!-- Authorized Signature Image with Fallback Canvas Support -->
-        <img id="authSignature" src="signature.png" alt="Authorized Signature" class="signature-img" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'40\' viewBox=\'0 0 120 40\'><path d=\'M10 25 Q 30 10 50 25 T 90 15 T 110 30\' stroke=\'%2312345b\' stroke-width=\'2\' fill=\'none\'/></svg>';">
+        <img id="authSignature" src="signature.png" alt="Authorized Signature" class="signature-img" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'40\' viewBox=\'0 0 120 40\'><path d=\'M10 25 Q 30 10 50 25 T 90 15 T 110 30\' stroke=\'%230b1d3a\' stroke-width=\'2\' fill=\'none\'/></svg>';">
         <div class="sign-line">
           Authorized Signature<br>
           <strong>Alagappa Performing Arts Academy</strong>
@@ -680,15 +902,15 @@ select {
   </main>
 </div>
 
-<!-- Custom Notification Toast -->
+<!-- Non-blocking Toast Notification element -->
 <div id="toast" class="toast-msg"></div>
 
 <script>
-// Helper utilities
+// Shortcut DOM utility
 const el = id => document.getElementById(id);
 const STORAGE_KEY = 'apaa_paid_receipts_v1';
 
-// Show non-blocking toast notifications (replaces alert)
+// Custom Toast notification message (replaces ugly browser alerts)
 function showToast(message) {
   const toast = el('toast');
   toast.textContent = message;
@@ -698,7 +920,7 @@ function showToast(message) {
   }, 3500);
 }
 
-// Generate receipt number APAA-YYYYMMDD-XXXX
+// Generate Receipt Number APAA-YYYYMMDD-XXXX
 function makeReceiptNo() {
   const d = new Date();
   const year = d.getFullYear();
@@ -708,11 +930,11 @@ function makeReceiptNo() {
   return `APAA-${year}${month}${day}-${rand}`;
 }
 
-// Initialize receipt defaults
+// Initialize Receipt Details
 el('receiptNo').textContent = makeReceiptNo();
 el('date').value = new Date().toISOString().slice(0, 10);
 
-// Number to Words Engine (Indian Currency Format)
+// Number-to-Words Logic (Indian Currency System)
 const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
 const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
@@ -806,7 +1028,7 @@ function getSaved() {
 }
 
 function updateSavedCount() {
-  el('savedCount').textContent = 'Saved receipts: ' + getSaved().length;
+  el('savedCount').textContent = 'Saved: ' + getSaved().length;
 }
 
 function savePaidReceipt() {
@@ -823,7 +1045,7 @@ function savePaidReceipt() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
     updateSavedCount();
-    showToast('Paid receipt saved successfully!');
+    showToast('Receipt saved successfully!');
   } catch (e) {
     showToast('Could not save receipt. Browser storage may be full.');
   }
@@ -833,7 +1055,7 @@ function savePaidReceipt() {
 async function downloadImage() {
   if (!validateReceipt()) return;
   if (!window.html2canvas) {
-    showToast('Image export library loading failed. Check your internet connection.');
+    showToast('Image library failed to load. Check internet connection.');
     return;
   }
   
@@ -852,15 +1074,15 @@ async function downloadImage() {
     a.href = canvas.toDataURL('image/png');
     a.click();
   } catch(err) {
-    showToast('Error exporting image. Please try again.');
+    showToast('Error generating PNG image export.');
   }
 }
 
-// Download PDF via html2canvas and jsPDF
+// Download PDF via html2canvas + jsPDF
 async function downloadPDF() {
   if (!validateReceipt()) return;
   if (!window.html2canvas || !window.jspdf) {
-    showToast('PDF export libraries failed to load. Check connection.');
+    showToast('PDF export libraries failed to load.');
     return;
   }
   
@@ -876,7 +1098,6 @@ async function downloadPDF() {
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     
-    // Fit canvas cleanly to A4 orientation
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'px',
@@ -886,15 +1107,15 @@ async function downloadPDF() {
     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
     pdf.save((el('receiptNo').textContent || 'APAA-receipt') + '.pdf');
   } catch(err) {
-    showToast('Error exporting PDF. Please try again.');
+    showToast('Error generating PDF document.');
   }
 }
 
-// Download Excel or fallback CSV
+// Download Excel Table via SheetJS
 function downloadExcel() {
   const rows = getSaved();
   if (!rows.length) {
-    showToast('No saved receipts found. Please save a paid receipt first.');
+    showToast('No saved receipts found. Click "Save Paid Receipt" first.');
     return;
   }
   
@@ -921,7 +1142,7 @@ function downloadExcel() {
     XLSX.utils.book_append_sheet(wb, ws, 'Paid Receipts');
     XLSX.writeFile(wb, 'APAA_Paid_Receipts.xlsx');
   } else {
-    // Fallback CSV export
+    // Fallback CSV download
     const csv = [
       columns.map(c => '"' + c[0] + '"').join(','),
       ...rows.map(r => columns.map(c => '"' + String(r[c[1]] ?? '').replace(/"/g, '""') + '"').join(','))
@@ -934,7 +1155,7 @@ function downloadExcel() {
     a.download = 'APAA_Paid_Receipts.csv';
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Excel library unavailable; downloaded CSV file instead.');
+    showToast('Excel library unavailable; CSV file exported.');
   }
 }
 
