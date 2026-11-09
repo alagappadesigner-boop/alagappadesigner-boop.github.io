@@ -152,6 +152,12 @@ body {
   border-color: var(--champagne-gold);
 }
 
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
 /* Receipt Sheet Container */
 .sheet {
   background: var(--paper-white);
@@ -536,6 +542,110 @@ select option {
   margin-top: 2px;
 }
 
+/* Student Ledger Section */
+.ledger-section {
+  margin-top: 32px;
+  background: var(--paper-white);
+  border: 1px solid var(--line-gold);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  padding: 26px 36px;
+}
+
+.ledger-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid var(--line-gold-light);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ledger-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: var(--bronze-dark);
+  margin: 0;
+  font-weight: 700;
+}
+
+.ledger-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 300px;
+  max-width: 100%;
+}
+
+.ledger-search input {
+  border: 1px solid var(--line-gold);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  text-align: left;
+  background: var(--bg-cream);
+}
+
+.ledger-search input:focus {
+  border-color: var(--champagne-gold);
+}
+
+.ledger-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ledger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--line-gold-light);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: background 0.15s ease;
+}
+
+.ledger-row:hover {
+  background: var(--champagne-glow);
+  border-color: var(--line-gold);
+}
+
+.ledger-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--espresso);
+  flex-wrap: wrap;
+}
+
+.ledger-meta .student-name {
+  font-weight: 700;
+  color: var(--bronze-dark);
+}
+
+.ledger-meta .dash {
+  color: var(--champagne-gold);
+}
+
+.ledger-meta .receipt-num {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--espresso-muted);
+}
+
+.ledger-empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--espresso-muted);
+  font-style: italic;
+  font-size: 13px;
+}
+
 /* Responsive Styles */
 @media (max-width: 820px) {
   .receipt-header {
@@ -564,6 +674,12 @@ select option {
     text-align: center;
   }
   .signature-block { margin-top: 16px; }
+  .ledger-section { padding: 20px; }
+  .ledger-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
 
 /* Print Styles */
@@ -572,7 +688,7 @@ select option {
     background: #ffffff !important;
     padding: 0 !important;
   }
-  .topbar { display: none !important; }
+  .topbar, .ledger-section { display: none !important; }
   .wrap { max-width: 100% !important; }
   .sheet {
     border: 0 !important;
@@ -787,6 +903,19 @@ select option {
       </div>
     </footer>
   </main>
+
+  <!-- Student Ledger Section -->
+  <section class="ledger-section">
+    <div class="ledger-header">
+      <h2>Student Ledger</h2>
+      <div class="ledger-search">
+        <input type="text" id="ledgerSearchInput" placeholder="Search student name or phone..." oninput="renderLedger()">
+      </div>
+    </div>
+    <div id="ledgerList" class="ledger-list">
+      <!-- Dynamic list rows populated via JavaScript -->
+    </div>
+  </section>
 </div>
 
 <script>
@@ -898,6 +1027,41 @@ function updateSavedCount() {
   el('savedCount').textContent = 'Saved receipts: ' + getSaved().length;
 }
 
+function renderLedger() {
+  const container = el('ledgerList');
+  const query = (el('ledgerSearchInput')?.value || '').toLowerCase().trim();
+  const saved = getSaved();
+
+  const filtered = saved.filter(item => {
+    const nameMatch = (item.studentName || '').toLowerCase().includes(query);
+    const phoneMatch = (item.phone || '').toLowerCase().includes(query);
+    const receiptMatch = (item.receiptNo || '').toLowerCase().includes(query);
+    return nameMatch || phoneMatch || receiptMatch;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="ledger-empty">No saved payment records found.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((item, index) => `
+    <div class="ledger-row">
+      <div class="ledger-meta">
+        <span class="student-name">${escapeHtml(item.studentName)}</span>
+        <span class="dash">—</span>
+        <span class="receipt-num">Receipt No. ${escapeHtml(item.receiptNo)}</span>
+      </div>
+      <button class="btn btn-primary btn-small" type="button" onclick="downloadSpecificPDF(${index})">
+        Download Receipt
+      </button>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function savePaidReceipt() {
   if (!validateReceipt()) return;
   const data = receiptData();
@@ -912,9 +1076,75 @@ function savePaidReceipt() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
     updateSavedCount();
+    renderLedger();
     alert('Paid receipt successfully saved in browser memory.');
   } catch (e) {
     alert('Failed to save receipt. Storage limit reached or storage disabled.');
+  }
+}
+
+// Download a specific receipt from the Ledger by index
+async function downloadSpecificPDF(index) {
+  const saved = getSaved();
+  const item = saved[index];
+  if (!item) return;
+
+  // Temporarily backup current form state
+  const curReceiptNo = el('receiptNo').textContent;
+  const curStudent = el('student').value;
+  const curPhone = el('phone').value;
+  const curCourse = el('course').value;
+  const curYear = el('year').value;
+  const curAmount = el('amount').value;
+  const curWords = el('amountWords').textContent;
+  const curDate = el('date').value;
+  const curTxn = el('txn').value;
+  const curStage = el('stage').value;
+  const curMode = getMode();
+
+  // Populate form with target receipt values
+  el('receiptNo').textContent = item.receiptNo;
+  el('student').value = item.studentName;
+  el('phone').value = item.phone;
+  el('course').value = item.course || '';
+  el('year').value = item.academicYear || '';
+  el('amount').value = item.amount;
+  el('amountWords').textContent = item.amountInWords;
+  el('date').value = item.paymentDate;
+  el('txn').value = item.transactionId === 'N/A' ? '' : item.transactionId;
+  el('stage').value = item.installmentStage || '';
+  
+  const radio = document.querySelector(`input[name="mode"][value="${item.paymentMode}"]`);
+  if (radio) radio.checked = true;
+
+  // Capture PDF
+  try {
+    const canvas = await html2canvas(document.querySelector('.sheet'), { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save((item.receiptNo || 'APAA-Receipt') + '.pdf');
+  } catch (err) {
+    alert('Failed to generate PDF for selected receipt.');
+  } finally {
+    // Restore original form state
+    el('receiptNo').textContent = curReceiptNo;
+    el('student').value = curStudent;
+    el('phone').value = curPhone;
+    el('course').value = curCourse;
+    el('year').value = curYear;
+    el('amount').value = curAmount;
+    el('amountWords').textContent = curWords;
+    el('date').value = curDate;
+    el('txn').value = curTxn;
+    el('stage').value = curStage;
+    const origRadio = document.querySelector(`input[name="mode"][value="${curMode}"]`);
+    if (origRadio) origRadio.checked = true;
   }
 }
 
@@ -1011,6 +1241,7 @@ function resetForm() {
 }
 
 updateSavedCount();
+renderLedger();
 </script>
 </body>
 </html>
