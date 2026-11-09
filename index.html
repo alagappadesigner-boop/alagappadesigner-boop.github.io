@@ -1,155 +1,1381 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Alagappa Performing Arts Academy | Fee Receipt</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--navy:#003366;--navy2:#082746;--gold:#d4af37;--ink:#1b2938;--muted:#667789;--line:#dce3ea;--paper:#f4f7fa;--white:#fff}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
-header{background:linear-gradient(120deg,var(--navy2),var(--navy));color:#fff;padding:22px max(22px,calc((100% - 1180px)/2));border-bottom:4px solid var(--gold)}
-.brand{display:flex;align-items:center;gap:15px}.mark{width:54px;height:54px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font-weight:800;font-size:18px;letter-spacing:1px}
-h1{font-size:21px;margin:0 0 5px;letter-spacing:.3px}.sub{font-size:12px;color:#d6e0eb;letter-spacing:1.4px;text-transform:uppercase}
-main{max-width:1180px;margin:28px auto;padding:0 20px}.topline{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}.topline h2{margin:0;color:var(--navy);font-size:23px}.muted{color:var(--muted);font-size:13px}
-.panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:22px;box-shadow:0 5px 18px #15314a0b;margin-bottom:18px}
-.panel h3{margin:0 0 18px;color:var(--navy);font-size:16px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-label{display:block;font-size:12px;font-weight:700;color:#42566b;margin-bottom:7px}input,select,textarea{width:100%;padding:11px 12px;border:1px solid #cbd5df;border-radius:8px;background:#fff;color:var(--ink);font:14px inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px #00336614}textarea{resize:vertical;min-height:42px}
-.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.btn{border:0;border-radius:8px;padding:11px 16px;font-weight:700;font-size:13px;cursor:pointer}.primary{background:var(--navy);color:#fff}.gold{background:var(--gold);color:#172536}.outline{background:#fff;border:1px solid var(--line);color:var(--navy)}.danger{background:#fff1f1;color:#a12727;border:1px solid #f0cccc}.btn:disabled{opacity:.5;cursor:not-allowed}
-.hidden{display:none!important}.status{padding:10px 12px;border-radius:8px;font-size:13px;margin:12px 0}.error{background:#fff0f0;color:#9b2525}.success{background:#effaf2;color:#176b34}.info{background:#eef4fa;color:#234e73}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:#506477;font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:#f8fafc}
-#loginView{max-width:430px;margin:50px auto}.login-note{line-height:1.55}.receipt-preview{border:1px dashed #b9c5d1;padding:22px;border-radius:10px;margin-top:18px;background:#fff}.receipt-head{text-align:center;border-bottom:2px solid var(--gold);padding-bottom:14px;margin-bottom:15px}.receipt-head h2{color:var(--navy);margin:0 0 5px}.receipt-head p{margin:4px;color:#657587;font-size:12px}.receipt-meta{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin:12px 0}.receipt-lines{width:100%;border-collapse:collapse}.receipt-lines td{border-bottom:1px solid #e3e8ed;padding:10px 5px}.receipt-total{font-weight:800;color:var(--navy);font-size:18px;text-align:right;margin-top:15px}.footer-note{text-align:center;color:#8290a0;font-size:11px;margin:28px 0}
-@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}main{margin:18px auto}.panel{padding:16px}.topline{align-items:flex-start;flex-direction:column}}
-@media(max-width:480px){.grid{grid-template-columns:1fr}.brand{align-items:flex-start}.mark{width:45px;height:45px;flex:none}h1{font-size:17px}}
-@media print{body{background:#fff}.no-print,header,.topline,.panel:not(#previewPanel),#previewPanel h3{display:none!important}main{margin:0;padding:0;max-width:none}.panel{border:0;box-shadow:none;padding:0}#receiptPreview{border:0;padding:0}.footer-note{display:none}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alagappa Performing Arts Academy - Fee Receipt System</title>
+    
+    <!-- External Dependencies for Icons, Canvas, PDF Generation, and Supabase -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --primary-navy: #003366;
+            --brand-gold: #D4AF37;
+            --text-dark: #2C3E50;
+            --text-muted: #7F8C8D;
+            --border-light: #E2E8F0;
+            --bg-light: #F8FAFC;
+            --error-red: #DC2626;
+        }
+
+        /* Global Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, div, header, footer, table, tbody, thead, tr, th, td, h1, h2, h3, span, label, p, i {
+            outline: none !important;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input, select, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F1F5F9;
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* --- Premium Receipt Card Document --- */
+        .receipt-card {
+            background: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .receipt-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            height: 320px;
+            background: url('Logo.png') no-repeat center/contain;
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        /* --- Header Alignment --- */
+        .receipt-header {
+            display: grid;
+            grid-template-columns: 130px 1fr 240px;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 18px;
+            border-bottom: 3px solid var(--brand-gold);
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .branding-container {
+            text-align: center;
+        }
+
+        .branding-container h1 {
+            color: var(--primary-navy);
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .branding-container .tagline {
+            color: var(--brand-gold);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 3px;
+            text-transform: uppercase;
+        }
+
+        .contact-container {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: right;
+            border-left: 1px solid var(--border-light);
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            line-height: 1.4;
+        }
+
+        .contact-item i {
+            color: var(--brand-gold);
+            width: 12px;
+            text-align: center;
+        }
+
+        /* --- Document Title Row --- */
+        .title-meta-section {
+            text-align: center;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+
+        .receipt-title {
+            font-size: 24px;
+            color: var(--primary-navy);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 13px;
+            color: var(--text-dark);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 15px;
+        }
+
+        .meta-row strong {
+            color: var(--primary-navy);
+        }
+
+        .meta-inline-input {
+            border: none;
+            border-bottom: 1px solid transparent;
+            outline: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            width: 120px;
+            transition: border-color 0.2s;
+        }
+
+        .meta-inline-input:focus {
+            border-bottom-color: var(--brand-gold);
+        }
+
+        .system-locked-field {
+            cursor: default;
+            user-select: none;
+            pointer-events: none;
+            color: var(--text-muted);
+        }
+
+        .system-locked-field:focus {
+            border-bottom-color: transparent !important;
+        }
+
+        /* --- Structural Input Cards Grid Layout --- */
+        .receipt-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .info-card {
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 20px;
+            background-color: #FFFFFF;
+        }
+
+        .card-heading {
+            font-size: 13px;
+            color: var(--primary-navy);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+
+        .data-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .field-container {
+            width: 65%;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .field-container-stack {
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .doc-input, .doc-select {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid transparent;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: right;
+            padding: 2px 0;
+            background: transparent;
+            transition: border-color 0.2s;
+        }
+
+        .doc-input:focus, .doc-select:focus {
+            border-bottom-color: var(--brand-gold);
+        }
+
+        .doc-select {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 16px;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%232C3E50' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
+        }
+
+        .phone-input-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .country-select {
+            border: none;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-navy);
+            background: transparent;
+            cursor: pointer;
+            padding: 2px 20px 2px 0;
+            width: auto;
+            min-width: 82px;
+            max-width: 95px;
+            text-align: left;
+            appearance: none;
+            -webkit-appearance: none;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23003366' d='M0 0l5 5 5-5z'/></svg>") no-repeat right 4px center;
+        }
+
+        .inline-error-msg {
+            display: none;
+            color: var(--error-red);
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 4px;
+            text-align: right;
+            width: 100%;
+        }
+
+        .amount-highlight-input {
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            color: var(--primary-navy) !important;
+        }
+
+        .mode-radio-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        .radio-label input {
+            accent-color: var(--primary-navy);
+        }
+
+        /* --- Enclosed Remarks Info Box --- */
+        .remarks-box {
+            background-color: var(--bg-light);
+            border-left: 4px solid var(--brand-gold);
+            padding: 16px 20px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .remarks-inner-label {
+            font-weight: 600;
+            color: var(--primary-navy);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .remarks-textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--text-dark);
+            height: 40px;
+        }
+
+        .academy-declaration-clause {
+            background-color: #FFFDF4;
+            border: 1px dashed #E9D5A1;
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 11.5px;
+            color: #5C5236;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .academy-declaration-clause i {
+            color: var(--brand-gold);
+            margin-top: 2px;
+        }
+
+        /* --- Closing Zone Layout --- */
+        .closing-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+        }
+
+        .verification-zone {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .qr-placeholder {
+            width: 75px;
+            height: 75px;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 9px;
+            background: var(--bg-light);
+            font-weight: 500;
+        }
+
+        .timestamp-note {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .signature-wrap {
+            text-align: center;
+            width: 240px;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid var(--text-dark);
+            margin-bottom: 6px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .signature-line img {
+            max-height: 40px;
+            object-fit: contain;
+        }
+
+        .signature-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Footer Styles --- */
+        .receipt-footer {
+            border-top: 1px solid var(--border-light);
+            padding-top: 15px;
+            text-align: center;
+        }
+
+        .thank-you {
+            font-size: 13px;
+            color: var(--brand-gold);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .system-generated-text {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* --- Isolated Controller Gateway Panel --- */
+        .secure-controller-gateway {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .gateway-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+        }
+
+        .gateway-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-toolbar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #FFFFFF;
+            transition: opacity 0.2s, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        #download { background-color: var(--primary-navy); }
+        #printBtn { background-color: var(--brand-gold); color: #000000; }
+        #exportExcel { background-color: #16A34A; }
+        #clearForm { background-color: #DC2626; }
+
+        /* --- Shared Supabase Batch Recovery Ledger Table --- */
+        .ledger-container {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-light);
+        }
+
+        .ledger-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-navy);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .ledger-table th {
+            background-color: var(--bg-light);
+            color: var(--primary-navy);
+            font-weight: 600;
+            text-align: left;
+            padding: 10px;
+            border-bottom: 2px solid var(--border-light);
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .ledger-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .print-preview-label {
+            display: none;
+        }
+
+        /* --- Entrance Animations --- */
+        @keyframes receiptPageEntrance {
+            0% { opacity: 0; transform: translateY(16px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes subtleValuePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); color: var(--primary-navy); }
+            100% { transform: scale(1); }
+        }
+
+        .container { animation: receiptPageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards; }
+        
+        .value-updated-highlight { animation: subtleValuePulse 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        .btn.btn-loading {
+            pointer-events: none;
+            opacity: 0.75;
+        }
+
+        .btn.btn-loading i {
+            animation: spinIcon 0.8s linear infinite;
+        }
+
+        @keyframes spinIcon {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .container, .btn, .value-updated-highlight {
+                animation: none !important;
+                transition: none !important;
+                transform: none !important;
+            }
+        }
+
+        /* --- Responsive Printing Overrides --- */
+        @media print {
+            body {
+                background-color: #FFFFFF;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .secure-controller-gateway, .ledger-container, .inline-error-msg {
+                display: none !important;
+            }
+            .receipt-card {
+                box-shadow: none !important;
+                padding: 20px !important;
+                width: 100% !important;
+            }
+            .doc-input, .doc-select, .mode-radio-group, .remarks-textarea, .meta-inline-input, .country-select {
+                display: none !important;
+            }
+            .print-preview-label {
+                display: inline-block !important;
+                font-weight: 600;
+                color: #000000;
+                text-align: right;
+            }
+            .amount-highlight-input + .print-preview-label {
+                font-size: 18px !important;
+                font-weight: 700 !important;
+                color: var(--primary-navy) !important;
+            }
+            .container { animation: none !important; }
+        }
+    </style>
 </head>
 <body>
-<header class="no-print"><div class="brand"><div class="mark">APA</div><div><h1>Alagappa Performing Arts Academy</h1><div class="sub">Fee Receipt Management</div></div></div></header>
 
-<main>
-<section id="loginView" class="panel">
-  <h3>Staff Sign In</h3>
-  <p class="muted login-note">Sign in with your authorised Academy staff email address and password.</p>
-  <div><label for="loginEmail">Staff email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@alagappa.org"></div>
-  <div style="margin-top:14px"><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter password"></div>
-  <div class="actions" style="margin-top:18px"><button class="btn primary" id="loginBtn">Sign in</button></div>
-  <div id="loginMessage" aria-live="polite"></div>
-  <p class="muted" style="margin-top:18px">Staff accounts must be created by an authorised administrator in Supabase Authentication.</p>
-</section>
+<div class="container">
+    
+    <!-- MAIN RECEIPT FORM LAYOUT PANEL -->
+    <div id="receiptBlock" class="receipt-card">
+        
+        <!-- Header -->
+        <header class="receipt-header">
+            <div class="logo-container">
+                <img src="Logo.png" alt="Logo" onerror="this.style.display='none';">
+            </div>
+            <div class="branding-container">
+                <h1>ALAGAPPA</h1>
+                <div class="tagline">Performing Arts Academy</div>
+                <div style="font-size: 9px; color: var(--text-muted); margin-top: 3px; font-weight: 500; letter-spacing: 0.5px;">
+                    BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM
+                </div>
+            </div>
+            <div class="contact-container">
+                <div class="contact-item">
+                    <span>49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084</span>
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <div class="contact-item">
+                    <span>Vaishnavi@alagappaarts.com</span>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+            </div>
+        </header>
 
-<section id="appView" class="hidden">
- <div class="topline"><div><h2>Fee Receipt Dashboard</h2><div class="muted">Create receipts and view the shared payment ledger.</div></div><div class="actions"><span class="muted" id="signedInAs"></span><button class="btn outline" id="logoutBtn">Sign out</button></div></div>
- <section class="panel">
-  <h3>New Fee Receipt</h3>
-  <form id="receiptForm">
-   <div class="grid">
-    <div><label for="studentName">Student name *</label><input id="studentName" required maxlength="120" placeholder="Enter student name"></div>
-    <div><label for="phone">Phone number</label><input id="phone" inputmode="tel" maxlength="20" placeholder="Student / parent phone"></div>
-    <div><label for="course">Course / programme *</label><input id="course" required maxlength="120" placeholder="Course name"></div>
-    <div><label for="academicYear">Academic year</label><input id="academicYear" placeholder="2026–2027"></div>
-    <div><label for="amount">Amount (₹) *</label><input id="amount" type="number" min="1" step="0.01" required placeholder="0.00"></div>
-    <div><label for="paymentDate">Payment date *</label><input id="paymentDate" type="date" required></div>
-    <div><label for="paymentMode">Payment mode *</label><select id="paymentMode" required><option value="">Select mode</option><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Cheque</option><option>Card</option></select></div>
-    <div><label for="transactionId">Transaction / cheque reference</label><input id="transactionId" maxlength="100" placeholder="Reference number"></div>
-    <div><label for="installment">Installment</label><select id="installment"><option value="">Select installment</option><option>Admission Fee</option><option>1st Installment</option><option>2nd Installment</option><option>3rd Installment</option><option>Full Payment</option><option>Other</option></select></div>
-    <div style="grid-column:1/-1"><label for="remarks">Remarks</label><textarea id="remarks" maxlength="500" placeholder="Optional notes"></textarea></div>
-   </div>
-   <div class="actions" style="margin-top:18px"><button class="btn primary" id="createBtn" type="submit">Generate Receipt</button><button class="btn outline" type="reset">Clear form</button></div>
-  </form>
-  <div id="formMessage" aria-live="polite"></div>
- </section>
+        <!-- Document Identifier -->
+        <div class="title-meta-section">
+            <h2 class="receipt-title">Fee Receipt</h2>
+            <div class="meta-row">
+                <span><strong>Receipt No:</strong> <input type="text" id="receiptNo" class="meta-inline-input system-locked-field" placeholder="APA-2026-0001" readonly tabindex="-1"><span id="print_receiptNo" class="print-preview-label"></span></span>
+                <span><strong>Receipt Date:</strong> <input type="text" id="receiptDate" class="meta-inline-input system-locked-field" style="width:110px;" placeholder="DD/MM/YYYY" readonly tabindex="-1"><span id="print_receiptDate" class="print-preview-label"></span></span>
+            </div>
+        </div>
 
- <section class="panel" id="previewPanel">
-  <div class="toolbar"><h3 style="margin:0">Receipt Preview</h3><div class="actions no-print"><button class="btn gold" id="printBtn" disabled>Print / Save PDF</button></div></div>
-  <div id="receiptPreview" class="receipt-preview muted">Your generated receipt will appear here.</div>
- </section>
+        <!-- Symmetrical Card Grid Layout -->
+        <div class="receipt-grid">
+            
+            <!-- Left Card Component: Student & Course Particulars -->
+            <div class="info-card">
+                <h3 class="card-heading">Student & Course Details</h3>
+                
+                <div class="data-row">
+                    <span class="label">Student Name *</span>
+                    <div class="field-container">
+                        <input type="text" id="name" class="doc-input" placeholder="Enter Name">
+                        <span id="print_name" class="print-preview-label"></span>
+                    </div>
+                </div>
 
- <section class="panel">
-  <div class="toolbar"><div><h3 style="margin:0 0 5px">Payment Ledger</h3><div class="muted">Receipts shared across authorised staff accounts.</div></div><div class="actions"><input id="ledgerSearch" placeholder="Search receipt / student" style="width:210px"><button class="btn outline" id="refreshBtn">Refresh</button><button class="btn outline" id="csvBtn">Export CSV</button></div></div>
-  <div class="tablewrap" style="margin-top:16px"><table><thead><tr><th>Receipt No.</th><th>Date</th><th>Student</th><th>Course</th><th>Amount</th><th>Mode</th><th>Created by</th></tr></thead><tbody id="ledgerBody"><tr><td colspan="7" class="muted">Loading receipts…</td></tr></tbody></table></div>
-  <div id="ledgerMessage" class="muted" style="margin-top:10px"></div>
- </section>
-</section>
-<div class="footer-note">Alagappa Performing Arts Academy · Official Fee Receipt</div>
-</main>
+                <div class="data-row">
+                    <span class="label">Phone Number *</span>
+                    <div class="field-container field-container-stack">
+                        <div class="phone-input-wrapper">
+                            <select id="countryCode" class="country-select">
+                                <option value="+91" data-min="10" data-max="10" selected>+91 (IN)</option>
+                                <option value="+1" data-min="10" data-max="10">+1 (US)</option>
+                                <option value="+44" data-min="9" data-max="10">+44 (UK)</option>
+                                <option value="+61" data-min="9" data-max="9">+61 (AU)</option>
+                                <option value="+65" data-min="8" data-max="8">+65 (SG)</option>
+                                <option value="+971" data-min="9" data-max="9">+971 (AE)</option>
+                            </select>
+                            <input type="text" id="phone" class="doc-input" placeholder="Enter phone number" maxlength="30">
+                        </div>
+                        <span id="print_phone" class="print-preview-label"></span>
+                        <div id="phoneError" class="inline-error-msg">Please enter a valid phone number for the selected country.</div>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">Course Registered *</span>
+                    <div class="field-container">
+                        <select id="course" class="doc-select">
+                            <option value="" disabled selected hidden>Select Course</option>
+                            <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
+                            <option value="Carnatic Vocal">Carnatic Vocal</option>
+                            <option value="Keyboard">Keyboard</option>
+                            <option value="Drawing">Drawing</option>
+                            <option value="Abacus">Abacus</option>
+                        </select>
+                        <span id="print_course" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">Academic Year *</span>
+                    <div class="field-container">
+                        <select id="year" class="doc-select">
+                            <option value="" disabled selected hidden>Select Year</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                        </select>
+                        <span id="print_year" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Card Component: Financial Summary Parameters -->
+            <div class="info-card">
+                <h3 class="card-heading">Payment Information</h3>
+                
+                <div class="data-row">
+                    <span class="label">Amount Paid *</span>
+                    <div class="field-container">
+                        <input type="number" id="paidAmount" class="doc-input amount-highlight-input" placeholder="₹ 0">
+                        <span id="print_paidAmount" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">Amount in Words</span>
+                    <div class="field-container">
+                        <input type="text" id="words" class="doc-input" placeholder="Zero Only" readonly>
+                        <span id="print_words" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">Payment Date *</span>
+                    <div class="field-container">
+                        <input type="text" id="paymentDate" class="doc-input" placeholder="DD/MM/YYYY">
+                        <span id="print_paymentDate" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">Payment Mode *</span>
+                    <div class="field-container">
+                        <div class="mode-radio-group">
+                            <label class="radio-label"><input type="radio" name="payment" value="Cash" checked> CASH</label>
+                            <label class="radio-label"><input type="radio" name="payment" value="UPI"> UPI</label>
+                            <label class="radio-label"><input type="radio" name="payment" value="Card"> CARD</label>
+                            <label class="radio-label"><input type="radio" name="payment" value="Bank"> BANK</label>
+                        </div>
+                        <span id="print_paymentMode" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">TXN / UPI ID</span>
+                    <div class="field-container">
+                        <input type="text" id="transactionId" class="doc-input" placeholder="N/A">
+                        <span id="print_transactionId" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+                <div class="data-row">
+                    <span class="label">Installment Stage *</span>
+                    <div class="field-container">
+                        <select id="installment" class="doc-select">
+                            <option value="" disabled selected hidden>Select Stage</option>
+                            <option value="Full Payment">Full Payment</option>
+                            <option value="First Installment">First Installment</option>
+                            <option value="Second Installment">Second Installment</option>
+                            <option value="Final Installment">Final Installment</option>
+                        </select>
+                        <span id="print_installment" class="print-preview-label"></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Enclosed Information Remarks Box Component -->
+        <div class="remarks-box">
+            <span class="remarks-inner-label">Remarks & Extra Declarations:</span>
+            <textarea id="remarks" class="remarks-textarea" placeholder="Enter payment references, cheque details, UPI transaction IDs, installment notes, or instructions..."></textarea>
+            <span id="print_remarks" class="print-preview-label" style="text-align: left; width: 100%;"></span>
+        </div>
+
+        <!-- System Institutional Declaration Standard Notice -->
+        <div class="academy-declaration-clause">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+                <strong>Official Notice:</strong> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.
+            </div>
+        </div>
+
+        <!-- Closing Diagnostics & Sign-off Layout Block -->
+        <div class="closing-area">
+            <div class="verification-zone">
+                <div class="qr-placeholder">
+                    <i class="fa-solid fa-qrcode" style="font-size: 24px; color: #BDC3C7; margin-bottom: 4px;"></i>
+                    <span>Verified Slip</span>
+                </div>
+                <div class="timestamp-note">
+                    <strong>Generated On:</strong> <span id="lblTimestamp">--</span><br>
+                    <strong>Secure Mode:</strong> Active System Gateway
+                </div>
+            </div>
+            
+            <div class="signature-wrap">
+                <div class="signature-line">
+                    <img src="signature.png" alt="Signature Asset" onerror="this.style.opacity='0';">
+                </div>
+                <div class="signature-title">Authorized Signature</div>
+            </div>
+        </div>
+
+        <!-- Institutional Fine-Print Footer -->
+        <footer class="receipt-footer">
+            <div class="thank-you">Thank You!</div>
+            <div class="system-generated-text">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
+        </footer>
+
+    </div>
+
+    <!-- CONTROL GATEWAY UTILITY PANEL -->
+    <div class="secure-controller-gateway">
+        <div class="gateway-header">
+            <div class="gateway-title">
+                <i class="fa-solid fa-shield-halved"></i> Isolated Processing Controller Gateway
+            </div>
+        </div>
+
+        <!-- Staff Authentication Control Bar -->
+        <div class="staff-auth-bar" style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 12px;">
+            <div id="authStatus"><i class="fa-solid fa-user-lock"></i> <span>Status: Not Signed In</span></div>
+            <div id="authActions">
+                <button type="button" id="btnLogin" class="btn" style="background-color: var(--primary-navy); padding: 5px 12px; font-size: 11px;"><i class="fa-solid fa-right-to-bracket"></i> Staff Login</button>
+                <button type="button" id="btnLogout" class="btn" style="background-color: var(--text-muted); padding: 5px 12px; font-size: 11px; display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </div>
+        </div>
+        
+        <div class="action-toolbar">
+            <button id="download" class="btn"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+            <button id="printBtn" class="btn"><i class="fa-solid fa-print"></i> Print Receipt</button>
+            <button id="exportExcel" class="btn"><i class="fa-solid fa-file-excel"></i> Export Batch Ledger</button>
+            <button id="clearForm" class="btn"><i class="fa-solid fa-trash-can"></i> Reset Form</button>
+        </div>
+    </div>
+
+    <!-- SHARED SUPABASE CENTRALIZED LEDGER TABLE -->
+    <div class="ledger-container">
+        <div class="ledger-title"><i class="fa-solid fa-list-check"></i> Captured Batch Records Ledger (Shared Database)</div>
+        <table class="ledger-table">
+            <thead>
+                <tr>
+                    <th>Receipt No</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Mode</th>
+                </tr>
+            </thead>
+            <tbody id="ledgerBody">
+                <!-- Data storage rows from Supabase get populated here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- JAVASCRIPT SUPABASE DATABASE ENGINE -->
 <script>
-// Add your Supabase Project URL and anon/public key here. Never put a service_role key in this file.
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("YOUR_") && !SUPABASE_ANON_KEY.includes("YOUR_");
-const db = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let currentUser = null, receipts = [], latestReceipt = null;
-const $ = id => document.getElementById(id);
-const message = (id, text, kind="info") => { $(id).innerHTML = text ? `<div class="status ${kind}">${escapeHtml(text)}</div>` : ""; };
-const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const rupees = n => new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(Number(n||0));
-const dateToday = new Date().toISOString().slice(0,10);
-$("paymentDate").value = dateToday;
-function amountWords(value){
- const n=Math.round(Number(value)); if(!n) return "Zero rupees only";
- const ones=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
- const tens=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
- function under1000(x){let out="";if(x>=100){out+=ones[Math.floor(x/100)]+" Hundred ";x%=100}if(x>=20){out+=tens[Math.floor(x/10)]+" ";x%=10}if(x>0)out+=ones[x]+" ";return out.trim()}
- let x=n, out=""; for(const [v,name] of [[10000000,"Crore"],[100000,"Lakh"],[1000,"Thousand"],[1,""]]){if(x>=v){const q=Math.floor(x/v);out+=under1000(q)+(name?" "+name:"")+" ";x%=v}}
- return out.trim()+" rupees only";
-}
-function renderReceipt(r){
- latestReceipt=r;
- $("receiptPreview").classList.remove("muted");
- $("receiptPreview").innerHTML=`<div class="receipt-head"><h2>ALAGAPPA PERFORMING ARTS ACADEMY</h2><p>OFFICIAL FEE RECEIPT</p></div>
- <div class="receipt-meta"><span><b>Receipt No:</b> ${escapeHtml(r.receipt_no)}</span><span><b>Date:</b> ${escapeHtml(r.payment_date)}</span></div>
- <table class="receipt-lines"><tr><td>Received from</td><td><b>${escapeHtml(r.student_name)}</b></td></tr><tr><td>Phone</td><td>${escapeHtml(r.phone||"—")}</td></tr><tr><td>Course / Programme</td><td>${escapeHtml(r.course)}</td></tr><tr><td>Academic year</td><td>${escapeHtml(r.academic_year||"—")}</td></tr><tr><td>Payment mode</td><td>${escapeHtml(r.payment_mode)}</td></tr><tr><td>Transaction reference</td><td>${escapeHtml(r.transaction_id||"—")}</td></tr><tr><td>Installment</td><td>${escapeHtml(r.installment||"—")}</td></tr><tr><td>Amount in words</td><td>${escapeHtml(amountWords(r.amount))}</td></tr><tr><td>Remarks</td><td>${escapeHtml(r.remarks||"—")}</td></tr></table>
- <div class="receipt-total">Total Received: ${rupees(r.amount)}</div><div class="receipt-meta" style="margin-top:30px"><span>Received by: ${escapeHtml(r.created_by_email||currentUser?.email||"")}</span><span>Authorised Signature</span></div>`;
- $("printBtn").disabled=false;
-}
-async function loadLedger(){
- if(!db||!currentUser)return;
- $("ledgerBody").innerHTML='<tr><td colspan="7">Loading…</td></tr>';
- const {data,error}=await db.from("receipts").select("*").order("created_at",{ascending:false}).limit(500);
- if(error){$("ledgerBody").innerHTML='<tr><td colspan="7">Unable to load ledger.</td></tr>';message("ledgerMessage",error.message,"error");return}
- receipts=data||[]; drawLedger();
-}
-function drawLedger(){
- const q=$("ledgerSearch").value.trim().toLowerCase();
- const rows=receipts.filter(r=>[r.receipt_no,r.student_name,r.course,r.created_by_email].some(v=>String(v||"").toLowerCase().includes(q)));
- $("ledgerBody").innerHTML=rows.length?rows.map(r=>`<tr><td>${escapeHtml(r.receipt_no)}</td><td>${escapeHtml(r.payment_date)}</td><td>${escapeHtml(r.student_name)}</td><td>${escapeHtml(r.course)}</td><td>${rupees(r.amount)}</td><td>${escapeHtml(r.payment_mode)}</td><td>${escapeHtml(r.created_by_email||"")}</td></tr>`).join(""):'<tr><td colspan="7">No matching receipts found.</td></tr>';
- $("ledgerMessage").textContent=`Showing ${rows.length} of ${receipts.length} loaded receipts.`;
-}
-async function showApp(user){
- currentUser=user;$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("signedInAs").textContent=user.email||"Staff";await loadLedger();
-}
-$("loginBtn").onclick=async()=>{
- if(!db){message("loginMessage","Add your Supabase Project URL and anon key in index.html before signing in.","error");return}
- const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
- if(!email||!password){message("loginMessage","Enter your staff email and password.","error");return}
- $("loginBtn").disabled=true;
- const {data,error}=await db.auth.signInWithPassword({email,password});
- $("loginBtn").disabled=false;
- if(error){message("loginMessage",error.message,"error");return}
- message("loginMessage","Signed in successfully.","success");await showApp(data.user);
-};
-$("logoutBtn").onclick=async()=>{if(db)await db.auth.signOut();currentUser=null;$("appView").classList.add("hidden");$("loginView").classList.remove("hidden");$("loginPassword").value="";};
-$("receiptForm").onsubmit=async e=>{
- e.preventDefault();if(!db||!currentUser){message("formMessage","Please configure Supabase and sign in first.","error");return}
- const amount=Number($("amount").value);
- if(!(amount>0)){message("formMessage","Enter a valid amount greater than zero.","error");return}
- const payload={student_name:$("studentName").value.trim(),phone:$("phone").value.trim(),course:$("course").value.trim(),academic_year:$("academicYear").value.trim(),amount,payment_date:$("paymentDate").value,payment_mode:$("paymentMode").value,transaction_id:$("transactionId").value.trim(),installment:$("installment").value,remarks:$("remarks").value.trim()};
- $("createBtn").disabled=true;
- const {data,error}=await db.rpc("create_fee_receipt",{p_student_name:payload.student_name,p_phone:payload.phone,p_course:payload.course,p_academic_year:payload.academic_year,p_amount:payload.amount,p_payment_date:payload.payment_date,p_payment_mode:payload.payment_mode,p_transaction_id:payload.transaction_id,p_installment:payload.installment,p_remarks:payload.remarks});
- $("createBtn").disabled=false;
- if(error){message("formMessage",error.message,"error");return}
- const receipt=Array.isArray(data)?data[0]:data;
- message("formMessage",`Receipt ${receipt.receipt_no} generated successfully.`,"success");
- renderReceipt({...payload,...receipt,created_by_email:currentUser.email});await loadLedger();
-};
-$("printBtn").onclick=()=>window.print();
-$("refreshBtn").onclick=loadLedger;$("ledgerSearch").oninput=drawLedger;
-$("csvBtn").onclick=()=>{
- const cols=["receipt_no","payment_date","student_name","phone","course","academic_year","amount","payment_mode","transaction_id","installment","remarks","created_by_email"];
- const csv=[cols.join(","),...receipts.map(r=>cols.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`).join(","))].join("\r\n");
- const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="APAA_Fee_Ledger.csv";a.click();URL.revokeObjectURL(a.href);
-};
-(async()=>{if(!db){message("loginMessage","Setup required: add your Supabase Project URL and anon key in index.html, then run the SQL in supabase_setup.sql.","info");return}const {data}=await db.auth.getSession();if(data.session)await showApp(data.session.user)})();
+    // --- 1. SUPABASE DATABASE CONFIGURATION ---
+    // REPLACE THESE VALUES WITH YOUR SUPABASE PROJECT KEYS
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_ID.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentStaffUser = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const downloadBtn = document.getElementById('download');
+        const printBtn = document.getElementById('printBtn');
+        const phoneInput = document.getElementById('phone');
+        const countryCodeSelect = document.getElementById('countryCode');
+        const phoneError = document.getElementById('phoneError');
+        const paidAmountInput = document.getElementById('paidAmount');
+        const wordsInput = document.getElementById('words');
+
+        // Clock & Pre-filled Date Formats
+        const now = new Date();
+        const dateString = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+        document.getElementById('receiptDate').value = dateString;
+        document.getElementById('paymentDate').value = dateString;
+
+        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+        document.getElementById('lblTimestamp').innerText = now.toLocaleString('en-US', options).replace(/,/g, '');
+
+        // --- 2. AUTHENTICATION CONTROLLER ---
+        async function initStaffAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            updateAuthUI(session ? session.user : null);
+
+            supabaseClient.auth.onAuthStateChange((_event, session) => {
+                updateAuthUI(session ? session.user : null);
+            });
+        }
+
+        function updateAuthUI(user) {
+            currentStaffUser = user;
+            const authStatus = document.getElementById('authStatus');
+            const btnLogin = document.getElementById('btnLogin');
+            const btnLogout = document.getElementById('btnLogout');
+
+            if (user) {
+                authStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#16A34A;"></i> <span>Signed in as: <b>${user.email}</b></span>`;
+                btnLogin.style.display = 'none';
+                btnLogout.style.display = 'inline-flex';
+            } else {
+                authStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:#DC2626;"></i> <span>Status: Signed Out (Sign in required to save)</span>`;
+                btnLogin.style.display = 'inline-flex';
+                btnLogout.style.display = 'none';
+            }
+        }
+
+        document.getElementById('btnLogin').addEventListener('click', async () => {
+            const email = prompt("Enter Staff Email:");
+            const password = prompt("Enter Staff Password:");
+            if (email && password) {
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) alert("Authentication Failed: " + error.message);
+            }
+        });
+
+        document.getElementById('btnLogout').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            alert("Logged out successfully.");
+        });
+
+        // --- 3. FETCH NEXT RECEIPT NUMBER PREVIEW ---
+        async function fetchNextReceiptNumberPreview() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('receipts')
+                    .select('receipt_no')
+                    .order('id', { ascending: false })
+                    .limit(1);
+
+                if (error) throw error;
+
+                let nextNum = 1;
+                if (data && data.length > 0) {
+                    const lastNo = data[0].receipt_no;
+                    const match = lastNo.match(/APA-2026-(\d+)/);
+                    if (match) {
+                        nextNum = parseInt(match[1], 10) + 1;
+                    }
+                }
+                const formattedNumber = `APA-2026-${String(nextNum).padStart(4, '0')}`;
+                document.getElementById('receiptNo').value = formattedNumber;
+            } catch (err) {
+                console.error("Sequence fetch error:", err);
+            }
+        }
+
+        // --- 4. NUMBER TO WORDS CONVERTER ---
+        function convertNumberToWords(amount) {
+            if (amount === 0) return 'Zero Only';
+            const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+            const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            
+            if ((amount = amount.toString()).length > 9) return 'Overflow';
+            let n = ('000000000' + amount).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+            if (!n) return ''; 
+            
+            let str = '';
+            str += n[1] != 0 ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+            str += n[2] != 0 ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+            str += n[3] != 0 ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+            str += n[4] != 0 ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+            str += n[5] != 0 ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+            
+            return str.trim() + ' Only';
+        }
+
+        // --- 5. PHONE NUMBER VALIDATION ENGINE ---
+        function runLivePhoneVerification() {
+            const rawValue = phoneInput.value;
+            const sanitizedDigits = rawValue.replace(/[\+\s\-\(\)]/g, '');
+            
+            if (rawValue.trim().length === 0) {
+                phoneError.style.display = 'none';
+                return false;
+            }
+
+            const selectedOption = countryCodeSelect.options[countryCodeSelect.selectedIndex];
+            const minLength = parseInt(selectedOption.getAttribute('data-min'), 10);
+            const maxLength = parseInt(selectedOption.getAttribute('data-max'), 10);
+
+            if (sanitizedDigits.length < minLength || sanitizedDigits.length > maxLength) {
+                phoneError.style.display = 'block';
+                return false;
+            } else {
+                phoneError.style.display = 'none';
+                return true;
+            }
+        }
+
+        // --- 6. MASTER FORM VALIDATION ---
+        function runReceiptFormValidation() {
+            const name = document.getElementById('name').value.trim();
+            const course = document.getElementById('course').value;
+            const year = document.getElementById('year').value;
+            const paidAmount = document.getElementById('paidAmount').value.trim();
+            const paymentDate = document.getElementById('paymentDate').value.trim();
+            const receiptDate = document.getElementById('receiptDate').value.trim();
+            const installment = document.getElementById('installment').value;
+
+            if (!name || !course || !year || !paidAmount || !paymentDate || !receiptDate || !installment) {
+                alert("Please complete all mandatory fields before printing or downloading the receipt.");
+                return false;
+            }
+
+            if (!runLivePhoneVerification()) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // --- 7. PRINT PREVIEWS VALUE SYNCHRONIZER ---
+        function syncPrintPreviews() {
+            document.getElementById('print_receiptNo').innerText = document.getElementById('receiptNo').value || 'N/A';
+            document.getElementById('print_receiptDate').innerText = document.getElementById('receiptDate').value || 'N/A';
+            document.getElementById('print_name').innerText = document.getElementById('name').value || 'N/A';
+            
+            const rawPhoneValue = phoneInput.value.trim();
+            const selectedPrefix = countryCodeSelect.value;
+            
+            let formattedPhoneOutput = rawPhoneValue;
+            if (rawPhoneValue.startsWith(selectedPrefix)) {
+                formattedPhoneOutput = rawPhoneValue.slice(selectedPrefix.length).trim();
+            }
+            
+            const combinedPhone = `${selectedPrefix} ${formattedPhoneOutput}`;
+            document.getElementById('print_phone').innerText = rawPhoneValue ? combinedPhone : 'N/A';
+            
+            document.getElementById('print_course').innerText = document.getElementById('course').value || 'N/A';
+            document.getElementById('print_year').innerText = document.getElementById('year').value || 'N/A';
+            document.getElementById('print_paidAmount').innerText = document.getElementById('paidAmount').value ? '₹ ' + parseFloat(document.getElementById('paidAmount').value).toLocaleString('en-IN') : '₹ 0';
+            document.getElementById('print_words').innerText = document.getElementById('words').value || 'Zero Only';
+            document.getElementById('print_paymentDate').innerText = document.getElementById('paymentDate').value || 'N/A';
+            document.getElementById('print_transactionId').innerText = document.getElementById('transactionId').value || 'N/A';
+            document.getElementById('print_installment').innerText = document.getElementById('installment').value || 'N/A';
+            
+            const remarksContent = document.getElementById('remarks').value.trim();
+            document.getElementById('print_remarks').innerText = remarksContent ? remarksContent : 'No Remarks';
+            
+            const checkedPayment = document.querySelector('input[name="payment"]:checked');
+            document.getElementById('print_paymentMode').innerText = checkedPayment ? checkedPayment.value : 'Cash';
+        }
+
+        // --- 8. DATABASE DUPLICATE RECORD CHECKER ---
+        async function checkDuplicateInDatabase() {
+            const activeReceiptNo = document.getElementById('receiptNo').value;
+            const activeName = document.getElementById('name').value.trim();
+            const activeCourse = document.getElementById('course').value;
+            const activeInstallment = document.getElementById('installment').value;
+
+            // 1. Check Receipt Number Conflict
+            const { data: numMatch } = await supabaseClient
+                .from('receipts')
+                .select('id')
+                .eq('receipt_no', activeReceiptNo);
+
+            if (numMatch && numMatch.length > 0) return true;
+
+            // 2. Check Student Milestone Payment Duplicate
+            const { data: recordMatch } = await supabaseClient
+                .from('receipts')
+                .select('id')
+                .ilike('student_name', activeName)
+                .eq('course', activeCourse)
+                .eq('installment_stage', activeInstallment);
+
+            if (recordMatch && recordMatch.length > 0) return true;
+
+            return false;
+        }
+
+        // --- 9. ATOMIC RECEIPT SAVE TO SUPABASE ---
+        async function saveReceiptToSupabase() {
+            if (!currentStaffUser) {
+                alert("Authentication Required: Please sign in as staff before creating receipts.");
+                return null;
+            }
+
+            const isDuplicate = await checkDuplicateInDatabase();
+            if (isDuplicate) {
+                alert("Duplicate record detected. This payment has already been recorded.");
+                return null;
+            }
+
+            // Execute atomic receipt sequence generator from database
+            const { data: seqData, error: seqError } = await supabaseClient.rpc('generate_next_receipt_number');
+            
+            let finalReceiptNo = document.getElementById('receiptNo').value;
+            if (!seqError && seqData) {
+                finalReceiptNo = seqData;
+            }
+
+            const payload = {
+                receipt_no: finalReceiptNo,
+                receipt_date: document.getElementById('receiptDate').value.split('/').reverse().join('-'),
+                student_name: document.getElementById('name').value.trim(),
+                country_code: countryCodeSelect.value,
+                phone_number: phoneInput.value.trim(),
+                phone_raw: phoneInput.value.replace(/[\+\s\-\(\)]/g, ''),
+                course: document.getElementById('course').value,
+                academic_year: document.getElementById('year').value,
+                paid_amount: parseFloat(document.getElementById('paidAmount').value),
+                amount_in_words: document.getElementById('words').value,
+                payment_date: document.getElementById('paymentDate').value.split('/').reverse().join('-'),
+                payment_mode: document.querySelector('input[name="payment"]:checked').value,
+                transaction_id: document.getElementById('transactionId').value.trim() || 'N/A',
+                installment_stage: document.getElementById('installment').value,
+                remarks: document.getElementById('remarks').value.trim() || 'No Remarks'
+            };
+
+            const { data, error } = await supabaseClient
+                .from('receipts')
+                .insert([payload])
+                .select();
+
+            if (error) {
+                console.error("Database Insert Error:", error);
+                alert("Save Operation Failed: " + error.message);
+                return null;
+            }
+
+            document.getElementById('receiptNo').value = finalReceiptNo;
+            await loadSharedLedgerFromSupabase();
+            await fetchNextReceiptNumberPreview();
+
+            return data[0];
+        }
+
+        // --- 10. FETCH SHARED LEDGER FROM DATABASE ---
+        async function loadSharedLedgerFromSupabase() {
+            const tbody = document.getElementById('ledgerBody');
+            if (!tbody) return;
+
+            const { data: records, error } = await supabaseClient
+                .from('receipts')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                console.error("Ledger Fetch Error:", error);
+                return;
+            }
+
+            tbody.innerHTML = records.length === 0 ? '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No captured records in shared database.</td></tr>' : '';
+
+            records.forEach((rec) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td><b>${rec.receipt_no}</b></td><td>${rec.student_name}</td><td>${rec.course}</td><td>₹${parseFloat(rec.paid_amount).toLocaleString('en-IN')}</td><td>${rec.payment_mode}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- 11. EXPORT SHARED LEDGER TO CSV ---
+        document.getElementById('exportExcel').addEventListener('click', async () => {
+            const { data: records, error } = await supabaseClient
+                .from('receipts')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error || !records || records.length === 0) {
+                return alert("There are no captured database logs available to export!");
+            }
+
+            let csv = "Receipt No,Student Name,Course,Amount Paid,Payment Mode,Payment Date,Transaction ID\n";
+            records.forEach(r => {
+                csv += `"${r.receipt_no}","${r.student_name}","${r.course}","${r.paid_amount}","${r.payment_mode}","${r.payment_date}","${r.transaction_id}"\n`;
+            });
+
+            const link = document.createElement("a");
+            link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+            link.download = "Academy_Shared_Ledger_Records.csv";
+            link.click();
+        });
+
+        // Input Listeners
+        paidAmountInput.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value, 10);
+            if (!isNaN(val) && val >= 0) {
+                wordsInput.value = convertNumberToWords(val);
+            } else {
+                wordsInput.value = '';
+            }
+
+            paidAmountInput.classList.remove('value-updated-highlight');
+            wordsInput.classList.remove('value-updated-highlight');
+            void paidAmountInput.offsetWidth;
+            paidAmountInput.classList.add('value-updated-highlight');
+            wordsInput.classList.add('value-updated-highlight');
+        });
+
+        phoneInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9\s\-\(\)\+]/g, '');
+            runLivePhoneVerification();
+        });
+
+        countryCodeSelect.addEventListener('change', () => {
+            runLivePhoneVerification();
+        });
+
+        // --- 12. DOWNLOAD PDF HANDLER ---
+        downloadBtn.addEventListener('click', async () => {
+            if (!runReceiptFormValidation()) return;
+
+            const savedRecord = await saveReceiptToSupabase();
+            if (!savedRecord) return;
+
+            syncPrintPreviews();
+            const targetElement = document.getElementById('receiptBlock');
+
+            try {
+                downloadBtn.classList.add('btn-loading');
+                const icon = downloadBtn.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-spinner';
+
+                const inputs = targetElement.querySelectorAll('input, select, textarea, .mode-radio-group, .country-select');
+                const previews = targetElement.querySelectorAll('.print-preview-label');
+
+                inputs.forEach(el => el.style.setProperty('display', 'none', 'important'));
+                previews.forEach(el => el.style.setProperty('display', 'inline-block', 'important'));
+
+                await new Promise(resolve => setTimeout(resolve, 150));
+
+                const canvas = await html2canvas(targetElement, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false });
+
+                inputs.forEach(el => el.style.removeProperty('display'));
+                previews.forEach(el => el.style.removeProperty('display'));
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const paddingSpace = 10;
+                const useWidth = pdfWidth - (paddingSpace * 2);
+                const pdfHeight = (canvas.height * useWidth) / canvas.width;
+
+                pdf.addImage(imgData, 'PNG', paddingSpace, paddingSpace, useWidth, pdfHeight);
+
+                const rawStudentName = document.getElementById('name').value.trim();
+                const cleanedStudentName = rawStudentName.replace(/[^a-zA-Z0-9]/g, '');
+                const lastFourDigits = savedRecord.receipt_no.slice(-4);
+
+                pdf.save(`${cleanedStudentName}_${lastFourDigits}.pdf`);
+            } catch (err) {
+                console.error(err);
+                alert("PDF rendering framework error.");
+            } finally {
+                downloadBtn.classList.remove('btn-loading');
+                const icon = downloadBtn.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-file-pdf';
+            }
+        });
+
+        // --- 13. PRINT RECEIPT HANDLER ---
+        printBtn.addEventListener('click', async () => {
+            if (!runReceiptFormValidation()) return;
+
+            const savedRecord = await saveReceiptToSupabase();
+            if (!savedRecord) return;
+
+            syncPrintPreviews();
+            setTimeout(() => {
+                window.print();
+            }, 150);
+        });
+
+        // --- 14. RESET FORM HANDLER ---
+        document.getElementById('clearForm').addEventListener('click', () => {
+            if (confirm("Are you sure you want to clear the active form inputs?")) {
+                document.querySelectorAll('input, select, textarea').forEach(el => {
+                    if (el.type === 'radio') {
+                        if (el.value === 'Cash') el.checked = true;
+                    } else {
+                        if (el.id !== 'receiptNo' && el.id !== 'receiptDate') {
+                            el.value = '';
+                        }
+                    }
+                });
+                countryCodeSelect.value = "+91";
+                phoneError.style.display = 'none';
+                document.getElementById('paymentDate').value = dateString;
+                fetchNextReceiptNumberPreview();
+            }
+        });
+
+        // Initializing Sequence Engine
+        initStaffAuth();
+        loadSharedLedgerFromSupabase();
+        fetchNextReceiptNumberPreview();
+    });
 </script>
-</body></html>
+</body>
+</html>
