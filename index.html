@@ -3,164 +3,956 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alagappa Performing Arts Academy | Fee Receipt</title>
+<title>Alagappa Performing Arts Academy | Fee Receipt Generator</title>
+<!-- External Libraries for Export & Functionality -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--navy:#12345b;--blue:#1e4f83;--gold:#d6a629;--ink:#26364a;--muted:#718096;--line:#dce5ef;--paper:#fff;--bg:#f3f6fa;--green:#087f5b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink);padding:28px 16px}
-.wrap{max-width:1050px;margin:auto}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:14px;flex-wrap:wrap}
-.topbar h1{font-size:20px;color:var(--navy);margin:0}.topbar p{margin:4px 0 0;color:var(--muted);font-size:13px}
-.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:11px 16px;font-weight:700;cursor:pointer;font-size:13px}.btn-primary{background:var(--navy);color:#fff}.btn-light{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn:hover{filter:brightness(.96)}
-.sheet{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 35px #1a36500d;overflow:hidden}
-.brand{padding:26px 34px 22px;border-bottom:1px solid var(--line);position:relative;text-align:center;background:linear-gradient(135deg,#fff 0%,#f8fbff 100%)}
-.brand:after{content:"";position:absolute;left:34px;right:34px;bottom:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--gold),var(--navy))}
-.brand h2{font-family:Georgia,serif;letter-spacing:3px;color:var(--navy);font-size:32px;margin:0;font-weight:700}.brand .academy{font-size:15px;letter-spacing:3px;font-weight:800;color:var(--blue);margin:3px 0 8px}.brand .courses{font-size:11px;letter-spacing:1.4px;color:#9a7418;font-weight:800}.brand .contact{font-size:12px;color:#627186;margin-top:12px;line-height:1.7}
-.receipt-head{display:flex;justify-content:space-between;align-items:center;padding:22px 34px 8px;gap:16px}.receipt-head h3{margin:0;color:var(--navy);font-size:19px;letter-spacing:2px}.receipt-tag{font-size:10px;font-weight:800;letter-spacing:1.4px;color:#9a7418;border:1px solid #ead9a8;padding:7px 11px;border-radius:30px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:14px 28px 24px}
-.panel{border:1px solid var(--line);border-radius:12px;padding:18px 19px;background:linear-gradient(180deg,#fbfcfe,#fff)}
-.panel-title{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;margin-bottom:13px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.7px;font-weight:800;color:var(--navy)}
-.panel-title span:last-child{color:var(--gold);font-size:16px}
-.field{display:grid;grid-template-columns:42% 58%;align-items:center;gap:8px;margin:0 0 13px;min-height:27px}.field:last-child{margin-bottom:0}
-label{font-size:12px;color:#58677c;font-weight:650}.required{color:#c0392b}
-input,select{width:100%;border:0;border-bottom:1px solid #cbd6e3;padding:7px 2px;background:transparent;color:#26364a;font:600 12px "Segoe UI",Arial;outline:none;text-align:right;border-radius:0}
-input:focus,select:focus{border-bottom:2px solid var(--gold)}input::placeholder{color:#a5afbd;font-weight:500}
-input[type=date]{color-scheme:light}select{cursor:pointer}
-.amount-wrap{display:flex;align-items:center;border:1px solid #9be3c9;background:#effcf6;border-radius:7px;padding:0 9px}.amount-wrap b{color:var(--green);font-size:13px}.amount-wrap input{border:0;text-align:right;color:#075f47;font-size:16px;font-weight:800}
-.radio-row{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.radio-row label{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#46566b}.radio-row input{width:auto;accent-color:var(--blue)}
-.words{font-style:italic;color:#65758a;text-align:right;font-size:12px;min-height:24px;padding:6px 0;border-bottom:1px dashed #cbd6e3}
-.note{padding:0 34px 22px;color:#8a96a6;font-size:10px;text-align:center}
-.footer{border-top:1px dashed var(--line);margin:0 34px;padding:18px 0 24px;display:flex;justify-content:space-between;gap:20px;align-items:end}
-.footer p{font-size:11px;color:#6f7d8f;line-height:1.6;margin:0}.sign{width:190px;text-align:center;border-top:1px solid #9aa8b8;padding-top:7px;font-size:11px;color:#526176}
-.receipt-no{font-size:11px;color:#718096;text-align:right;margin-top:5px}
-@media(max-width:700px){.actions .btn{padding:9px 11px;font-size:11px}body{padding:12px 8px}.brand{padding:22px 16px}.brand h2{font-size:27px}.brand .academy{font-size:12px;letter-spacing:2px}.brand .courses{font-size:9px;letter-spacing:.8px}.form-grid{grid-template-columns:1fr;padding:12px 14px 20px}.receipt-head{padding:18px 18px 5px}.footer{margin:0 18px}.field{grid-template-columns:40% 60%}.topbar{padding:0 4px}}
-@media print{body{background:#fff;padding:0}.wrap{max-width:none}.topbar{display:none}.sheet{border:0;border-radius:0;box-shadow:none}.panel{break-inside:avoid}.brand{padding-top:18px}.form-grid{padding-bottom:12px}.note{padding-bottom:12px}.footer{padding-bottom:12px}}
+:root {
+  --navy: #12345b;
+  --blue: #1e4f83;
+  --gold: #d6a629;
+  --ink: #26364a;
+  --muted: #718096;
+  --line: #dce5ef;
+  --paper: #ffffff;
+  --bg: #f3f6fa;
+  --green: #087f5b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+  padding: 28px 16px;
+}
+
+.wrap {
+  max-width: 1050px;
+  margin: auto;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.topbar h1 {
+  font-size: 22px;
+  color: var(--navy);
+  margin: 0;
+}
+
+.topbar p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: #fff;
+}
+
+.btn-light {
+  background: #fff;
+  color: var(--navy);
+  border: 1px solid var(--line);
+}
+
+.btn:hover {
+  filter: brightness(0.94);
+  transform: translateY(-1px);
+}
+
+.sheet {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(26, 54, 80, 0.08);
+  overflow: hidden;
+}
+
+.brand {
+  padding: 26px 34px 22px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  text-align: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.brand::after {
+  content: "";
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--navy), var(--gold), var(--navy));
+}
+
+/* Academy Logo Styles */
+.brand-logo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.brand-logo {
+  max-height: 85px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand h2 {
+  font-family: Georgia, serif;
+  letter-spacing: 3px;
+  color: var(--navy);
+  font-size: 30px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.brand .academy {
+  font-size: 15px;
+  letter-spacing: 3px;
+  font-weight: 800;
+  color: var(--blue);
+  margin: 3px 0 8px;
+}
+
+.brand .courses {
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  color: #9a7418;
+  font-weight: 800;
+}
+
+.brand .contact {
+  font-size: 12px;
+  color: #627186;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.receipt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 34px 8px;
+  gap: 16px;
+}
+
+.receipt-head h3 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 19px;
+  letter-spacing: 2px;
+}
+
+.receipt-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  color: #9a7418;
+  border: 1px solid #ead9a8;
+  padding: 7px 11px;
+  border-radius: 30px;
+  background: #fffdf5;
+}
+
+.receipt-no {
+  font-size: 11px;
+  color: #718096;
+  text-align: right;
+  margin-top: 5px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 14px 28px 24px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 19px;
+  background: linear-gradient(180deg, #fbfcfe, #ffffff);
+}
+
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  margin-bottom: 13px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  letter-spacing: 0.7px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.panel-title span:last-child {
+  color: var(--gold);
+  font-size: 16px;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 42% 58%;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 13px;
+  min-height: 27px;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  font-size: 12px;
+  color: #58677c;
+  font-weight: 650;
+}
+
+.required {
+  color: #c0392b;
+  font-style: normal;
+}
+
+input, select {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #cbd6e3;
+  padding: 7px 2px;
+  background: transparent;
+  color: #26364a;
+  font: 600 12px "Segoe UI", Arial, sans-serif;
+  outline: none;
+  text-align: right;
+  border-radius: 0;
+}
+
+input:focus, select:focus {
+  border-bottom: 2px solid var(--gold);
+}
+
+input::placeholder {
+  color: #a5afbd;
+  font-weight: 500;
+}
+
+input[type=date] {
+  color-scheme: light;
+}
+
+select {
+  cursor: pointer;
+}
+
+.phone-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.phone-wrap span {
+  font-size: 12px;
+  color: #58677c;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.phone-wrap input {
+  text-align: right;
+}
+
+.amount-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid #9be3c9;
+  background: #effcf6;
+  border-radius: 7px;
+  padding: 0 9px;
+}
+
+.amount-wrap b {
+  color: var(--green);
+  font-size: 13px;
+}
+
+.amount-wrap input {
+  border: 0;
+  text-align: right;
+  color: #075f47;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.radio-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #46566b;
+  cursor: pointer;
+}
+
+.radio-row input {
+  width: auto;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.words {
+  font-style: italic;
+  color: #65758a;
+  text-align: right;
+  font-size: 12px;
+  min-height: 24px;
+  padding: 6px 0;
+  border-bottom: 1px dashed #cbd6e3;
+  word-break: break-word;
+}
+
+.note {
+  padding: 0 34px 22px;
+  color: #8a96a6;
+  font-size: 10px;
+  text-align: center;
+}
+
+/* Footer & Signature Section */
+.footer {
+  border-top: 1px dashed var(--line);
+  margin: 0 34px;
+  padding: 18px 0 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.footer p {
+  font-size: 11px;
+  color: #6f7d8f;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sign-container {
+  width: 200px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.signature-img {
+  max-width: 130px;
+  max-height: 55px;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.sign-line {
+  border-top: 1px solid #9aa8b8;
+  width: 100%;
+  padding-top: 6px;
+  font-size: 11px;
+  color: #526176;
+}
+
+/* Modal / Alert Notification Box */
+.toast-msg {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--navy);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 1000;
+  display: none;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Styling */
+@media(max-width: 700px) {
+  .actions .btn {
+    padding: 9px 11px;
+    font-size: 11px;
+  }
+  body {
+    padding: 12px 8px;
+  }
+  .brand {
+    padding: 22px 16px;
+  }
+  .brand h2 {
+    font-size: 24px;
+  }
+  .brand .academy {
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+  .brand .courses {
+    font-size: 9px;
+    letter-spacing: 0.8px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    padding: 12px 14px 20px;
+  }
+  .receipt-head {
+    padding: 18px 18px 5px;
+  }
+  .footer {
+    margin: 0 18px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .field {
+    grid-template-columns: 40% 60%;
+  }
+  .topbar {
+    padding: 0 4px;
+  }
+}
+
+/* Print Optimization */
+@media print {
+  body {
+    background: #ffffff;
+    padding: 0;
+  }
+  .wrap {
+    max-width: none;
+    width: 100%;
+  }
+  .topbar, .toast-msg {
+    display: none !important;
+  }
+  .sheet {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .panel {
+    break-inside: avoid;
+  }
+  .brand {
+    padding-top: 18px;
+  }
+  .form-grid {
+    padding-bottom: 12px;
+  }
+  .note {
+    padding-bottom: 12px;
+  }
+  .footer {
+    padding-bottom: 12px;
+  }
+  input, select {
+    border-bottom: 1px solid #333 !important;
+  }
+}
 </style>
 </head>
 <body>
+
 <div class="wrap">
-  <div class="topbar">
-    <div><h1>Fee Receipt Generator</h1><p>Alagappa Performing Arts Academy · Chennai</p><p id="savedCount" style="font-weight:700;color:#087f5b">Saved receipts: 0</p></div>
+  <!-- Top Navigation / Action Bar -->
+  <header class="topbar">
+    <div>
+      <h1>Fee Receipt Generator</h1>
+      <p>Alagappa Performing Arts Academy · Chennai</p>
+      <p id="savedCount" style="font-weight:700; color:#087f5b; margin-top:2px;">Saved receipts: 0</p>
+    </div>
     <div class="actions">
       <button class="btn btn-light" type="button" onclick="resetForm()">Reset</button>
+      <button class="btn btn-light" type="button" onclick="printReceipt()">Print</button>
       <button class="btn btn-light" type="button" onclick="downloadImage()">Download Image</button>
       <button class="btn btn-light" type="button" onclick="downloadPDF()">Download PDF</button>
       <button class="btn btn-primary" type="button" onclick="savePaidReceipt()">Save Paid Receipt</button>
       <button class="btn btn-primary" type="button" onclick="downloadExcel()">Download Excel</button>
     </div>
-  </div>
-  <main class="sheet">
+  </header>
+
+  <!-- Fee Receipt Printable Sheet -->
+  <main class="sheet" id="receiptSheet">
+    
+    <!-- Header Section with Logo & Academy Info -->
     <header class="brand">
+      <div class="brand-logo-wrap">
+        <!-- Main Logo with Canvas/CORS Support and Fallback -->
+        <img id="academyLogo" src="Logo.png" alt="Alagappa Performing Arts Academy Logo" class="brand-logo" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'70\' viewBox=\'0 0 120 70\'><rect width=\'120\' height=\'70\' fill=\'%2312345b\' rx=\'8\'/><text x=\'50%\' y=\'45%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23d6a629\' font-family=\'Georgia, serif\' font-size=\'22\' font-weight=\'bold\'>APAA</text><text x=\'50%\' y=\'72%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'sans-serif\' font-size=\'8\'>ACADEMY LOGO</text></svg>';">
+      </div>
       <h2>ALAGAPPA</h2>
       <div class="academy">PERFORMING ARTS ACADEMY</div>
-      <div class="courses">BHARATHANATYAM&nbsp; • &nbsp;CARNATIC VOCAL&nbsp; • &nbsp;NATTUVANGAM</div>
-      <div class="contact">49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084<br>Vaishnavi@alagappaarts.com</div>
+      <div class="courses">BHARATHANATYAM &nbsp;•&nbsp; CARNATIC VOCAL &nbsp;•&nbsp; NATTUVANGAM</div>
+      <div class="contact">
+        49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084<br>
+        Vaishnavi@alagappaarts.com
+      </div>
     </header>
-    <div class="receipt-head"><h3>FEE RECEIPT</h3><div><div class="receipt-tag">OFFICIAL PAYMENT ACKNOWLEDGEMENT</div><div class="receipt-no">Receipt No: <strong id="receiptNo"></strong></div></div></div>
+
+    <!-- Receipt Sub-header -->
+    <div class="receipt-head">
+      <h3>FEE RECEIPT</h3>
+      <div>
+        <div class="receipt-tag">OFFICIAL PAYMENT ACKNOWLEDGEMENT</div>
+        <div class="receipt-no">Receipt No: <strong id="receiptNo"></strong></div>
+      </div>
+    </div>
+
+    <!-- Interactive Form -->
     <form id="feeForm" onsubmit="return false">
       <div class="form-grid">
+        
+        <!-- Left Panel: Student & Course Details -->
         <section class="panel">
-          <div class="panel-title"><span>STUDENT &amp; COURSE DETAILS</span><span>♙</span></div>
-          <div class="field"><label for="student">Student Name <i class="required">*</i></label><input id="student" placeholder="Enter student name" required></div>
-          <div class="field"><label for="phone">Phone Number <i class="required">*</i></label><input id="phone" type="tel" placeholder="+91 98765 43210" required maxlength="15"></div>
-          <div class="field"><label for="course">Course Registered <i class="required">*</i></label><select id="course" required><option value="">Select Course</option><option>Diploma in Bharatanatyam</option><option>Carnatic Vocal</option><option>Keyboard</option><option>Drawing</option><option>Abacus</option></select></div>
-          <div class="field"><label for="year">Academic Year <i class="required">*</i></label><select id="year" required><option value="">Select Year</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option></select></div>
+          <div class="panel-title">
+            <span>STUDENT &amp; COURSE DETAILS</span>
+            <span>♙</span>
+          </div>
+          
+          <div class="field">
+            <label for="student">Student Name <i class="required">*</i></label>
+            <input id="student" placeholder="Enter student name" required>
+          </div>
+          
+          <div class="field">
+            <label for="phone">Phone Number <i class="required">*</i></label>
+            <div class="phone-wrap">
+              <span>+91</span>
+              <input id="phone" type="tel" placeholder="98765 43210" required maxlength="12">
+            </div>
+          </div>
+          
+          <div class="field">
+            <label for="course">Course Registered <i class="required">*</i></label>
+            <select id="course" required>
+              <option value="">Select Course</option>
+              <option>Diploma in Bharatanatyam</option>
+              <option>Carnatic Vocal</option>
+              <option>Keyboard</option>
+              <option>Drawing</option>
+              <option>Abacus</option>
+            </select>
+          </div>
+          
+          <div class="field">
+            <label for="year">Academic Year <i class="required">*</i></label>
+            <select id="year" required>
+              <option value="">Select Year</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+            </select>
+          </div>
         </section>
+
+        <!-- Right Panel: Payment Details -->
         <section class="panel">
-          <div class="panel-title"><span>PAYMENT INFORMATION</span><span>▣</span></div>
-          <div class="field"><label for="amount">Amount Paid <i class="required">*</i></label><div class="amount-wrap"><b>₹</b><input id="amount" type="number" min="1" step="0.01" placeholder="0" required oninput="updateWords()"></div></div>
-          <div class="field"><label>Amount in Words</label><div class="words" id="amountWords">Zero Only</div></div>
-          <div class="field"><label for="date">Payment Date <i class="required">*</i></label><input id="date" type="date" required></div>
-          <div class="field"><label>Payment Mode <i class="required">*</i></label><div class="radio-row"><label><input type="radio" name="mode" value="CASH" checked> CASH</label><label><input type="radio" name="mode" value="UPI"> UPI</label><label><input type="radio" name="mode" value="CARD"> CARD</label><label><input type="radio" name="mode" value="BANK"> BANK</label></div></div>
-          <div class="field"><label for="txn">TXN / UPI ID</label><input id="txn" placeholder="Enter transaction reference"></div>
-          <div class="field"><label for="stage">Installment Stage <i class="required">*</i></label><select id="stage" required><option value="">Select Stage</option><option>Full Payment</option><option>First Installment</option><option>Second Installment</option><option>Final Installment</option></select></div>
+          <div class="panel-title">
+            <span>PAYMENT INFORMATION</span>
+            <span>▣</span>
+          </div>
+          
+          <div class="field">
+            <label for="amount">Amount Paid <i class="required">*</i></label>
+            <div class="amount-wrap">
+              <b>₹</b>
+              <input id="amount" type="number" min="1" step="0.01" placeholder="0" required oninput="updateWords()">
+            </div>
+          </div>
+          
+          <div class="field">
+            <label>Amount in Words</label>
+            <div class="words" id="amountWords">Zero Only</div>
+          </div>
+          
+          <div class="field">
+            <label for="date">Payment Date <i class="required">*</i></label>
+            <input id="date" type="date" required>
+          </div>
+          
+          <div class="field">
+            <label>Payment Mode <i class="required">*</i></label>
+            <div class="radio-row">
+              <label><input type="radio" name="mode" value="CASH" checked> CASH</label>
+              <label><input type="radio" name="mode" value="UPI"> UPI</label>
+              <label><input type="radio" name="mode" value="CARD"> CARD</label>
+              <label><input type="radio" name="mode" value="BANK"> BANK</label>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label for="txn">TXN / UPI ID</label>
+            <input id="txn" placeholder="Enter transaction reference">
+          </div>
+          
+          <div class="field">
+            <label for="stage">Installment Stage <i class="required">*</i></label>
+            <select id="stage" required>
+              <option value="">Select Stage</option>
+              <option>Full Payment</option>
+              <option>First Installment</option>
+              <option>Second Installment</option>
+              <option>Final Installment</option>
+            </select>
+          </div>
         </section>
+
       </div>
     </form>
+
+    <!-- Disclaimer Note -->
     <div class="note">This receipt is valid subject to successful realization of the payment. Please retain it for your records.</div>
-    <footer class="footer"><p><strong>Thank you for your payment.</strong><br>For any payment queries, contact Vaishnavi@alagappaarts.com</p><div class="sign">Authorized Signature<br><strong>Alagappa Performing Arts Academy</strong></div></footer>
+
+    <!-- Footer with Signature -->
+    <footer class="footer">
+      <p>
+        <strong>Thank you for your payment.</strong><br>
+        For any payment queries, contact Vaishnavi@alagappaarts.com
+      </p>
+      
+      <div class="sign-container">
+        <!-- Authorized Signature Image with Fallback Canvas Support -->
+        <img id="authSignature" src="signature.png" alt="Authorized Signature" class="signature-img" crossorigin="anonymous" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'120\' height=\'40\' viewBox=\'0 0 120 40\'><path d=\'M10 25 Q 30 10 50 25 T 90 15 T 110 30\' stroke=\'%2312345b\' stroke-width=\'2\' fill=\'none\'/></svg>';">
+        <div class="sign-line">
+          Authorized Signature<br>
+          <strong>Alagappa Performing Arts Academy</strong>
+        </div>
+      </div>
+    </footer>
+
   </main>
 </div>
-<script>
-const el=id=>document.getElementById(id);
-const STORAGE_KEY='apaa_paid_receipts_v1';
-function makeReceiptNo(){const d=new Date();return 'APAA-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+Math.floor(1000+Math.random()*9000)}
-el('receiptNo').textContent=makeReceiptNo();
-el('date').value=new Date().toISOString().slice(0,10);
 
-const ones=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
-const tens=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
-function underThousand(n){let s='';if(n>=100){s+=ones[Math.floor(n/100)]+' Hundred';n%=100;if(n)s+=' ';}if(n>=20){s+=tens[Math.floor(n/10)];if(n%10)s+=' '+ones[n%10];}else if(n)s+=ones[n];return s;}
-function numberWords(n){if(n===0)return 'Zero';let parts=[];const units=[[10000000,'Crore'],[100000,'Lakh'],[1000,'Thousand'],[1,'']];for(const [v,name] of units){if(n>=v){let q=Math.floor(n/v);n%=v;parts.push((v===1?underThousand(q):numberWords(q))+(name?' '+name:''));}}return parts.join(' ');}
-function updateWords(){let v=Number(el('amount').value);if(!v){el('amountWords').textContent='Zero Only';return;}let rupees=Math.floor(v),paise=Math.round((v-rupees)*100);el('amountWords').textContent=numberWords(rupees)+' Rupees'+(paise?' and '+numberWords(paise)+' Paise':'')+' Only';}
-function getMode(){return document.querySelector('input[name="mode"]:checked')?.value||'';}
-function validateReceipt(){if(!el('feeForm').reportValidity())return false;if(Number(el('amount').value)<=0){alert('Please enter an amount greater than zero.');return false;}return true;}
-function receiptData(){return {
-  receiptNo:el('receiptNo').textContent,
-  studentName:el('student').value.trim(),
-  phone:el('phone').value.trim(),
-  course:el('course').value,
-  academicYear:el('year').value,
-  amount:Number(el('amount').value),
-  amountInWords:el('amountWords').textContent,
-  paymentDate:el('date').value,
-  paymentMode:getMode(),
-  transactionId:el('txn').value.trim()||'N/A',
-  installmentStage:el('stage').value,
-  savedAt:new Date().toLocaleString()
-};}
-function getSaved(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return [];}}
-function updateSavedCount(){el('savedCount').textContent='Saved receipts: '+getSaved().length;}
-function savePaidReceipt(){
-  if(!validateReceipt())return;
-  const data=receiptData(), saved=getSaved();
-  if(saved.some(r=>r.receiptNo===data.receiptNo)){alert('This receipt has already been saved.');return;}
-  saved.push(data);
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(saved));updateSavedCount();alert('Paid receipt saved successfully in this browser.');}
-  catch(e){alert('Could not save receipt. Your browser storage may be full or disabled.');}
+<!-- Custom Notification Toast -->
+<div id="toast" class="toast-msg"></div>
+
+<script>
+// Helper utilities
+const el = id => document.getElementById(id);
+const STORAGE_KEY = 'apaa_paid_receipts_v1';
+
+// Show non-blocking toast notifications (replaces alert)
+function showToast(message) {
+  const toast = el('toast');
+  toast.textContent = message;
+  toast.style.display = 'block';
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 3500);
 }
-async function downloadImage(){
-  if(!validateReceipt())return;
-  if(!window.html2canvas){alert('Image export library could not load. Please check your internet connection and try again.');return;}
-  const node=document.querySelector('.sheet');
-  const canvas=await html2canvas(node,{scale:2,backgroundColor:'#ffffff',useCORS:true});
-  const a=document.createElement('a');a.download=(el('receiptNo').textContent||'APAA-receipt')+'.png';a.href=canvas.toDataURL('image/png');a.click();
+
+// Generate receipt number APAA-YYYYMMDD-XXXX
+function makeReceiptNo() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `APAA-${year}${month}${day}-${rand}`;
 }
-async function downloadPDF(){
-  if(!validateReceipt())return;
-  if(!window.html2canvas||!window.jspdf){alert('PDF export library could not load. Please check your internet connection and try again.');return;}
-  const canvas=await html2canvas(document.querySelector('.sheet'),{scale:2,backgroundColor:'#ffffff',useCORS:true});
-  const img=canvas.toDataURL('image/png');
-  const {jsPDF}=window.jspdf;
-  const pdf=new jsPDF({orientation:canvas.width>canvas.height?'landscape':'portrait',unit:'px',format:[canvas.width,canvas.height]});
-  pdf.addImage(img,'PNG',0,0,canvas.width,canvas.height);
-  pdf.save((el('receiptNo').textContent||'APAA-receipt')+'.pdf');
+
+// Initialize receipt defaults
+el('receiptNo').textContent = makeReceiptNo();
+el('date').value = new Date().toISOString().slice(0, 10);
+
+// Number to Words Engine (Indian Currency Format)
+const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+function underThousand(n) {
+  let s = '';
+  if (n >= 100) {
+    s += ones[Math.floor(n / 100)] + ' Hundred';
+    n %= 100;
+    if (n) s += ' ';
+  }
+  if (n >= 20) {
+    s += tens[Math.floor(n / 10)];
+    if (n % 10) s += ' ' + ones[n % 10];
+  } else if (n) {
+    s += ones[n];
+  }
+  return s;
 }
-function downloadExcel(){
-  const rows=getSaved();
-  if(!rows.length){alert('No paid receipts have been saved yet. Please save a paid receipt first.');return;}
-  const columns=[
-    ['Receipt Number','receiptNo'],['Student Name','studentName'],['Phone Number','phone'],
-    ['Course','course'],['Academic Year','academicYear'],['Amount Paid (INR)','amount'],
-    ['Amount in Words','amountInWords'],['Payment Date','paymentDate'],['Payment Mode','paymentMode'],
-    ['Transaction / UPI ID','transactionId'],['Installment Stage','installmentStage'],['Saved At','savedAt']
+
+function numberWords(n) {
+  if (n === 0) return 'Zero';
+  let parts = [];
+  const units = [
+    [10000000, 'Crore'],
+    [100000, 'Lakh'],
+    [1000, 'Thousand'],
+    [1, '']
   ];
-  if(window.XLSX){
-    const data=[columns.map(c=>c[0]),...rows.map(r=>columns.map(c=>r[c[1]]??''))];
-    const ws=XLSX.utils.aoa_to_sheet(data);ws['!cols']=columns.map(c=>({wch:Math.max(c[0].length+2,18)}));
-    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Paid Receipts');
-    XLSX.writeFile(wb,'APAA_Paid_Receipts.xlsx');
-  }else{
-    const csv=[columns.map(c=>'"'+c[0]+'"').join(','),...rows.map(r=>columns.map(c=>'"'+String(r[c[1]]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');
-    const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-    a.href=url;a.download='APAA_Paid_Receipts.csv';a.click();URL.revokeObjectURL(url);
-    alert('Excel library was unavailable, so an Excel-compatible CSV file was downloaded.');
+  for (const [v, name] of units) {
+    if (n >= v) {
+      let q = Math.floor(n / v);
+      n %= v;
+      parts.push((v === 1 ? underThousand(q) : numberWords(q)) + (name ? ' ' + name : ''));
+    }
+  }
+  return parts.join(' ');
+}
+
+function updateWords() {
+  let v = Number(el('amount').value);
+  if (!v || v <= 0) {
+    el('amountWords').textContent = 'Zero Only';
+    return;
+  }
+  let rupees = Math.floor(v);
+  let paise = Math.round((v - rupees) * 100);
+  el('amountWords').textContent = numberWords(rupees) + ' Rupees' + (paise ? ' and ' + numberWords(paise) + ' Paise' : '') + ' Only';
+}
+
+function getMode() {
+  return document.querySelector('input[name="mode"]:checked')?.value || 'CASH';
+}
+
+function validateReceipt() {
+  if (!el('feeForm').reportValidity()) {
+    return false;
+  }
+  if (Number(el('amount').value) <= 0) {
+    showToast('Please enter a valid amount greater than zero.');
+    return false;
+  }
+  return true;
+}
+
+function getReceiptDataObject() {
+  const phoneVal = el('phone').value.trim();
+  const formattedPhone = phoneVal.startsWith('+91') ? phoneVal : '+91 ' + phoneVal;
+
+  return {
+    receiptNo: el('receiptNo').textContent,
+    studentName: el('student').value.trim(),
+    phone: formattedPhone,
+    course: el('course').value,
+    academicYear: el('year').value,
+    amount: Number(el('amount').value),
+    amountInWords: el('amountWords').textContent,
+    paymentDate: el('date').value,
+    paymentMode: getMode(),
+    transactionId: el('txn').value.trim() || 'N/A',
+    installmentStage: el('stage').value,
+    savedAt: new Date().toLocaleString()
+  };
+}
+
+function getSaved() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch (e) {
+    return [];
   }
 }
-function printReceipt(){if(!validateReceipt())return;window.print();}
-function resetForm(){if(!confirm('Clear all entered receipt details?'))return;el('feeForm').reset();el('amountWords').textContent='Zero Only';el('date').value=new Date().toISOString().slice(0,10);el('receiptNo').textContent=makeReceiptNo();}
+
+function updateSavedCount() {
+  el('savedCount').textContent = 'Saved receipts: ' + getSaved().length;
+}
+
+function savePaidReceipt() {
+  if (!validateReceipt()) return;
+  const data = getReceiptDataObject();
+  const saved = getSaved();
+  
+  if (saved.some(r => r.receiptNo === data.receiptNo)) {
+    showToast('This receipt has already been saved.');
+    return;
+  }
+  
+  saved.push(data);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    updateSavedCount();
+    showToast('Paid receipt saved successfully!');
+  } catch (e) {
+    showToast('Could not save receipt. Browser storage may be full.');
+  }
+}
+
+// Download Image PNG via html2canvas
+async function downloadImage() {
+  if (!validateReceipt()) return;
+  if (!window.html2canvas) {
+    showToast('Image export library loading failed. Check your internet connection.');
+    return;
+  }
+  
+  const node = el('receiptSheet');
+  try {
+    const canvas = await html2canvas(node, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: true,
+      logging: false
+    });
+    
+    const a = document.createElement('a');
+    a.download = (el('receiptNo').textContent || 'APAA-receipt') + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  } catch(err) {
+    showToast('Error exporting image. Please try again.');
+  }
+}
+
+// Download PDF via html2canvas and jsPDF
+async function downloadPDF() {
+  if (!validateReceipt()) return;
+  if (!window.html2canvas || !window.jspdf) {
+    showToast('PDF export libraries failed to load. Check connection.');
+    return;
+  }
+  
+  try {
+    const canvas = await html2canvas(el('receiptSheet'), {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: true,
+      logging: false
+    });
+    
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    
+    // Fit canvas cleanly to A4 orientation
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save((el('receiptNo').textContent || 'APAA-receipt') + '.pdf');
+  } catch(err) {
+    showToast('Error exporting PDF. Please try again.');
+  }
+}
+
+// Download Excel or fallback CSV
+function downloadExcel() {
+  const rows = getSaved();
+  if (!rows.length) {
+    showToast('No saved receipts found. Please save a paid receipt first.');
+    return;
+  }
+  
+  const columns = [
+    ['Receipt Number', 'receiptNo'],
+    ['Student Name', 'studentName'],
+    ['Phone Number', 'phone'],
+    ['Course', 'course'],
+    ['Academic Year', 'academicYear'],
+    ['Amount Paid (INR)', 'amount'],
+    ['Amount in Words', 'amountInWords'],
+    ['Payment Date', 'paymentDate'],
+    ['Payment Mode', 'paymentMode'],
+    ['Transaction / UPI ID', 'transactionId'],
+    ['Installment Stage', 'installmentStage'],
+    ['Saved At', 'savedAt']
+  ];
+  
+  if (window.XLSX) {
+    const data = [columns.map(c => c[0]), ...rows.map(r => columns.map(c => r[c[1]] ?? ''))];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!cols'] = columns.map(c => ({ wch: Math.max(c[0].length + 2, 18) }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Paid Receipts');
+    XLSX.writeFile(wb, 'APAA_Paid_Receipts.xlsx');
+  } else {
+    // Fallback CSV export
+    const csv = [
+      columns.map(c => '"' + c[0] + '"').join(','),
+      ...rows.map(r => columns.map(c => '"' + String(r[c[1]] ?? '').replace(/"/g, '""') + '"').join(','))
+    ].join('\r\n');
+    
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'APAA_Paid_Receipts.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Excel library unavailable; downloaded CSV file instead.');
+  }
+}
+
+function printReceipt() {
+  if (!validateReceipt()) return;
+  window.print();
+}
+
+function resetForm() {
+  el('feeForm').reset();
+  el('amountWords').textContent = 'Zero Only';
+  el('date').value = new Date().toISOString().slice(0, 10);
+  el('receiptNo').textContent = makeReceiptNo();
+  showToast('Form reset successfully.');
+}
+
+// Initial count load
 updateSavedCount();
-</script></script>
+</script>
 </body>
 </html>
