@@ -771,6 +771,34 @@ body {
   .receipt-meta-row { font-size: 10px; }
 }
 
+
+/* Refined responsive screen layout */
+body { padding: 14px clamp(8px, 1.5vw, 22px); }
+.wrap { width: 100%; max-width: 1120px; margin: 0 auto; }
+.sheet { width: 100%; padding: 26px clamp(18px, 2.5vw, 34px) 22px; }
+.receipt-header {
+  grid-template-columns: minmax(105px, 135px) minmax(0, 1fr) minmax(190px, 245px);
+  gap: clamp(12px, 1.8vw, 22px);
+}
+.academy-logo { width: 118px; height: 66px; }
+.academy-details h2 { font-size: clamp(21px, 2.1vw, 25px); }
+.header-right { font-size: 10px; overflow-wrap: anywhere; }
+.form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.panel { min-width: 0; padding: 16px 18px; }
+.field { grid-template-columns: minmax(0, 42%) minmax(0, 58%); }
+.field input { min-width: 0; }
+.ledger-section { max-width: 100%; }
+@media (max-width: 760px) {
+  body { padding: 8px; }
+  .sheet { padding: 16px 12px; }
+  .receipt-header { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .academy-logo { justify-self: center; }
+  .header-right { text-align: center; padding: 0; }
+  .header-right::before { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .receipt-meta-row { flex-wrap: wrap; justify-content: center; gap: 6px 18px; }
+}
+
 </style>
 </head>
 <body>
@@ -813,8 +841,8 @@ body {
     <div class="receipt-title-block">
       <h3>FEE RECEIPT</h3>
       <div class="receipt-meta-row">
-        <span>Receipt No: <strong id="receiptNo">APAA-2026-0022</strong></span>
-        <span>Receipt Date: <strong id="displayDate">10/07/2026</strong></span>
+        <span>Receipt No: <strong id="receiptNo">Generating...</strong></span>
+        <span>Receipt Date: <strong id="displayDate">Today</strong></span>
       </div>
     </div>
 
@@ -829,22 +857,22 @@ body {
 
           <div class="field">
             <label for="student">Student Name *</label>
-            <input id="student" value="ABIRAMI M S" required>
+            <input id="student" type="text" placeholder="Enter student name" required autocomplete="name">
           </div>
 
           <div class="field">
             <label for="phone">Phone Number *</label>
-            <input id="phone" type="tel" value="+91 91764 71176" required maxlength="15">
+            <input id="phone" type="tel" placeholder="+91 98765 43210" required maxlength="16" autocomplete="tel" inputmode="tel">
           </div>
 
           <div class="field">
             <label for="course">Course Registered *</label>
-            <input id="course" value="Bachelor's in Bharathanatyam" required>
+            <input id="course" type="text" placeholder="Enter registered course" required>
           </div>
 
           <div class="field">
             <label for="year">Academic Year *</label>
-            <input id="year" value="1st Year" required>
+            <input id="year" type="text" placeholder="Enter academic year" required>
           </div>
         </section>
 
@@ -858,33 +886,33 @@ body {
             <label for="amount">Amount Paid *</label>
             <div class="amount-wrap">
               <b>₹</b>
-              <input id="amount" type="text" value="10,000" required oninput="updateWords()">
+              <input id="amount" type="text" placeholder="Enter amount" required inputmode="decimal" oninput="updateWords()">
             </div>
           </div>
 
           <div class="field">
             <label>Amount in Words</label>
-            <div class="words" id="amountWords">Ten Thousand Only</div>
+            <div class="words" id="amountWords">Amount in words will appear here</div>
           </div>
 
           <div class="field">
             <label for="date">Payment Date *</label>
-            <input id="date" type="text" value="24/06/2026" required onchange="el('displayDate').textContent=this.value">
+            <input id="date" type="text" placeholder="DD/MM/YYYY" required onchange="el('displayDate').textContent=this.value">
           </div>
 
           <div class="field">
             <label for="modeInput">Payment Mode *</label>
-            <input id="modeInput" value="UPI" required>
+            <input id="modeInput" type="text" placeholder="Cash / UPI / Card / Bank" required>
           </div>
 
           <div class="field">
             <label for="txn">TXN / UPI ID</label>
-            <input id="txn" value="617527291913">
+            <input id="txn" type="text" placeholder="Enter transaction reference (if applicable)">
           </div>
 
           <div class="field">
             <label for="stage">Installment Stage *</label>
-            <input id="stage" value="First Installment" required>
+            <input id="stage" type="text" placeholder="Enter installment stage" required>
           </div>
         </section>
       </div>
@@ -1014,8 +1042,8 @@ function numberWords(n) {
 function updateWords() {
   let raw = el('amount').value.replace(/,/g, '');
   let v = Number(raw);
-  if (!v || v <= 0) {
-    el('amountWords').textContent = 'Zero Rupees Only';
+  if (!raw.trim() || !Number.isFinite(v) || v <= 0) {
+    el('amountWords').textContent = 'Amount in words will appear here';
     return;
   }
   let rupees = Math.floor(v);
@@ -1123,15 +1151,21 @@ function updateSavedCount() {
 
 async function getBase64ImageFromURL(url) {
   return new Promise((resolve) => {
+    if (!url) return resolve(null);
     const img = new Image();
-    img.crossOrigin = 'Anonymous';
+    img.crossOrigin = 'anonymous';
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL('image/png'));
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      } catch (error) {
+        console.warn('Image could not be embedded in PDF:', error);
+        resolve(null);
+      }
     };
     img.onerror = () => resolve(null);
     img.src = url;
@@ -1189,12 +1223,22 @@ async function generateProfessionalPDF(itemData) {
   doc.line(col3X - 4, headerStartY + 2, col3X - 4, headerStartY + 22);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.5);
+  doc.setFontSize(6.2);
   doc.setTextColor(...colMuted);
-  doc.text('49, Gangadeeshwar Koil St,', col3X + col3Width - 2, headerStartY + 5, { align: 'right' });
-  doc.text('Purasawalkam, Chennai - 600084 📍', col3X + col3Width - 2, headerStartY + 9, { align: 'right' });
-  doc.text('+91 73558-596403 📞', col3X + col3Width - 2, headerStartY + 13, { align: 'right' });
-  doc.text('vaishnavi@alagappaarts.com ✉️', col3X + col3Width - 2, headerStartY + 17, { align: 'right' });
+  const contactRight = pageWidth - margin;
+  const contactWidth = 54;
+  const contactLines = [
+    '49, Gangadeeshwar Koil St,',
+    'Purasawalkam, Chennai - 600084',
+    '+91 73558-596403',
+    'vaishnavi@alagappaarts.com'
+  ];
+  let contactY = headerStartY + 5;
+  contactLines.forEach((line) => {
+    const wrapped = doc.splitTextToSize(line, contactWidth);
+    doc.text(wrapped, contactRight, contactY, { align: 'right', maxWidth: contactWidth });
+    contactY += wrapped.length * 3.1;
+  });
 
   currentY += 24;
 
@@ -1279,7 +1323,7 @@ async function generateProfessionalPDF(itemData) {
     doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
   };
 
-  addRowSmall(rightX, p2Y_adj, 'Amount Paid *', `₹ ${itemData.amount}`);
+  addRowSmall(rightX, p2Y_adj, 'Amount Paid *', `Rs. ${String(itemData.amount).replace(/,/g, '')}`);
   addRowSmall(rightX, p2Y_adj + rowGap2, 'Amount in Words', itemData.amountInWords);
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 2), 'Payment Date *', itemData.paymentDate);
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 3), 'Payment Mode *', itemData.paymentMode);
@@ -1357,29 +1401,35 @@ async function generateProfessionalPDF(itemData) {
 async function handlePrintReceiptWorkflow() {
   if (!validateReceipt()) return;
 
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert('PDF library could not be loaded. Please check your internet connection and try again. Your entered details have been kept.');
+    return;
+  }
+
   const normalizedPhone = validateAndNormalizePhone();
   if (!normalizedPhone) return;
 
   const data = receiptData(normalizedPhone);
   const saved = getSaved();
+  const existingIndex = saved.findIndex(r => r.receiptNo === data.receiptNo);
 
-  if (!saved.some(r => r.receiptNo === data.receiptNo)) {
-    saved.push(data);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-      updateSavedCount();
-      renderLedger();
-    } catch (e) {
-      alert('Failed to save receipt history to browser storage.');
-      return;
-    }
+  try {
+    if (existingIndex === -1) saved.push(data);
+    else saved[existingIndex] = data;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    updateSavedCount();
+    renderLedger();
+  } catch (storageError) {
+    console.error('Receipt save error:', storageError);
+    alert('Could not save the receipt history. Please check browser storage and try again. Your entered details have been kept.');
+    return;
   }
 
   try {
     await generateProfessionalPDF(data);
-  } catch (err) {
-    console.error('PDF Generation Error:', err);
-    alert('PDF generation encountered an error. Your receipt record has been saved safely.');
+  } catch (pdfError) {
+    console.error('PDF Generation Error:', pdfError);
+    alert('The receipt was saved to Student Ledger, but PDF download failed. Please use Download Receipt in the ledger to try again. Your entered details have been kept.');
   }
 }
 
@@ -1502,6 +1552,21 @@ function sendWhatsApp() {
   window.open(url, '_blank');
 }
 
+function formatTodayForReceipt(date = new Date()) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}/${date.getFullYear()}`;
+}
+
+function initializeNewReceipt() {
+  const today = formatTodayForReceipt();
+  if (el('date') && !el('date').value) el('date').value = today;
+  if (el('displayDate')) el('displayDate').textContent = today;
+  if (el('receiptNo')) el('receiptNo').textContent = makeReceiptNo();
+  if (el('genDateTime')) el('genDateTime').textContent = new Date().toLocaleString('en-IN');
+}
+
+initializeNewReceipt();
 updateSavedCount();
 renderLedger();
 </script>
