@@ -23,11 +23,12 @@
   --bronze-dark: #3d2c1e;
   --bronze-med: #523b28;
   --bronze-light: #7a5d43;
-  --champagne-gold: #b89346;
+  --champagne-gold: #c9a23f;
   --champagne-gold-light: #e6cf9c;
   --champagne-glow: #f9f4ea;
   --espresso: #241b16;
   --espresso-muted: #59473d;
+  --navy-primary: #123B68;
   --line-gold: #d8c4a0;
   --line-gold-light: #ece2cd;
   --accent-green: #245840;
@@ -133,7 +134,7 @@ body {
 
 .btn-secondary {
   background: var(--champagne-gold);
-  color: var(--bronze-dark);
+  color: #ffffff;
   border: 1px solid var(--champagne-gold);
   font-weight: 700;
 }
@@ -186,30 +187,30 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 5px;
-  background: linear-gradient(90deg, var(--bronze-dark), var(--champagne-gold), var(--bronze-dark));
+  background: linear-gradient(90deg, var(--navy-primary), var(--champagne-gold), var(--navy-primary));
 }
 
-/* Balanced Grid Header Layout */
+/* Balanced Three-Column Header Layout matching web preview */
 .receipt-header {
   display: grid;
-  grid-template-columns: 170px 1fr 130px;
+  grid-template-columns: 140px 1fr 120px;
   align-items: center;
   gap: 20px;
-  padding: 30px 36px;
+  padding: 28px 36px;
   border-bottom: 1px solid var(--line-gold-light);
   background: linear-gradient(180deg, #fffdfa 0%, var(--paper-white) 100%);
 }
 
 .academy-logo {
-  width: 145px;
-  height: 90px;
+  width: 130px;
+  height: 85px;
   object-fit: contain;
   justify-self: center;
 }
 
 .university-logo {
-  width: 100px;
-  height: 90px;
+  width: 95px;
+  height: 80px;
   object-fit: contain;
   justify-self: center;
 }
@@ -220,38 +221,38 @@ body {
 
 .academy-details h2 {
   font-family: 'Playfair Display', serif;
-  letter-spacing: 3px;
-  color: var(--bronze-dark);
-  font-size: 32px;
+  letter-spacing: 2px;
+  color: var(--navy-primary);
+  font-size: 30px;
   margin: 0;
   font-weight: 800;
   line-height: 1.15;
 }
 
 .academy-details .academy {
-  font-size: 17px;
-  letter-spacing: 2.5px;
+  font-size: 16px;
+  letter-spacing: 2px;
   font-weight: 700;
-  color: var(--bronze-med);
-  margin: 6px 0 10px;
+  color: var(--champagne-gold);
+  margin: 5px 0 8px;
   text-transform: uppercase;
   font-family: 'Cormorant Garamond', serif;
 }
 
 .academy-details .courses {
-  font-size: 12px;
-  letter-spacing: 1.8px;
-  color: var(--champagne-gold);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--espresso-muted);
   font-weight: 700;
   text-transform: uppercase;
   font-family: 'Lato', sans-serif;
 }
 
 .academy-details .contact {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--espresso-muted);
-  margin-top: 10px;
-  line-height: 1.6;
+  margin-top: 8px;
+  line-height: 1.5;
   font-family: 'Lato', sans-serif;
 }
 
@@ -259,7 +260,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 12px;
+  margin: 0 auto 10px;
   width: 82%;
   gap: 12px;
 }
@@ -288,7 +289,7 @@ body {
 
 .receipt-head h3 {
   margin: 0;
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
   font-family: 'Playfair Display', serif;
   font-size: 21px;
   letter-spacing: 2px;
@@ -299,7 +300,7 @@ body {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.5px;
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
   background: var(--champagne-glow);
   border: 1px solid var(--line-gold);
   padding: 6px 14px;
@@ -318,7 +319,7 @@ body {
 }
 
 .receipt-no strong {
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
   font-family: monospace;
   font-size: 13px;
 }
@@ -349,7 +350,7 @@ body {
   font-size: 14px;
   letter-spacing: 0.8px;
   font-weight: 700;
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
   text-transform: uppercase;
   font-family: 'Playfair Display', serif;
 }
@@ -397,7 +398,7 @@ input, select {
 
 input:focus, select:focus {
   border-bottom: 2.5px solid var(--champagne-gold);
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
 }
 
 input::placeholder {
@@ -476,7 +477,7 @@ select option {
 
 .radio-row input {
   width: auto;
-  accent-color: var(--bronze-dark);
+  accent-color: var(--navy-primary);
   cursor: pointer;
 }
 
@@ -522,7 +523,7 @@ select option {
 }
 
 .footer-info strong {
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
 }
 
 .signature-block {
@@ -556,7 +557,7 @@ select option {
 
 .sign-line strong {
   display: block;
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
   font-weight: 700;
   margin-top: 2px;
 }
@@ -593,7 +594,7 @@ select option {
 .ledger-header h2 {
   font-family: 'Playfair Display', serif;
   font-size: 20px;
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
   margin: 0;
   font-weight: 700;
 }
@@ -652,7 +653,7 @@ select option {
 
 .ledger-meta .student-name {
   font-weight: 700;
-  color: var(--bronze-dark);
+  color: var(--navy-primary);
 }
 
 .ledger-meta .dash {
@@ -729,7 +730,7 @@ select option {
 <body>
 
 <div class="wrap">
-  <!-- Topbar Info Only (Action buttons moved down to Student Ledger) -->
+  <!-- Topbar Info Only -->
   <div class="topbar">
     <div class="topbar-info">
       <h1>Fee Receipt Generator</h1>
@@ -744,14 +745,14 @@ select option {
   <!-- Main Printable Receipt Card -->
   <main class="sheet">
     <header class="receipt-header">
-      <!-- Left Academy Logo -->
+      <!-- Left Academy Logo (Prominent) -->
       <img id="logoLeftImg" src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Logo.png" 
            class="academy-logo" 
            alt="Academy Logo"
            crossorigin="anonymous"
            onerror="this.onerror=null; this.src='Logo.png';">
 
-      <!-- Center Academy Details Block -->
+      <!-- Center Academy Details Block (Strongest Visual Emphasis) -->
       <div class="academy-details">
         <h2>ALAGAPPA</h2>
         <div class="academy">PERFORMING ARTS ACADEMY</div>
@@ -760,14 +761,14 @@ select option {
           <div class="diamond"></div>
           <div class="line"></div>
         </div>
-        <div class="courses">BHARATHANATYAM &nbsp;•&nbsp; CARNATIC VOCAL &nbsp;•&nbsp; NATTUVANGAM</div>
+        <div class="courses">BHARATHANATYAM &nbsp;|&nbsp; CARNATIC VOCAL &nbsp;|&nbsp; NATTUVANGAM</div>
         <div class="contact">
           49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084<br>
-          Vaishnavi@alagappaarts.com
+          +91 73558-596403 &nbsp;|&nbsp; Vaishnavi@alagappaarts.com
         </div>
       </div>
 
-      <!-- Right University Logo -->
+      <!-- Right University Logo (Slightly smaller, balanced proportions) -->
       <img id="logoRightImg" src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Alagappa_University_Logo.png" 
            class="university-logo" 
            alt="Alagappa University Logo"
@@ -909,7 +910,7 @@ select option {
 
   <!-- Student Ledger Section -->
   <section class="ledger-section">
-    <!-- Action buttons moved here, immediately above Student Ledger heading -->
+    <!-- Action buttons bar placed immediately above Student Ledger heading -->
     <div class="ledger-actions-bar">
       <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
         <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
@@ -1140,7 +1141,7 @@ async function getBase64ImageFromURL(url) {
   });
 }
 
-// Professional Vector PDF Generator matching reference design
+// Premium PDF Generator featuring precise logo hierarchy (Academy Logo prominent on left, Center Academy branding with strongest emphasis, University logo slightly smaller on right)
 async function generateProfessionalPDF(itemData) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -1149,70 +1150,96 @@ async function generateProfessionalPDF(itemData) {
   const margin = 15;
   const contentWidth = pageWidth - (margin * 2);
 
-  const colBronzeDark = [61, 44, 30];
-  const colBronzeMed = [82, 59, 40];
-  const colGold = [184, 147, 70];
-  const colEspresso = [36, 27, 22];
+  const colNavy = [18, 59, 104];       // #123B68
+  const colGold = [201, 162, 63];      // #C9A23F
+  const colEspresso = [36, 27, 22];    // #241B16
+  const colMuted = [89, 71, 61];       // #59473D
   const colPanelBg = [249, 244, 234];
   const colPanelBorder = [216, 196, 160];
 
   let currentY = 15;
 
-  doc.setFillColor(61, 44, 30);
+  // Top Accent Bar
+  doc.setFillColor(...colNavy);
   doc.rect(margin, currentY, contentWidth, 2, 'F');
   currentY += 6;
 
+  // Load Images
   const leftLogoBase64 = await getBase64ImageFromURL(el('logoLeftImg').src);
   const rightLogoBase64 = await getBase64ImageFromURL(el('logoRightImg').src);
   const sigBase64 = await getBase64ImageFromURL(el('signatureImg').src);
 
+  // 3-Column Header Layout with strict Logo Size & Branding Hierarchy
+  // Left Column (Academy Logo - slightly larger & prominent): width 40mm
+  // Center Column (Academy Name - strongest emphasis): width 78mm
+  // Right Column (University Logo - slightly smaller than academy logo): width 60mm
+  const col1X = margin;
+  const col1Width = 40;
+  const col2X = margin + 42;
+  const col2Width = 76;
+  const col3X = margin + 120;
+  const col3Width = 60;
+
+  let headerStartY = currentY;
+
+  // 1. LEFT: Academy Logo (Prominent)
   if (leftLogoBase64) {
-    doc.addImage(leftLogoBase64, 'PNG', margin, currentY, 26, 16);
-  }
-  if (rightLogoBase64) {
-    doc.addImage(rightLogoBase64, 'PNG', pageWidth - margin - 22, currentY + 1, 22, 14);
+    doc.addImage(leftLogoBase64, 'PNG', col1X + 2, headerStartY + 1, 34, 23);
   }
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.setTextColor(...colBronzeDark);
-  doc.text('ALAGAPPA', pageWidth / 2, currentY + 4, { align: 'center' });
+  // 2. CENTRE: Academy Branding (Strongest visual emphasis)
+  doc.setFont('times', 'bold');
+  doc.setFontSize(16.5);
+  doc.setTextColor(...colNavy);
+  doc.text('ALAGAPPA', col2X + (col2Width / 2), headerStartY + 5, { align: 'center' });
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(...colBronzeMed);
-  doc.text('PERFORMING ARTS ACADEMY', pageWidth / 2, currentY + 10, { align: 'center' });
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
+  doc.setFont('times', 'bold');
+  doc.setFontSize(11);
   doc.setTextColor(...colGold);
-  doc.text('BHARATHANATYAM   •   CARNATIC VOCAL   •   NATTUVANGAM', pageWidth / 2, currentY + 15, { align: 'center' });
+  doc.text('PERFORMING ARTS ACADEMY', col2X + (col2Width / 2), headerStartY + 12, { align: 'center' });
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(...colMuted);
+  doc.text('BHARATHANATYAM   |   CARNATIC VOCAL   |   NATTUVANGAM', col2X + (col2Width / 2), headerStartY + 17.5, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
-  doc.setTextColor(89, 71, 61);
-  doc.text('49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084  |  Vaishnavi@alagappaarts.com', pageWidth / 2, currentY + 20, { align: 'center' });
+  doc.setTextColor(...colMuted);
+  doc.text('49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084', col2X + (col2Width / 2), headerStartY + 22, { align: 'center' });
+  doc.text('+91 73558-596403   |   vaishnavi@alagappaarts.com', col2X + (col2Width / 2), headerStartY + 26.5, { align: 'center' });
 
-  currentY += 24;
+  // 3. RIGHT: University Logo (Slightly smaller, balanced proportions)
+  if (rightLogoBase64) {
+    doc.addImage(rightLogoBase64, 'PNG', col3X + 18, headerStartY + 3, 24, 20);
+  }
 
+  currentY += 32;
+
+  // Refined Gold Horizontal Divider below the entire header
   doc.setDrawColor(...colGold);
-  doc.setLineWidth(0.5);
-  doc.line(margin + 20, currentY, pageWidth - margin - 20, currentY);
+  doc.setLineWidth(0.6);
+  doc.line(margin, currentY, pageWidth - margin, currentY);
   currentY += 8;
 
+  // Fee Receipt Title (Centre-aligned, bold navy blue)
+  doc.setFont('times', 'bold');
+  doc.setFontSize(15);
+  doc.setTextColor(...colNavy);
+  doc.text('FEE RECEIPT', pageWidth / 2, currentY, { align: 'center' });
+
+  currentY += 6;
+
+  // Receipt Number on left, Receipt Date on right, aligned neatly
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(...colBronzeDark);
-  doc.text('FEE RECEIPT', margin, currentY);
-
-  doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.setTextColor(89, 71, 61);
-  doc.text(`Receipt No: ${itemData.receiptNo}`, pageWidth - margin, currentY - 2, { align: 'right' });
-  doc.text(`Payment Date: ${itemData.paymentDate}`, pageWidth - margin, currentY + 3, { align: 'right' });
+  doc.setTextColor(...colMuted);
+  doc.text(`Receipt No: ${itemData.receiptNo}`, margin, currentY);
+  doc.text(`Payment Date: ${itemData.paymentDate}`, pageWidth - margin, currentY, { align: 'right' });
 
-  currentY += 10;
+  currentY += 6;
 
+  // Two Side-by-Side Panels for Student & Payment Info
   const panelWidth = (contentWidth - 6) / 2;
   const panelHeight = 54;
   let leftX = margin;
@@ -1224,9 +1251,9 @@ async function generateProfessionalPDF(itemData) {
   doc.setLineWidth(0.3);
   doc.roundedRect(leftX, currentY, panelWidth, panelHeight, 2, 2, 'FD');
 
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('times', 'bold');
   doc.setFontSize(9.5);
-  doc.setTextColor(...colBronzeDark);
+  doc.setTextColor(...colNavy);
   doc.text('STUDENT & COURSE DETAILS', leftX + 6, currentY + 8);
 
   doc.setDrawColor(...colPanelBorder);
@@ -1238,7 +1265,7 @@ async function generateProfessionalPDF(itemData) {
   const addRow = (x, y, label, val) => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8.5);
-    doc.setTextColor(89, 71, 61);
+    doc.setTextColor(...colMuted);
     doc.text(label, x + 6, y);
 
     doc.setFont('helvetica', 'normal');
@@ -1257,9 +1284,9 @@ async function generateProfessionalPDF(itemData) {
   doc.setDrawColor(...colPanelBorder);
   doc.roundedRect(rightX, currentY, panelWidth, panelHeight, 2, 2, 'FD');
 
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('times', 'bold');
   doc.setFontSize(9.5);
-  doc.setTextColor(...colBronzeDark);
+  doc.setTextColor(...colNavy);
   doc.text('PAYMENT INFORMATION', rightX + 6, currentY + 8);
 
   doc.line(rightX + 6, currentY + 11, rightX + panelWidth - 6, currentY + 11);
@@ -1305,7 +1332,7 @@ async function generateProfessionalPDF(itemData) {
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.setTextColor(89, 71, 61);
+  doc.setTextColor(...colMuted);
   doc.text('Thank you for your payment.', margin, currentY + 4);
   doc.text('For billing queries, contact Vaishnavi@alagappaarts.com', margin, currentY + 9);
 
@@ -1316,13 +1343,13 @@ async function generateProfessionalPDF(itemData) {
   doc.setDrawColor(122, 93, 67);
   doc.line(sigX, currentY + 16, pageWidth - margin, currentY + 16);
 
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('times', 'bold');
   doc.setFontSize(7.5);
-  doc.setTextColor(...colBronzeDark);
+  doc.setTextColor(...colNavy);
   doc.text('Authorized Signature', sigX + 25, currentY + 20, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.setTextColor(89, 71, 61);
+  doc.setTextColor(...colMuted);
   doc.text('Alagappa Performing Arts Academy', sigX + 25, currentY + 24, { align: 'center' });
 
   doc.save(`${itemData.receiptNo}.pdf`);
@@ -1399,8 +1426,7 @@ function renderLedger() {
     return;
   }
 
-  container.innerHTML = filtered.map((item, index) => {
-    // Find exact index in main saved array to ensure correct download mapping even when filtered
+  container.innerHTML = filtered.map((item) => {
     const originalIndex = saved.findIndex(r => r.receiptNo === item.receiptNo);
     return `
       <div class="ledger-row">
