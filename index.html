@@ -33,6 +33,8 @@
   --accent-green: #245840;
   --accent-green-bg: #ebf5f0;
   --accent-green-border: #9ed1b7;
+  --danger-red: #991b1b;
+  --danger-red-hover: #7f1d1d;
   --shadow-soft: 0 10px 30px rgba(61, 44, 30, 0.08);
   --shadow-card: 0 4px 14px rgba(61, 44, 30, 0.05);
 }
@@ -150,6 +152,17 @@ body {
 
 .btn-whatsapp:hover {
   background: #1ebe5d;
+}
+
+.btn-danger {
+  background: var(--danger-red);
+  color: #ffffff;
+  border: 1px solid var(--danger-red);
+  font-weight: 700;
+}
+
+.btn-danger:hover {
+  background: var(--danger-red-hover);
 }
 
 .btn-small {
@@ -558,6 +571,14 @@ select option {
   padding: 26px 36px;
 }
 
+/* Action buttons bar placed immediately above Student Ledger heading */
+.ledger-actions-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
 .ledger-header {
   display: flex;
   justify-content: space-between;
@@ -708,7 +729,7 @@ select option {
 <body>
 
 <div class="wrap">
-  <!-- Top Action Toolbar -->
+  <!-- Topbar Info Only (Action buttons moved down to Student Ledger) -->
   <div class="topbar">
     <div class="topbar-info">
       <h1>Fee Receipt Generator</h1>
@@ -717,21 +738,6 @@ select option {
         <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
         <span id="savedCount">Saved receipts: 0</span>
       </div>
-    </div>
-    
-    <div class="actions">
-      <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
-        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-        Print Receipt
-      </button>
-      <button class="btn btn-secondary" type="button" onclick="downloadExcel()">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-        Download Excel
-      </button>
-      <button class="btn btn-whatsapp" type="button" onclick="sendWhatsApp()">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-        WhatsApp
-      </button>
     </div>
   </div>
 
@@ -903,10 +909,31 @@ select option {
 
   <!-- Student Ledger Section -->
   <section class="ledger-section">
+    <!-- Action buttons moved here, immediately above Student Ledger heading -->
+    <div class="ledger-actions-bar">
+      <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print Receipt
+      </button>
+      <button class="btn btn-secondary" type="button" onclick="downloadExcel()">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        Download Excel
+      </button>
+      <button class="btn btn-whatsapp" type="button" onclick="sendWhatsApp()">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        WhatsApp
+      </button>
+    </div>
+
     <div class="ledger-header">
       <h2>Student Ledger</h2>
-      <div class="ledger-search">
-        <input type="text" id="ledgerSearchInput" placeholder="Search student name or phone..." oninput="renderLedger()">
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <div class="ledger-search">
+          <input type="text" id="ledgerSearchInput" placeholder="Search student name or phone..." oninput="renderLedger()">
+        </div>
+        <button class="btn btn-danger btn-small" type="button" onclick="clearAllRecords()">
+          Clear All Records
+        </button>
       </div>
     </div>
     <div id="ledgerList" class="ledger-list">
@@ -1118,12 +1145,10 @@ async function generateProfessionalPDF(itemData) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-  // A4 dimensions: 210mm wide x 297mm high
   const pageWidth = 210;
   const margin = 15;
   const contentWidth = pageWidth - (margin * 2);
 
-  // Colors
   const colBronzeDark = [61, 44, 30];
   const colBronzeMed = [82, 59, 40];
   const colGold = [184, 147, 70];
@@ -1133,12 +1158,10 @@ async function generateProfessionalPDF(itemData) {
 
   let currentY = 15;
 
-  // Top Accent Bar
   doc.setFillColor(61, 44, 30);
   doc.rect(margin, currentY, contentWidth, 2, 'F');
   currentY += 6;
 
-  // Header Logos (Load base64)
   const leftLogoBase64 = await getBase64ImageFromURL(el('logoLeftImg').src);
   const rightLogoBase64 = await getBase64ImageFromURL(el('logoRightImg').src);
   const sigBase64 = await getBase64ImageFromURL(el('signatureImg').src);
@@ -1150,7 +1173,6 @@ async function generateProfessionalPDF(itemData) {
     doc.addImage(rightLogoBase64, 'PNG', pageWidth - margin - 22, currentY + 1, 22, 14);
   }
 
-  // Header Center Text
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
   doc.setTextColor(...colBronzeDark);
@@ -1173,13 +1195,11 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += 24;
 
-  // Gold Divider Line
   doc.setDrawColor(...colGold);
   doc.setLineWidth(0.5);
   doc.line(margin + 20, currentY, pageWidth - margin - 20, currentY);
   currentY += 8;
 
-  // Subheader: Fee Receipt & Receipt No / Date
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(...colBronzeDark);
@@ -1193,7 +1213,6 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += 10;
 
-  // Two Side-by-Side Panels for Student & Payment Info
   const panelWidth = (contentWidth - 6) / 2;
   const panelHeight = 54;
   let leftX = margin;
@@ -1270,7 +1289,6 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += 16;
 
-  // Official System Notice & Security Gateway info
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(7.5);
   doc.setTextColor(113, 128, 150);
@@ -1280,7 +1298,6 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += 10;
 
-  // Footer & Authorized Signature
   doc.setDrawColor(...colPanelBorder);
   doc.setLineWidth(0.3);
   doc.line(margin, currentY, pageWidth - margin, currentY);
@@ -1292,7 +1309,6 @@ async function generateProfessionalPDF(itemData) {
   doc.text('Thank you for your payment.', margin, currentY + 4);
   doc.text('For billing queries, contact Vaishnavi@alagappaarts.com', margin, currentY + 9);
 
-  // Signature Block on Right
   const sigX = pageWidth - margin - 50;
   if (sigBase64) {
     doc.addImage(sigBase64, 'PNG', sigX + 5, currentY - 2, 40, 16);
@@ -1309,7 +1325,6 @@ async function generateProfessionalPDF(itemData) {
   doc.setTextColor(89, 71, 61);
   doc.text('Alagappa Performing Arts Academy', sigX + 25, currentY + 24, { align: 'center' });
 
-  // Save PDF
   doc.save(`${itemData.receiptNo}.pdf`);
 }
 
@@ -1323,7 +1338,6 @@ async function handlePrintReceiptWorkflow() {
   const data = receiptData(normalizedPhone);
   const saved = getSaved();
 
-  // Prevent duplicate receipt entries in history
   if (!saved.some(r => r.receiptNo === data.receiptNo)) {
     saved.push(data);
     try {
@@ -1336,7 +1350,6 @@ async function handlePrintReceiptWorkflow() {
     }
   }
 
-  // Generate and Automatically Download Professional PDF
   try {
     await generateProfessionalPDF(data);
     clearFormAndResetReceipt();
@@ -1352,6 +1365,21 @@ function clearFormAndResetReceipt() {
   el('date').value = new Date().toISOString().slice(0, 10);
   el('receiptNo').textContent = makeReceiptNo();
   document.querySelectorAll('.field-error').forEach(e => e.classList.remove('field-error'));
+}
+
+// Clear All Records Functionality with Confirmation & Success Alert
+function clearAllRecords() {
+  const confirmed = confirm("Are you sure you want to delete all saved student receipt records? This action cannot be undone.");
+  if (confirmed) {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      updateSavedCount();
+      renderLedger();
+      alert("All student receipt records have been cleared successfully.");
+    } catch (e) {
+      alert("Failed to clear receipt records.");
+    }
+  }
 }
 
 function renderLedger() {
@@ -1371,25 +1399,28 @@ function renderLedger() {
     return;
   }
 
-  container.innerHTML = filtered.map((item, index) => `
-    <div class="ledger-row">
-      <div class="ledger-meta">
-        <span class="student-name">${escapeHtml(item.studentName)}</span>
-        <span class="dash">—</span>
-        <span class="receipt-num">Receipt No. ${escapeHtml(item.receiptNo)}</span>
+  container.innerHTML = filtered.map((item, index) => {
+    // Find exact index in main saved array to ensure correct download mapping even when filtered
+    const originalIndex = saved.findIndex(r => r.receiptNo === item.receiptNo);
+    return `
+      <div class="ledger-row">
+        <div class="ledger-meta">
+          <span class="student-name">${escapeHtml(item.studentName)}</span>
+          <span class="dash">—</span>
+          <span class="receipt-num">Receipt No. ${escapeHtml(item.receiptNo)}</span>
+        </div>
+        <button class="btn btn-primary btn-small" type="button" onclick="downloadSpecificPDF(${originalIndex})">
+          Download Receipt
+        </button>
       </div>
-      <button class="btn btn-primary btn-small" type="button" onclick="downloadSpecificPDF(${index})">
-        Download Receipt
-      </button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function escapeHtml(str) {
   return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// Download a specific receipt from the Ledger by index
 async function downloadSpecificPDF(index) {
   const saved = getSaved();
   const item = saved[index];
