@@ -406,6 +406,12 @@ select option {
   padding: 6px;
 }
 
+/* Highlight class for invalid fields */
+.field-error {
+  border-bottom: 2px solid #b91c1c !important;
+  background-color: rgba(185, 28, 28, 0.04) !important;
+}
+
 /* Amount Paid Highlight Box */
 .amount-wrap {
   display: flex;
@@ -714,7 +720,7 @@ select option {
     </div>
     
     <div class="actions">
-      <button class="btn btn-primary" type="button" onclick="printAndSaveReceipt()">
+      <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
         <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
         Print Receipt
       </button>
@@ -977,20 +983,97 @@ function getMode() {
   return document.querySelector('input[name="mode"]:checked')?.value || 'CASH';
 }
 
+// Strict Indian Mobile Number Validation (+91 followed by exactly 10 digits)
+function validateAndNormalizePhone() {
+  const phoneInput = el('phone');
+  let raw = phoneInput.value.trim();
+
+  // Clear previous error highlight
+  phoneInput.classList.remove('field-error');
+
+  if (!raw) {
+    alert("Please enter the student's mobile number.");
+    phoneInput.classList.add('field-error');
+    phoneInput.focus();
+    return null;
+  }
+
+  // Remove spaces, hyphens, and parentheses for analysis
+  let cleaned = raw.replace(/[\s\-\(\)]/g, '');
+
+  // Check country code presence (+91 or 91)
+  let digitsOnly = cleaned.replace(/\D/g, '');
+
+  if (!cleaned.startsWith('+91') && !cleaned.startsWith('91') && digitsOnly.length === 10) {
+    // Missing +91 country code when 10 digits are provided
+    alert("Please enter a valid Indian mobile number with +91 country code.");
+    phoneInput.classList.add('field-error');
+    phoneInput.focus();
+    return null;
+  }
+
+  let normalized = '';
+  if (cleaned.startsWith('+91')) {
+    let sub = cleaned.slice(3);
+    if (!/^\d{10}$/.test(sub)) {
+      alert("Invalid phone number. Please enter +91 followed by 10 digits.");
+      phoneInput.classList.add('field-error');
+      phoneInput.focus();
+      return null;
+    }
+    normalized = '+91' + sub;
+  } else if (cleaned.startsWith('91') && cleaned.length === 12) {
+    let sub = cleaned.slice(2);
+    if (!/^\d{10}$/.test(sub)) {
+      alert("Invalid phone number. Please enter +91 followed by 10 digits.");
+      phoneInput.classList.add('field-error');
+      phoneInput.focus();
+      return null;
+    }
+    normalized = '+91' + sub;
+  } else if (digitsOnly.length === 10) {
+    alert("Please enter a valid Indian mobile number with +91 country code.");
+    phoneInput.classList.add('field-error');
+    phoneInput.focus();
+    return null;
+  } else {
+    alert("Invalid phone number. Please enter +91 followed by 10 digits.");
+    phoneInput.classList.add('field-error');
+    phoneInput.focus();
+    return null;
+  }
+
+  return normalized;
+}
+
 function validateReceipt() {
-  if (!el('feeForm').reportValidity()) return false;
-  if (Number(el('amount').value) <= 0) {
-    alert('Please enter a payment amount greater than zero.');
+  // Clear any existing error highlights
+  document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+
+  if (!el('feeForm').reportValidity()) {
     return false;
   }
+
+  if (Number(el('amount').value) <= 0) {
+    alert('Please enter a payment amount greater than zero.');
+    el('amount').classList.add('field-error');
+    el('amount').focus();
+    return false;
+  }
+
+  const normalizedPhone = validateAndNormalizePhone();
+  if (!normalizedPhone) {
+    return false;
+  }
+
   return true;
 }
 
-function receiptData() {
+function receiptData(normalizedPhone) {
   return {
     receiptNo: el('receiptNo').textContent,
     studentName: el('student').value.trim(),
-    phone: el('phone').value.trim(),
+    phone: normalizedPhone,
     course: el('course').value,
     academicYear: el('year').value,
     amount: Number(el('amount').value),
@@ -1015,13 +1098,18 @@ function updateSavedCount() {
   el('savedCount').textContent = 'Saved receipts: ' + getSaved().length;
 }
 
-// Automatically save receipt and trigger print
-function printAndSaveReceipt() {
+// Complete Print Receipt Workflow: Validate -> Save -> Download PDF -> Clear Form -> Next Receipt No
+async function handlePrintReceiptWorkflow() {
+  // 1. Validate all details and phone number
   if (!validateReceipt()) return;
-  const data = receiptData();
+
+  const normalizedPhone = validateAndNormalizePhone();
+  if (!normalizedPhone) return;
+
+  const data = receiptData(normalizedPhone);
   const saved = getSaved();
-  
-  // Prevent duplicate receipt entries
+
+  // Prevent duplicate receipt entries in history
   if (!saved.some(r => r.receiptNo === data.receiptNo)) {
     saved.push(data);
     try {
@@ -1029,11 +1117,44 @@ function printAndSaveReceipt() {
       updateSavedCount();
       renderLedger();
     } catch (e) {
-      console.error('LocalStorage error:', e);
+      alert('Failed to save receipt history to browser storage.');
+      return;
     }
   }
-  
-  window.print();
+
+  // 2. Generate and Automatically Download PDF
+  if (!window.html2canvas || !window.jspdf) {
+    alert('PDF export libraries are loading. Please check your connection and try again.');
+    return;
+  }
+
+  try {
+    const canvas = await html2canvas(document.querySelector('.sheet'), { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save((data.receiptNo || 'APAA-Receipt') + '.pdf');
+
+    // 3. Automatically Clear Form & Generate Next Unique Receipt Number upon successful PDF download
+    clearFormAndResetReceipt();
+
+  } catch (err) {
+    console.error('PDF Generation Error:', err);
+    alert('PDF generation encountered an error. Your receipt record has been saved safely.');
+  }
+}
+
+function clearFormAndResetReceipt() {
+  el('feeForm').reset();
+  el('amountWords').textContent = 'Zero Rupees Only';
+  el('date').value = new Date().toISOString().slice(0, 10);
+  el('receiptNo').textContent = makeReceiptNo();
+  document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
 }
 
 function renderLedger() {
@@ -1140,7 +1261,7 @@ async function downloadSpecificPDF(index) {
 function downloadExcel() {
   const rows = getSaved();
   if (!rows.length) {
-    alert('No saved receipts found. Please print/save a receipt first.');
+    alert('No saved receipts found. Please generate a receipt first.');
     return;
   }
   
@@ -1183,16 +1304,14 @@ function downloadExcel() {
 
 // WhatsApp Sharing
 function sendWhatsApp() {
-  if (!validateReceipt()) return;
-  const name = el('student').value.trim();
-  const amt = el('amount').value.trim();
+  const name = el('student').value.trim() || '[Student Name]';
+  const amt = el('amount').value.trim() || '0';
   const rcpt = el('receiptNo').textContent;
   const phone = el('phone').value.trim();
   
   const msg = `Dear ${name},\n\nThank you for your payment of ₹${amt} to Alagappa Performing Arts Academy.\nReceipt No: ${rcpt}\n\nRegards,\nAlagappa Performing Arts Academy`;
   const encoded = encodeURIComponent(msg);
   
-  // Clean phone number for WhatsApp URL format if provided
   let cleanPhone = phone.replace(/[^0-9]/g, '');
   if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
   
