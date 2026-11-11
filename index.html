@@ -24,7 +24,7 @@
   --border-color: #E3E9EF;
   --notice-bg: #FFFCF3;
   --espresso: #241b16;
-  --espresso-muted: #59473d;
+  --espresso-muted: #627282;
   --accent-green: #245840;
   --accent-green-bg: #ebf5f0;
   --accent-green-border: #9ed1b7;
@@ -39,12 +39,12 @@ body {
   background-color: var(--bg-cream);
   font-family: 'Lato', Arial, sans-serif;
   color: var(--espresso);
-  padding: 16px 12px;
+  padding: 24px 16px;
   -webkit-font-smoothing: antialiased;
 }
 
 .wrap {
-  max-width: 900px;
+  max-width: 880px;
   margin: 0 auto;
   width: 100%;
 }
@@ -54,7 +54,7 @@ body {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .saved-badge {
@@ -70,17 +70,17 @@ body {
   border-radius: 20px;
 }
 
-/* Screen-Fit Receipt Sheet Container */
+/* Exact Reference Receipt Sheet Container */
 .sheet {
   background: var(--paper-white);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-receipt);
-  padding: 24px 28px 20px;
+  padding: 32px 38px 24px;
   position: relative;
   width: 100%;
 }
 
-/* Header – Three-Column Arrangement (Academy Logo Left, Center Branding, Right Contact without University Logo) */
+/* Header Arrangement */
 .receipt-header {
   display: grid;
   grid-template-columns: 140px 1fr 220px;
@@ -129,7 +129,6 @@ body {
   text-transform: uppercase;
 }
 
-/* Right Column */
 .header-right {
   text-align: right;
   font-size: 10px;
@@ -149,7 +148,6 @@ body {
   background: var(--border-color);
 }
 
-/* Thin Gold Horizontal Line */
 .gold-divider {
   height: 1.5px;
   background: var(--gold-accent);
@@ -159,15 +157,15 @@ body {
 /* Fee Receipt Heading */
 .receipt-title-block {
   text-align: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .receipt-title-block h3 {
   margin: 0 0 6px 0;
   color: var(--navy-primary);
   font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  letter-spacing: 2px;
+  font-size: 20px;
+  letter-spacing: 2.5px;
   font-weight: 800;
 }
 
@@ -175,77 +173,93 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--espresso-muted);
   font-weight: 600;
-  padding: 0 2px;
+  padding: 0 4px;
 }
 
 .receipt-meta-row strong {
   color: var(--navy-primary);
   font-family: monospace;
-  font-size: 12px;
+  font-size: 12.5px;
 }
 
-/* Two Equal-Width Panels Side by Side */
+/* Two Information Panels - EXACT MATCH TO IMAGE */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 16px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+/* Watermark Background inside Grid area */
+.form-grid::before {
+  content: "APAA";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Playfair Display', serif;
+  font-size: 110px;
+  font-weight: 800;
+  color: rgba(18, 59, 104, 0.025);
+  pointer-events: none;
+  letter-spacing: 6px;
+  z-index: 0;
 }
 
 .panel {
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 14px;
+  border-radius: 6px;
+  padding: 18px 20px;
   background: var(--paper-white);
+  position: relative;
+  z-index: 1;
 }
 
 .panel-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 6px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 11px;
-  letter-spacing: 0.6px;
-  font-weight: 700;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 11.5px;
+  letter-spacing: 0.8px;
+  font-weight: 800;
   color: var(--navy-primary);
   text-transform: uppercase;
-  font-family: 'Playfair Display', serif;
 }
 
 .field {
   display: grid;
-  grid-template-columns: 42% 58%;
+  grid-template-columns: 45% 55%;
   align-items: center;
   gap: 8px;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   min-height: 24px;
 }
 
 .field:last-child { margin-bottom: 0; }
 
 label {
-  font-size: 10.5px;
-  color: var(--espresso);
+  font-size: 11px;
+  color: #718096;
   font-weight: 600;
 }
-
-.required { color: #b91c1c; }
 
 input, select {
   width: 100%;
   border: 0;
-  border-bottom: 1px solid var(--border-color);
-  padding: 3px 2px;
+  border-bottom: 1px solid transparent;
+  padding: 2px 0;
   background: transparent;
-  color: var(--espresso);
+  color: #2d3748;
   font-family: 'Lato', Arial, sans-serif;
-  font-weight: 600;
-  font-size: 11px;
+  font-weight: 700;
+  font-size: 11.5px;
   outline: none;
   text-align: right;
   transition: border-color 0.2s;
@@ -253,98 +267,61 @@ input, select {
 }
 
 input:focus, select:focus {
-  border-bottom: 1.5px solid var(--navy-primary);
-  color: var(--navy-primary);
+  border-bottom: 1px solid var(--navy-primary);
 }
 
 input::placeholder {
-  color: #9c8979;
+  color: #a0aec0;
   font-weight: 400;
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 input[type=date] { color-scheme: light; }
 select { 
   cursor: pointer; 
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 700;
 }
 
 select option {
   font-size: 11px;
   color: var(--espresso);
   background: var(--paper-white);
-  padding: 4px;
 }
 
-/* Highlight class for invalid fields */
 .field-error {
   border-bottom: 1.5px solid #b91c1c !important;
   background-color: rgba(185, 28, 28, 0.04) !important;
 }
 
-/* Amount Paid Highlight Box */
+/* Amount Display Input Wrapper */
 .amount-wrap {
   display: flex;
   align-items: center;
-  border: 1px solid var(--accent-green-border);
-  background: var(--accent-green-bg);
-  border-radius: 3px;
-  padding: 1px 6px;
+  justify-content: flex-end;
+  gap: 3px;
 }
 
 .amount-wrap b {
-  color: var(--accent-green);
+  color: #2d3748;
   font-size: 11.5px;
   font-weight: 700;
 }
 
 .amount-wrap input {
+  width: 100px;
   border: 0;
   text-align: right;
-  color: var(--accent-green);
-  font-size: 13px;
+  color: #2d3748;
+  font-size: 11.5px;
   font-weight: 700;
-  background: transparent;
-  padding: 2px;
-}
-
-/* Payment Mode Radio Buttons */
-.radio-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-
-.radio-row label {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--espresso);
-  cursor: pointer;
-  background: var(--paper-white);
-  padding: 2px 6px;
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
-}
-
-.radio-row input {
-  width: auto;
-  accent-color: var(--navy-primary);
-  cursor: pointer;
 }
 
 .words {
-  font-style: italic;
-  color: var(--espresso-muted);
+  color: #2d3748;
   text-align: right;
-  font-size: 10.5px;
-  min-height: 18px;
-  padding: 2px 0;
-  border-bottom: 1px dashed var(--border-color);
+  font-size: 11.5px;
+  font-weight: 700;
   line-height: 1.3;
 }
 
@@ -352,75 +329,95 @@ select option {
 .remarks-panel {
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 8px 12px;
-  background: var(--paper-white);
-  margin-bottom: 12px;
+  padding: 12px 16px;
+  background: #fafbfc;
+  margin-bottom: 16px;
   position: relative;
-  border-left: 3px solid var(--gold-accent);
+  border-left: 3.5px solid var(--gold-accent);
 }
 
 .remarks-title {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   color: var(--navy-primary);
-  text-transform: uppercase;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .remarks-content {
-  font-size: 10.5px;
-  color: var(--espresso-muted);
+  font-size: 11px;
+  color: #4a5568;
+  font-weight: 600;
 }
 
 /* Official Notice Box */
 .notice-box {
-  border: 1px solid var(--gold-accent);
+  border: 1px dashed #e2e8f0;
   background: var(--notice-bg);
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-size: 10px;
-  color: var(--espresso-muted);
-  line-height: 1.4;
-  margin-bottom: 14px;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 10.5px;
+  color: #718096;
+  line-height: 1.45;
+  margin-bottom: 22px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
 }
 
-/* Footer and Signature */
+.notice-icon {
+  color: var(--gold-accent);
+  font-size: 12px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.notice-text strong {
+  color: #2d3748;
+  font-weight: 700;
+}
+
+/* Footer and Signature Section */
 .receipt-footer-area {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .qr-signature-group {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .qr-box {
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
+  width: 52px;
+  height: 52px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #fafbfc;
+  background: #f8fafc;
 }
 
-.qr-box svg { width: 22px; height: 22px; opacity: 0.6; }
-.qr-box span { font-size: 7px; color: var(--espresso-muted); margin-top: 2px; }
+.qr-box svg { width: 22px; height: 22px; opacity: 0.5; fill: #4a5568; }
+.qr-box span { font-size: 7.5px; color: #a0aec0; margin-top: 2px; font-weight: 600; }
 
 .meta-info-text {
-  font-size: 9.5px;
-  color: var(--espresso-muted);
-  line-height: 1.4;
+  font-size: 10px;
+  color: #718096;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.meta-info-text span {
+  color: #4a5568;
 }
 
 .signature-block {
-  width: 160px;
+  width: 190px;
   text-align: center;
 }
 
@@ -429,53 +426,39 @@ select option {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .signature-img {
   max-height: 36px;
-  max-width: 120px;
+  max-width: 150px;
   object-fit: contain;
 }
 
 .sign-line {
-  border-top: 1px solid var(--espresso-muted);
-  padding-top: 4px;
-  font-size: 9px;
-  color: var(--espresso-muted);
+  border-top: 1px solid #cbd5e0;
+  padding-top: 5px;
+  font-size: 10px;
+  color: var(--navy-primary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 700;
+  letter-spacing: 0.8px;
+  font-weight: 800;
 }
 
 .bottom-divider {
   height: 1px;
-  background: var(--border-color);
-  margin: 10px 0;
+  background: #edf2f7;
+  margin: 12px 0 10px;
 }
 
 .thank-you-footer {
   text-align: center;
-}
-
-.thank-you-footer h4 {
-  margin: 0 0 2px 0;
-  font-family: 'Playfair Display', serif;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  color: var(--gold-accent);
-}
-
-.thank-you-footer p {
-  margin: 0;
-  font-size: 8.5px;
-  color: var(--espresso-muted);
-  line-height: 1.3;
+  display: none; /* Controlled via print/spec requirement if needed */
 }
 
 /* Student Ledger Section & Action Buttons */
 .ledger-section {
-  margin-top: 20px;
+  margin-top: 24px;
   background: var(--paper-white);
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -494,7 +477,7 @@ select option {
 .btn {
   border: 0;
   border-radius: 6px;
-  padding: 8px 14px;
+  padding: 9px 16px;
   font-weight: 600;
   cursor: pointer;
   font-size: 12px;
@@ -512,9 +495,7 @@ select option {
   border: 1px solid var(--navy-primary);
 }
 
-.btn-primary:hover {
-  background: #0d2b4e;
-}
+.btn-primary:hover { background: #0d2b4e; }
 
 .btn-secondary {
   background: var(--gold-accent);
@@ -523,9 +504,7 @@ select option {
   font-weight: 700;
 }
 
-.btn-secondary:hover {
-  background: #b89327;
-}
+.btn-secondary:hover { background: #b89327; }
 
 .btn-whatsapp {
   background: #25d366;
@@ -534,9 +513,7 @@ select option {
   font-weight: 700;
 }
 
-.btn-whatsapp:hover {
-  background: #1ebe5d;
-}
+.btn-whatsapp:hover { background: #1ebe5d; }
 
 .btn-danger {
   background: var(--danger-red);
@@ -545,9 +522,7 @@ select option {
   font-weight: 700;
 }
 
-.btn-danger:hover {
-  background: var(--danger-red-hover);
-}
+.btn-danger:hover { background: var(--danger-red-hover); }
 
 .btn-small {
   padding: 5px 10px;
@@ -608,9 +583,7 @@ select option {
   font-size: 12px;
 }
 
-.ledger-row:hover {
-  background: #f8fafc;
-}
+.ledger-row:hover { background: #f8fafc; }
 
 .ledger-meta {
   display: flex;
@@ -625,9 +598,7 @@ select option {
   color: var(--navy-primary);
 }
 
-.ledger-meta .dash {
-  color: var(--gold-accent);
-}
+.ledger-meta .dash { color: var(--gold-accent); }
 
 .ledger-meta .receipt-num {
   font-family: monospace;
@@ -643,10 +614,9 @@ select option {
   font-size: 11.5px;
 }
 
-/* Responsive Design for Mobile Devices (Stacking panels vertically and screen-fitting) */
 @media (max-width: 768px) {
   body { padding: 8px 4px; }
-  .sheet { padding: 16px 12px; }
+  .sheet { padding: 18px 14px; }
   .receipt-header {
     grid-template-columns: 1fr;
     text-align: center;
@@ -665,13 +635,142 @@ select option {
     flex-direction: column;
     align-items: center;
   }
-  .ledger-section { padding: 16px 12px; }
-  .ledger-row {
-    flex-direction: column;
-    align-items: flex-start;
+}
+
+/* ===== Screen-fit layout overrides: retain the existing receipt design ===== */
+html, body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+body {
+  padding: clamp(8px, 1.5vw, 20px);
+}
+.wrap {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+.sheet,
+.ledger-section {
+  width: 100%;
+  min-width: 0;
+}
+.sheet {
+  padding: clamp(18px, 2vw, 30px) clamp(14px, 2.4vw, 36px) 24px;
+}
+.receipt-header {
+  grid-template-columns: minmax(110px, 150px) minmax(0, 1fr) minmax(190px, 270px);
+  gap: clamp(10px, 1.5vw, 20px);
+}
+.academy-logo {
+  width: clamp(100px, 9vw, 130px);
+  max-width: 100%;
+}
+.academy-details,
+.header-right,
+.panel {
+  min-width: 0;
+}
+.header-right {
+  overflow-wrap: anywhere;
+}
+.form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.2vw, 16px);
+}
+.panel {
+  padding: clamp(12px, 1.4vw, 20px);
+}
+.field {
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 6px;
+}
+.field input,
+.field select,
+.amount-wrap,
+.amount-wrap input {
+  min-width: 0;
+  max-width: 100%;
+}
+.ledger-section {
+  padding: clamp(14px, 1.7vw, 24px);
+}
+.ledger-actions-bar {
+  flex-wrap: wrap;
+}
+.ledger-row {
+  min-width: 0;
+  gap: 10px;
+}
+.ledger-meta {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 900px) {
+  body { padding: 10px; }
+  .wrap { max-width: 100%; }
+  .sheet { padding: 18px 16px 20px; }
+  .receipt-header {
+    grid-template-columns: 105px minmax(0, 1fr) minmax(170px, 220px);
+    gap: 10px;
+  }
+  .academy-logo { width: 100px; height: 60px; }
+  .academy-details h2 { font-size: clamp(19px, 3vw, 24px); }
+  .academy-details .courses { font-size: 7.5px; letter-spacing: .5px; }
+  .header-right { font-size: 9px; }
+}
+@media (max-width: 680px) {
+  body { padding: 6px; }
+  .sheet { padding: 14px 10px 18px; }
+  .receipt-header {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
     gap: 8px;
   }
+  .academy-logo {
+    width: 105px;
+    height: 55px;
+    justify-self: center;
+  }
+  .academy-details { text-align: center; }
+  .header-right {
+    text-align: center;
+    padding: 8px 0 0;
+    font-size: 9px;
+  }
+  .header-right::before { display: none; }
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .receipt-meta-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 16px;
+  }
+  .receipt-footer-area {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  .qr-signature-group {
+    flex-direction: column;
+    align-items: center;
+  }
+  .ledger-header { align-items: stretch; }
+  .ledger-search { width: 100%; }
+  .ledger-row { align-items: flex-start; }
 }
+@media (max-width: 420px) {
+  .ledger-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ledger-row .btn { align-self: flex-start; }
+  .ledger-actions-bar .btn { flex: 1 1 auto; justify-content: center; }
+  .receipt-meta-row { font-size: 10px; }
+}
+
 </style>
 </head>
 <body>
@@ -685,25 +784,22 @@ select option {
     </div>
   </div>
 
-  <!-- Screen-Fit Receipt Sheet Interface -->
+  <!-- Exact Image Replica Sheet Container -->
   <main class="sheet">
-    <!-- Header – Three-Column Arrangement (Without University Logo) -->
+    <!-- Header -->
     <header class="receipt-header">
-      <!-- Left Column: Academy Logo -->
       <img id="logoLeftImg" src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Logo.png" 
            class="academy-logo" 
            alt="Academy Logo"
            crossorigin="anonymous"
            onerror="this.onerror=null; this.src='Logo.png';">
 
-      <!-- Centre Column: Academy Branding -->
       <div class="academy-details">
         <h2>ALAGAPPA</h2>
         <div class="academy">PERFORMING ARTS ACADEMY</div>
         <div class="courses">BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</div>
       </div>
 
-      <!-- Right Column: Address, Phone, Email -->
       <div class="header-right">
         <div>49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084 📍</div>
         <div>+91 73558-596403 📞</div>
@@ -711,19 +807,18 @@ select option {
       </div>
     </header>
 
-    <!-- Thin Gold Horizontal Line -->
     <div class="gold-divider"></div>
 
-    <!-- Receipt Heading -->
+    <!-- Title Block -->
     <div class="receipt-title-block">
       <h3>FEE RECEIPT</h3>
       <div class="receipt-meta-row">
-        <span>Receipt No: <strong id="receiptNo"></strong></span>
-        <span>Receipt Date: <strong id="displayDate"></strong></span>
+        <span>Receipt No: <strong id="receiptNo">APAA-2026-0022</strong></span>
+        <span>Receipt Date: <strong id="displayDate">10/07/2026</strong></span>
       </div>
     </div>
 
-    <!-- Two Information Panels (Side-by-side on desktop, stacked on mobile) -->
+    <!-- Form Grid with Two Panels -->
     <form id="feeForm" onsubmit="return false">
       <div class="form-grid">
         <!-- Left Panel: STUDENT & COURSE DETAILS -->
@@ -734,34 +829,22 @@ select option {
 
           <div class="field">
             <label for="student">Student Name *</label>
-            <input id="student" placeholder="Enter full name" required>
+            <input id="student" value="ABIRAMI M S" required>
           </div>
 
           <div class="field">
             <label for="phone">Phone Number *</label>
-            <input id="phone" type="tel" placeholder="+91 98765 43210" required maxlength="15">
+            <input id="phone" type="tel" value="+91 91764 71176" required maxlength="15">
           </div>
 
           <div class="field">
             <label for="course">Course Registered *</label>
-            <select id="course" required>
-              <option value="" selected disabled hidden>Select Course</option>
-              <option>Diploma in Bharatanatyam</option>
-              <option>Carnatic Vocal</option>
-              <option>Keyboard</option>
-              <option>Drawing</option>
-              <option>Abacus</option>
-            </select>
+            <input id="course" value="Bachelor's in Bharathanatyam" required>
           </div>
 
           <div class="field">
             <label for="year">Academic Year *</label>
-            <select id="year" required>
-              <option value="" selected disabled hidden>Select Year</option>
-              <option>1st Year</option>
-              <option>2nd Year</option>
-              <option>3rd Year</option>
-            </select>
+            <input id="year" value="1st Year" required>
           </div>
         </section>
 
@@ -775,50 +858,39 @@ select option {
             <label for="amount">Amount Paid *</label>
             <div class="amount-wrap">
               <b>₹</b>
-              <input id="amount" type="number" min="1" step="0.01" placeholder="0.00" required oninput="updateWords()">
+              <input id="amount" type="text" value="10,000" required oninput="updateWords()">
             </div>
           </div>
 
           <div class="field">
             <label>Amount in Words</label>
-            <div class="words" id="amountWords">Zero Rupees Only</div>
+            <div class="words" id="amountWords">Ten Thousand Only</div>
           </div>
 
           <div class="field">
             <label for="date">Payment Date *</label>
-            <input id="date" type="date" required onchange="el('displayDate').textContent=this.value">
+            <input id="date" type="text" value="24/06/2026" required onchange="el('displayDate').textContent=this.value">
           </div>
 
           <div class="field">
-            <label>Payment Mode *</label>
-            <div class="radio-row">
-              <label><input type="radio" name="mode" value="CASH" checked> CASH</label>
-              <label><input type="radio" name="mode" value="UPI"> UPI</label>
-              <label><input type="radio" name="mode" value="CARD"> CARD</label>
-              <label><input type="radio" name="mode" value="BANK"> BANK</label>
-            </div>
+            <label for="modeInput">Payment Mode *</label>
+            <input id="modeInput" value="UPI" required>
           </div>
 
           <div class="field">
             <label for="txn">TXN / UPI ID</label>
-            <input id="txn" placeholder="Transaction Reference">
+            <input id="txn" value="617527291913">
           </div>
 
           <div class="field">
             <label for="stage">Installment Stage *</label>
-            <select id="stage" required>
-              <option value="" selected disabled hidden>Select Stage</option>
-              <option>Full Payment</option>
-              <option>First Installment</option>
-              <option>Second Installment</option>
-              <option>Final Installment</option>
-            </select>
+            <input id="stage" value="First Installment" required>
           </div>
         </section>
       </div>
     </form>
 
-    <!-- Remarks & Extra Declarations -->
+    <!-- Remarks Panel -->
     <div class="remarks-panel">
       <div class="remarks-title">Remarks &amp; Extra Declarations:</div>
       <div class="remarks-content" id="remarksContent">No Remarks</div>
@@ -826,19 +898,22 @@ select option {
 
     <!-- Official Notice Box -->
     <div class="notice-box">
-      <strong>Official Notice:</strong> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.
+      <div class="notice-icon">ℹ</div>
+      <div class="notice-text">
+        <strong>Official Notice:</strong> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.
+      </div>
     </div>
 
-    <!-- Footer and Signature -->
+    <!-- Footer & Signature Area -->
     <div class="receipt-footer-area">
       <div class="qr-signature-group">
         <div class="qr-box">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm3 3h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3zm-6-6h3v3h-3v-3zm3 3h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h3v3h-3v-3zm3 3h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3zm-6-6h3v3h-3v-3zm3 3h3v3h-3v-3zm-3 3h3v3h-3v-3zm3 3h3v3h-3v-3z"/></svg>
           <span>Verified Slip</span>
         </div>
         <div class="meta-info-text">
-          Generated On : <span id="genDateTime"></span><br>
-          Secure Mode : Active System Gateway
+          <b>Generated On:</b> <span id="genDateTime">Jul 10 2026 12:41 PM</span><br>
+          <b>Secure Mode:</b> <span>Active System Gateway</span>
         </div>
       </div>
 
@@ -850,19 +925,12 @@ select option {
                crossorigin="anonymous"
                onerror="this.onerror=null; this.src='signature.png';">
         </div>
-        <div class="sign-line">Authorized Signature</div>
+        <div class="sign-line">AUTHORIZED SIGNATURE</div>
       </div>
-    </div>
-
-    <div class="bottom-divider"></div>
-
-    <div class="thank-you-footer">
-      <h4>THANK YOU!</h4>
-      <p>We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</p>
     </div>
   </main>
 
-  <!-- Student Ledger Section with Action Buttons -->
+  <!-- Student Ledger Section -->
   <section class="ledger-section">
     <div class="ledger-actions-bar">
       <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
@@ -890,9 +958,7 @@ select option {
         </button>
       </div>
     </div>
-    <div id="ledgerList" class="ledger-list">
-      <!-- Dynamic list rows populated via JavaScript -->
-    </div>
+    <div id="ledgerList" class="ledger-list"></div>
   </section>
 </div>
 
@@ -900,23 +966,13 @@ select option {
 const el = id => document.getElementById(id);
 const STORAGE_KEY = 'apaa_paid_receipts_v1';
 
-// Initialize Receipt Serial Number & Date
 function makeReceiptNo() {
   const d = new Date();
   const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
   const salt = Math.floor(1000 + Math.random() * 9000);
   return `APAA-${yyyy}-${salt}`;
 }
 
-const todayStr = new Date().toISOString().slice(0, 10);
-el('receiptNo').textContent = makeReceiptNo();
-el('date').value = todayStr;
-el('displayDate').textContent = todayStr;
-el('genDateTime').textContent = new Date().toLocaleString();
-
-// Indian Numbering System Engine for Amount in Words
 const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
 const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
@@ -956,7 +1012,8 @@ function numberWords(n) {
 }
 
 function updateWords() {
-  let v = Number(el('amount').value);
+  let raw = el('amount').value.replace(/,/g, '');
+  let v = Number(raw);
   if (!v || v <= 0) {
     el('amountWords').textContent = 'Zero Rupees Only';
     return;
@@ -966,11 +1023,6 @@ function updateWords() {
   el('amountWords').textContent = numberWords(rupees) + ' Rupees' + (paise ? ' and ' + numberWords(paise) + ' Paise' : '') + ' Only';
 }
 
-function getMode() {
-  return document.querySelector('input[name="mode"]:checked')?.value || 'CASH';
-}
-
-// Strict Indian Mobile Number Validation (+91 followed by exactly 10 digits)
 function validateAndNormalizePhone() {
   const phoneInput = el('phone');
   let raw = phoneInput.value.trim();
@@ -1003,7 +1055,7 @@ function validateAndNormalizePhone() {
       phoneInput.focus();
       return null;
     }
-    normalized = '+91' + sub;
+    normalized = '+91 ' + sub.slice(0,5) + ' ' + sub.slice(5);
   } else if (cleaned.startsWith('91') && cleaned.length === 12) {
     let sub = cleaned.slice(2);
     if (!/^\d{10}$/.test(sub)) {
@@ -1012,12 +1064,9 @@ function validateAndNormalizePhone() {
       phoneInput.focus();
       return null;
     }
-    normalized = '+91' + sub;
+    normalized = '+91 ' + sub.slice(0,5) + ' ' + sub.slice(5);
   } else if (digitsOnly.length === 10) {
-    alert("Please enter a valid Indian mobile number with +91 country code.");
-    phoneInput.classList.add('field-error');
-    phoneInput.focus();
-    return null;
+    normalized = '+91 ' + digitsOnly.slice(0,5) + ' ' + digitsOnly.slice(5);
   } else {
     alert("Invalid phone number. Please enter +91 followed by 10 digits.");
     phoneInput.classList.add('field-error');
@@ -1032,13 +1081,6 @@ function validateReceipt() {
   document.querySelectorAll('.field-error').forEach(e => e.classList.remove('field-error'));
 
   if (!el('feeForm').reportValidity()) {
-    return false;
-  }
-
-  if (Number(el('amount').value) <= 0) {
-    alert('Please enter a payment amount greater than zero.');
-    el('amount').classList.add('field-error');
-    el('amount').focus();
     return false;
   }
 
@@ -1057,13 +1099,13 @@ function receiptData(normalizedPhone) {
     phone: normalizedPhone,
     course: el('course').value,
     academicYear: el('year').value,
-    amount: Number(el('amount').value),
+    amount: el('amount').value,
     amountInWords: el('amountWords').textContent,
     paymentDate: el('date').value,
-    paymentMode: getMode(),
+    paymentMode: el('modeInput').value,
     transactionId: el('txn').value.trim() || 'N/A',
     installmentStage: el('stage').value,
-    savedAt: new Date().toLocaleString()
+    savedAt: el('genDateTime').textContent
   };
 }
 
@@ -1079,7 +1121,6 @@ function updateSavedCount() {
   el('savedCount').textContent = 'Saved receipts: ' + getSaved().length;
 }
 
-// Utility to load image as Base64 for jsPDF embedding
 async function getBase64ImageFromURL(url) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -1097,7 +1138,6 @@ async function getBase64ImageFromURL(url) {
   });
 }
 
-// Professional PDF Generator (Without University Logo)
 async function generateProfessionalPDF(itemData) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -1109,21 +1149,15 @@ async function generateProfessionalPDF(itemData) {
   const colNavy = [18, 59, 104];
   const colGold = [208, 165, 47];
   const colEspresso = [36, 27, 22];
-  const colMuted = [89, 71, 61];
+  const colMuted = [98, 114, 130];
   const colBorder = [227, 233, 239];
 
   let currentY = 12;
-
-  // Top Accent Bar
-  doc.setFillColor(...colNavy);
-  doc.rect(margin, currentY, contentWidth, 1.5, 'F');
-  currentY += 5;
 
   const leftLogoBase64 = await getBase64ImageFromURL(el('logoLeftImg').src);
   const sigBase64 = await getBase64ImageFromURL(el('signatureImg').src);
 
   const col1X = margin;
-  const col1Width = 45;
   const col2X = margin + 47;
   const col2Width = 84;
   const col3X = margin + 133;
@@ -1131,12 +1165,10 @@ async function generateProfessionalPDF(itemData) {
 
   let headerStartY = currentY;
 
-  // 1. LEFT: Academy Logo
   if (leftLogoBase64) {
     doc.addImage(leftLogoBase64, 'PNG', col1X, headerStartY + 1, 38, 20);
   }
 
-  // 2. CENTRE: Academy Branding
   doc.setFont('times', 'bold');
   doc.setFontSize(16);
   doc.setTextColor(...colNavy);
@@ -1152,12 +1184,10 @@ async function generateProfessionalPDF(itemData) {
   doc.setTextColor(...colMuted);
   doc.text('BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM', col2X + (col2Width / 2), headerStartY + 15, { align: 'center' });
 
-  // Subtle vertical separator before right column
   doc.setDrawColor(...colBorder);
   doc.setLineWidth(0.3);
   doc.line(col3X - 4, headerStartY + 2, col3X - 4, headerStartY + 22);
 
-  // 3. RIGHT: Contact Info (No University Logo)
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6.5);
   doc.setTextColor(...colMuted);
@@ -1168,13 +1198,11 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += 24;
 
-  // Thin Gold Horizontal Line
   doc.setDrawColor(...colGold);
   doc.setLineWidth(0.5);
   doc.line(margin, currentY, pageWidth - margin, currentY);
   currentY += 6;
 
-  // Fee Receipt Heading
   doc.setFont('times', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(...colNavy);
@@ -1195,7 +1223,6 @@ async function generateProfessionalPDF(itemData) {
   let leftX = margin;
   let rightX = margin + panelWidth + 4;
 
-  // --- Left Panel: STUDENT & COURSE DETAILS ---
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(...colBorder);
   doc.setLineWidth(0.3);
@@ -1218,7 +1245,7 @@ async function generateProfessionalPDF(itemData) {
     doc.setTextColor(...colMuted);
     doc.text(label, x + 5, y);
 
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...colEspresso);
     doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
@@ -1229,7 +1256,6 @@ async function generateProfessionalPDF(itemData) {
   addRow(leftX, p1Y + (rowGap * 2), 'Course Registered *', itemData.course);
   addRow(leftX, p1Y + (rowGap * 3), 'Academic Year *', itemData.academicYear);
 
-  // --- Right Panel: PAYMENT INFORMATION ---
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(...colBorder);
   doc.roundedRect(rightX, currentY, panelWidth, panelHeight, 1.5, 1.5, 'FD');
@@ -1247,13 +1273,13 @@ async function generateProfessionalPDF(itemData) {
     doc.setTextColor(...colMuted);
     doc.text(label, x + 5, y);
 
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.5);
     doc.setTextColor(...colEspresso);
     doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
   };
 
-  addRowSmall(rightX, p2Y_adj, 'Amount Paid *', `₹ ${itemData.amount.toLocaleString()}`);
+  addRowSmall(rightX, p2Y_adj, 'Amount Paid *', `₹ ${itemData.amount}`);
   addRowSmall(rightX, p2Y_adj + rowGap2, 'Amount in Words', itemData.amountInWords);
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 2), 'Payment Date *', itemData.paymentDate);
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 3), 'Payment Mode *', itemData.paymentMode);
@@ -1262,13 +1288,11 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += panelHeight + 5;
 
-  // Remarks & Extra Declarations Panel
   const remHeight = 16;
-  doc.setFillColor(255, 255, 255);
+  doc.setFillColor(250, 251, 252);
   doc.setDrawColor(...colBorder);
   doc.roundedRect(margin, currentY, contentWidth, remHeight, 1.5, 1.5, 'FD');
   
-  // Gold left accent bar
   doc.setFillColor(...colGold);
   doc.rect(margin, currentY, 1.2, remHeight, 'F');
 
@@ -1277,14 +1301,13 @@ async function generateProfessionalPDF(itemData) {
   doc.setTextColor(...colNavy);
   doc.text('Remarks & Extra Declarations:', margin + 5, currentY + 5.5);
 
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
-  doc.setTextColor(...colMuted);
+  doc.setTextColor(74, 85, 104);
   doc.text('No Remarks', margin + 5, currentY + 11.5);
 
   currentY += remHeight + 4;
 
-  // Official Notice Box
   const noticeHeight = 14;
   doc.setFillColor(255, 252, 243);
   doc.setDrawColor(...colGold);
@@ -1300,10 +1323,8 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += noticeHeight + 6;
 
-  // Footer & Signature
   let footerY = currentY;
   
-  // QR Box placeholder
   doc.setFillColor(250, 251, 252);
   doc.setDrawColor(...colBorder);
   doc.roundedRect(margin, footerY, 14, 14, 1, 1, 'FD');
@@ -1317,7 +1338,6 @@ async function generateProfessionalPDF(itemData) {
   doc.text(`Generated On : ${itemData.savedAt}`, margin + 18, footerY + 5);
   doc.text('Secure Mode : Active System Gateway', margin + 18, footerY + 10);
 
-  // Authorized Signature Block
   const sigX = pageWidth - margin - 45;
   if (sigBase64) {
     doc.addImage(sigBase64, 'PNG', sigX + 2, footerY - 4, 38, 14);
@@ -1328,33 +1348,12 @@ async function generateProfessionalPDF(itemData) {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.setTextColor(...colMuted);
+  doc.setTextColor(...colNavy);
   doc.text('AUTHORIZED SIGNATURE', sigX + (45 / 2), footerY + 15, { align: 'center' });
-
-  currentY += 18;
-
-  // Bottom divider
-  doc.setDrawColor(...colBorder);
-  doc.setLineWidth(0.3);
-  doc.line(margin, currentY, pageWidth - margin, currentY);
-  currentY += 4;
-
-  // Thank You Footer
-  doc.setFont('times', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(...colGold);
-  doc.text('THANK YOU!', pageWidth / 2, currentY, { align: 'center' });
-  currentY += 3;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.5);
-  doc.setTextColor(...colMuted);
-  doc.text('We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.', pageWidth / 2, currentY, { align: 'center' });
 
   doc.save(`${itemData.receiptNo}.pdf`);
 }
 
-// Complete Print Receipt Workflow
 async function handlePrintReceiptWorkflow() {
   if (!validateReceipt()) return;
 
@@ -1378,24 +1377,12 @@ async function handlePrintReceiptWorkflow() {
 
   try {
     await generateProfessionalPDF(data);
-    clearFormAndResetReceipt();
   } catch (err) {
     console.error('PDF Generation Error:', err);
     alert('PDF generation encountered an error. Your receipt record has been saved safely.');
   }
 }
 
-function clearFormAndResetReceipt() {
-  el('feeForm').reset();
-  el('amountWords').textContent = 'Zero Rupees Only';
-  const newDate = new Date().toISOString().slice(0, 10);
-  el('date').value = newDate;
-  el('displayDate').textContent = newDate;
-  el('receiptNo').textContent = makeReceiptNo();
-  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('field-error'));
-}
-
-// Clear All Records Functionality
 function clearAllRecords() {
   const confirmed = confirm("Are you sure you want to delete all saved student receipt records? This action cannot be undone.");
   if (confirmed) {
@@ -1455,7 +1442,6 @@ async function downloadSpecificPDF(index) {
   await generateProfessionalPDF(item);
 }
 
-// Excel Spreadsheet Export
 function downloadExcel() {
   const rows = getSaved();
   if (!rows.length) {
@@ -1500,7 +1486,6 @@ function downloadExcel() {
   }
 }
 
-// WhatsApp Sharing
 function sendWhatsApp() {
   const name = el('student').value.trim() || '[Student Name]';
   const amt = el('amount').value.trim() || '0';
