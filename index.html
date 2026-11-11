@@ -928,6 +928,181 @@ input::placeholder { font-size: 13px; }
   .notice-text, .notice-text strong { font-size: 14px; }
 }
 
+
+/* Custom payment date calendar */
+.date-picker-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+.date-picker-wrap #dateDisplay {
+  width: 100%;
+  padding: 7px 34px 7px 10px;
+  min-height: 36px;
+  border: 1px solid #d8e1eb;
+  border-radius: 7px;
+  background: #fff;
+  color: #123b68;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+.date-picker-wrap #dateDisplay::placeholder { color: #8796a8; }
+.calendar-toggle {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #123b68;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.calendar-toggle:hover { background: #f1f5f9; }
+.calendar-toggle svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.payment-calendar {
+  position: absolute;
+  z-index: 1000;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 310px;
+  max-width: min(310px, calc(100vw - 28px));
+  padding: 15px;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 14px 38px rgba(20, 43, 70, .18);
+  color: #17324f;
+}
+.payment-calendar[hidden] { display: none !important; }
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 13px;
+}
+.calendar-month-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #123b68;
+}
+.calendar-nav { display: flex; gap: 5px; }
+.calendar-nav button {
+  width: 30px; height: 30px;
+  border: 1px solid #e1e8ef;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #123b68;
+  cursor: pointer;
+  font-size: 17px;
+}
+.calendar-nav button:hover { background: #fff4d8; border-color: #d0a52f; }
+.calendar-weekdays, .calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  text-align: center;
+}
+.calendar-weekdays { margin-bottom: 6px; }
+.calendar-weekdays span {
+  color: #8593a3;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 0;
+}
+.calendar-day {
+  min-width: 0;
+  height: 34px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #263b53;
+  font-size: 13px;
+  cursor: pointer;
+}
+.calendar-day:hover { background: #f4f7fb; }
+.calendar-day.outside { color: #b8c1cb; }
+.calendar-day.today { outline: 1px solid #d0a52f; color: #9a7418; font-weight: 800; }
+.calendar-day.selected { background: #123b68; color: #fff; font-weight: 800; }
+.calendar-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid #edf1f5;
+}
+.calendar-foot button {
+  border: 0;
+  background: transparent;
+  color: #123b68;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 5px 7px;
+  border-radius: 5px;
+}
+.calendar-foot button:hover { background: #f3f6fa; }
+@media (max-width: 480px) {
+  .payment-calendar { right: 0; width: 290px; }
+}
+
+/* Verified slip + generated metadata: match reference image 2 */
+.receipt-footer-area {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 22px 10px 18px;
+  min-height: 132px;
+}
+.qr-signature-group {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.qr-box {
+  width: 108px;
+  height: 108px;
+  flex: 0 0 108px;
+  border: 1.5px solid #dce5ee;
+  border-radius: 8px;
+  background: #f8fafc;
+  gap: 7px;
+}
+.qr-box svg { width: 42px; height: 42px; opacity: .58; fill: #aeb8c2; }
+.qr-box span { font-size: 13px; color: #87949a; margin-top: 1px; font-weight: 600; }
+.meta-info-text {
+  font-size: 16px;
+  line-height: 1.45;
+  color: #87949a;
+  font-weight: 600;
+}
+.meta-info-text b { font-weight: 800; color: #87949a; }
+.meta-info-text span { color: #87949a; font-weight: 500; }
+@media (max-width: 680px) {
+  .receipt-footer-area { justify-content: center; }
+  .qr-signature-group { gap: 14px; }
+  .qr-box { width: 88px; height: 88px; flex-basis: 88px; }
+  .qr-box svg { width: 34px; height: 34px; }
+  .meta-info-text { font-size: 13px; }
+}
+
 </style>
 </head>
 <body>
@@ -1026,7 +1201,14 @@ input::placeholder { font-size: 13px; }
 
           <div class="field">
             <label for="date">Payment Date *</label>
-            <input id="date" type="date" required onchange="el('displayDate').textContent=formatDateForDisplay(this.value)">
+            <div class="date-picker-wrap">
+              <input id="date" type="hidden" required>
+              <input id="dateDisplay" type="text" class="date-display-input" placeholder="Select payment date" readonly aria-label="Payment date">
+              <button type="button" class="calendar-toggle" aria-label="Open calendar" onclick="togglePaymentCalendar()">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
+              </button>
+              <div id="paymentCalendar" class="payment-calendar" hidden></div>
+            </div>
           </div>
 
           <div class="field">
@@ -1519,17 +1701,17 @@ async function generateProfessionalPDF(itemData) {
   
   doc.setFillColor(250, 251, 252);
   doc.setDrawColor(...colBorder);
-  doc.roundedRect(margin, footerY, 18, 18, 1.2, 1.2, 'FD');
+  doc.roundedRect(margin, footerY, 25, 25, 1.6, 1.6, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(6.5);
+  doc.setFontSize(7.2);
   doc.setTextColor(...colMuted);
-  doc.text('Verified Slip', margin + 2.2, footerY + 15.5);
+  doc.text('Verified Slip', margin + 3.5, footerY + 21);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(10);
   doc.setTextColor(...colMuted);
-  doc.text(`Generated On: ${itemData.savedAt}`, margin + 23, footerY + 7);
-  doc.text('Secure Mode: Active System Gateway', margin + 23, footerY + 13);
+  doc.text(`Generated On: ${itemData.savedAt}`, margin + 31, footerY + 9);
+  doc.text('Secure Mode: Active System Gateway', margin + 31, footerY + 16);
 
   const sigX = pageWidth - margin - 49;
   if (sigBase64) {
@@ -1701,6 +1883,95 @@ function sendWhatsApp() {
   window.open(url, '_blank');
 }
 
+
+let paymentCalendarMonth = new Date();
+paymentCalendarMonth.setDate(1);
+
+function parseISODate(value) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function dateToISO(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+function togglePaymentCalendar() {
+  const panel = el('paymentCalendar');
+  if (!panel) return;
+  if (panel.hidden) {
+    const selected = parseISODate(el('date').value);
+    paymentCalendarMonth = selected || new Date();
+    paymentCalendarMonth.setDate(1);
+    renderPaymentCalendar();
+    panel.hidden = false;
+  } else {
+    panel.hidden = true;
+  }
+}
+function changePaymentCalendarMonth(delta) {
+  paymentCalendarMonth.setMonth(paymentCalendarMonth.getMonth() + delta);
+  renderPaymentCalendar();
+}
+function renderPaymentCalendar() {
+  const panel = el('paymentCalendar');
+  if (!panel) return;
+  const year = paymentCalendarMonth.getFullYear();
+  const month = paymentCalendarMonth.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startOffset = firstDay.getDay();
+  const gridStart = new Date(year, month, 1 - startOffset);
+  const selectedISO = el('date').value;
+  const todayISO = dateToISO(new Date());
+  let days = '';
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(gridStart);
+    d.setDate(gridStart.getDate() + i);
+    const iso = dateToISO(d);
+    const classes = ['calendar-day'];
+    if (d.getMonth() !== month) classes.push('outside');
+    if (iso === todayISO) classes.push('today');
+    if (iso === selectedISO) classes.push('selected');
+    days += `<button type="button" class="${classes.join(' ')}" onclick="selectPaymentDate('${iso}')">${d.getDate()}</button>`;
+  }
+  panel.innerHTML = `
+    <div class="calendar-head">
+      <div class="calendar-month-label">${paymentCalendarMonth.toLocaleDateString('en-IN', {month:'long', year:'numeric'})}</div>
+      <div class="calendar-nav">
+        <button type="button" aria-label="Previous month" onclick="changePaymentCalendarMonth(-1)">‹</button>
+        <button type="button" aria-label="Next month" onclick="changePaymentCalendarMonth(1)">›</button>
+      </div>
+    </div>
+    <div class="calendar-weekdays">
+      <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+    </div>
+    <div class="calendar-days">${days}</div>
+    <div class="calendar-foot">
+      <button type="button" onclick="clearPaymentDate()">Clear date</button>
+      <button type="button" onclick="selectPaymentDate('${todayISO}')">Today</button>
+    </div>`;
+}
+function selectPaymentDate(iso) {
+  el('date').value = iso;
+  el('dateDisplay').value = formatDateForDisplay(iso);
+  el('displayDate').textContent = formatDateForDisplay(iso);
+  el('paymentCalendar').hidden = true;
+  el('date').dispatchEvent(new Event('change', {bubbles:true}));
+}
+function clearPaymentDate() {
+  el('date').value = '';
+  el('dateDisplay').value = '';
+  el('displayDate').textContent = '';
+  el('paymentCalendar').hidden = true;
+}
+document.addEventListener('click', (event) => {
+  const wrap = document.querySelector('.date-picker-wrap');
+  const panel = el('paymentCalendar');
+  if (wrap && panel && !wrap.contains(event.target)) panel.hidden = true;
+});
+
 function formatDateForDisplay(value) {
   if (!value) return '';
   const parts = value.split('-');
@@ -1717,7 +1988,8 @@ function formatTodayForReceipt(date = new Date()) {
 function initializeNewReceipt() {
   const today = formatTodayForReceipt();
   if (el('date') && !el('date').value) el('date').value = today;
-  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(today);
+  if (el('dateDisplay')) el('dateDisplay').value = formatDateForDisplay(el('date').value || today);
+  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(el('date').value || today);
   if (el('receiptNo')) el('receiptNo').textContent = makeReceiptNo();
   if (el('genDateTime')) el('genDateTime').textContent = new Date().toLocaleString('en-IN');
 }
