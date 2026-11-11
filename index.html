@@ -1204,17 +1204,17 @@ async function generateProfessionalPDF(itemData) {
   }
 
   doc.setFont('times', 'bold');
-  doc.setFontSize(16);
+  doc.setFontSize(18);
   doc.setTextColor(...colNavy);
   doc.text('ALAGAPPA', col2X + (col2Width / 2), headerStartY + 4.5, { align: 'center' });
 
   doc.setFont('times', 'bold');
-  doc.setFontSize(9.5);
+  doc.setFontSize(10.5);
   doc.setTextColor(...colGold);
   doc.text('PERFORMING ARTS ACADEMY', col2X + (col2Width / 2), headerStartY + 10.5, { align: 'center' });
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(6);
+  doc.setFontSize(7.2);
   doc.setTextColor(...colMuted);
   doc.text('BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM', col2X + (col2Width / 2), headerStartY + 15, { align: 'center' });
 
@@ -1223,7 +1223,7 @@ async function generateProfessionalPDF(itemData) {
   doc.line(col3X - 4, headerStartY + 2, col3X - 4, headerStartY + 22);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.2);
+  doc.setFontSize(7.2);
   doc.setTextColor(...colMuted);
   const contactRight = pageWidth - margin;
   const contactWidth = 54;
@@ -1237,7 +1237,7 @@ async function generateProfessionalPDF(itemData) {
   contactLines.forEach((line) => {
     const wrapped = doc.splitTextToSize(line, contactWidth);
     doc.text(wrapped, contactRight, contactY, { align: 'right', maxWidth: contactWidth });
-    contactY += wrapped.length * 3.1;
+    contactY += wrapped.length * 3.6;
   });
 
   currentY += 24;
@@ -1248,14 +1248,14 @@ async function generateProfessionalPDF(itemData) {
   currentY += 6;
 
   doc.setFont('times', 'bold');
-  doc.setFontSize(14);
+  doc.setFontSize(16);
   doc.setTextColor(...colNavy);
   doc.text('FEE RECEIPT', pageWidth / 2, currentY, { align: 'center' });
 
   currentY += 5;
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(9);
   doc.setTextColor(...colMuted);
   doc.text(`Receipt No: ${itemData.receiptNo}`, margin, currentY);
   doc.text(`Receipt Date: ${itemData.paymentDate}`, pageWidth - margin, currentY, { align: 'right' });
@@ -1263,7 +1263,7 @@ async function generateProfessionalPDF(itemData) {
   currentY += 6;
 
   const panelWidth = (contentWidth - 4) / 2;
-  const panelHeight = 48;
+  const panelHeight = 51;
   let leftX = margin;
   let rightX = margin + panelWidth + 4;
 
@@ -1273,7 +1273,7 @@ async function generateProfessionalPDF(itemData) {
   doc.roundedRect(leftX, currentY, panelWidth, panelHeight, 1.5, 1.5, 'FD');
 
   doc.setFont('times', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(10);
   doc.setTextColor(...colNavy);
   doc.text('STUDENT & COURSE DETAILS', leftX + 5, currentY + 7);
 
@@ -1281,16 +1281,16 @@ async function generateProfessionalPDF(itemData) {
   doc.line(leftX + 5, currentY + 9.5, leftX + panelWidth - 5, currentY + 9.5);
 
   let p1Y = currentY + 16;
-  const rowGap = 7;
+  const rowGap = 7.4;
 
   const addRow = (x, y, label, val) => {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(8.8);
     doc.setTextColor(...colMuted);
     doc.text(label, x + 5, y);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(8.8);
     doc.setTextColor(...colEspresso);
     doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
   };
@@ -1304,21 +1304,21 @@ async function generateProfessionalPDF(itemData) {
   doc.setDrawColor(...colBorder);
   doc.roundedRect(rightX, currentY, panelWidth, panelHeight, 1.5, 1.5, 'FD');
   doc.setFont('times', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(10);
   doc.setTextColor(...colNavy);
   doc.text('PAYMENT INFORMATION', rightX + 5, currentY + 6);
   doc.line(rightX + 5, currentY + 8, rightX + panelWidth - 5, currentY + 8);
 
   let p2Y_adj = currentY + 13.5;
-  const rowGap2 = 5.8;
+  const rowGap2 = 6.1;
   const addRowSmall = (x, y, label, val) => {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(8.5);
     doc.setTextColor(...colMuted);
     doc.text(label, x + 5, y);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(8.5);
     doc.setTextColor(...colEspresso);
     doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
   };
@@ -1330,7 +1330,7 @@ async function generateProfessionalPDF(itemData) {
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 4), 'TXN / UPI ID', itemData.transactionId);
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 5), 'Installment Stage *', itemData.installmentStage);
 
-  currentY += panelHeight + 5;
+  currentY += panelHeight + 6;
 
   const remHeight = 16;
   doc.setFillColor(250, 251, 252);
@@ -1341,12 +1341,12 @@ async function generateProfessionalPDF(itemData) {
   doc.rect(margin, currentY, 1.2, remHeight, 'F');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
+  doc.setFontSize(8.5);
   doc.setTextColor(...colNavy);
   doc.text('Remarks & Extra Declarations:', margin + 5, currentY + 5.5);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
+  doc.setFontSize(8.5);
   doc.setTextColor(74, 85, 104);
   doc.text('No Remarks', margin + 5, currentY + 11.5);
 
@@ -1358,7 +1358,7 @@ async function generateProfessionalPDF(itemData) {
   doc.roundedRect(margin, currentY, contentWidth, noticeHeight, 1.5, 1.5, 'FD');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7);
+  doc.setFontSize(8);
   doc.setTextColor(...colEspresso);
   doc.text('Official Notice: ', margin + 4, currentY + 5.5);
   doc.setFont('helvetica', 'normal');
@@ -1373,12 +1373,12 @@ async function generateProfessionalPDF(itemData) {
   doc.setDrawColor(...colBorder);
   doc.roundedRect(margin, footerY, 14, 14, 1, 1, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(5);
+  doc.setFontSize(6);
   doc.setTextColor(...colMuted);
   doc.text('Verified Slip', margin + 2, footerY + 12.5);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
+  doc.setFontSize(8);
   doc.text(`Generated On : ${itemData.savedAt}`, margin + 18, footerY + 5);
   doc.text('Secure Mode : Active System Gateway', margin + 18, footerY + 10);
 
@@ -1391,7 +1391,7 @@ async function generateProfessionalPDF(itemData) {
   doc.line(sigX, footerY + 11, pageWidth - margin, footerY + 11);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7);
+  doc.setFontSize(8);
   doc.setTextColor(...colNavy);
   doc.text('AUTHORIZED SIGNATURE', sigX + (45 / 2), footerY + 15, { align: 'center' });
 
