@@ -799,6 +799,84 @@ body { padding: 14px clamp(8px, 1.5vw, 22px); }
   .receipt-meta-row { flex-wrap: wrap; justify-content: center; gap: 6px 18px; }
 }
 
+
+/* Readability improvements for the live receipt form */
+.panel-title { font-size: 14px; letter-spacing: .65px; }
+label { font-size: 13.5px; line-height: 1.35; }
+input, select { font-size: 14px; min-height: 30px; }
+input::placeholder { font-size: 13px; }
+.field { min-height: 30px; margin-bottom: 14px; }
+.words { font-size: 13px; line-height: 1.4; }
+.receipt-title, .receipt-heading { font-size: 20px; }
+.receipt-meta, .receipt-meta-row { font-size: 12.5px; }
+.header-right { font-size: 11.5px; line-height: 1.55; }
+.academy-details .courses { font-size: 9.5px; }
+.panel { padding: 20px 20px; }
+@media (max-width: 760px) {
+  label { font-size: 13px; }
+  input, select { font-size: 14px; }
+  .panel-title { font-size: 13px; }
+}
+
+
+/* Official notice and verification/signature footer styling */
+.notice-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px dashed #e8c978;
+  border-radius: 9px;
+  background: #fffdf7;
+  color: #665b40;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.notice-icon {
+  flex: 0 0 auto;
+  color: #d4a72c;
+  font-size: 17px;
+  line-height: 1.4;
+}
+.notice-text strong { font-weight: 800; }
+.receipt-footer-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 0 18px;
+}
+.qr-signature-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.qr-box {
+  width: 86px;
+  height: 86px;
+  border: 1px solid #dce5ee;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #89949d;
+  background: #fbfcfd;
+  gap: 5px;
+}
+.qr-box svg { width: 34px; height: 34px; fill: #b8c0c7; }
+.qr-box span { font-size: 11px; }
+.meta-info-text { font-size: 14px; line-height: 1.55; color: #87949a; }
+.meta-info-text b { font-weight: 800; }
+.signature-block { width: min(350px, 32%); text-align: center; }
+.signature-img { max-width: 100%; height: 58px; object-fit: contain; }
+.sign-line { border-top: 1px solid #263746; padding-top: 9px; color: #123b68; font-size: 15px; font-weight: 800; letter-spacing: .6px; }
+@media (max-width: 680px) {
+  .receipt-footer-area { flex-direction: column; align-items: stretch; }
+  .qr-signature-group { flex-wrap: wrap; }
+  .signature-block { width: 100%; }
+}
+
 </style>
 </head>
 <body>
@@ -897,7 +975,7 @@ body { padding: 14px clamp(8px, 1.5vw, 22px); }
 
           <div class="field">
             <label for="date">Payment Date *</label>
-            <input id="date" type="text" placeholder="DD/MM/YYYY" required onchange="el('displayDate').textContent=this.value">
+            <input id="date" type="date" required onchange="el('displayDate').textContent=formatDateForDisplay(this.value)">
           </div>
 
           <div class="field">
@@ -1129,7 +1207,7 @@ function receiptData(normalizedPhone) {
     academicYear: el('year').value,
     amount: el('amount').value,
     amountInWords: el('amountWords').textContent,
-    paymentDate: el('date').value,
+    paymentDate: formatDateForDisplay(el('date').value),
     paymentMode: el('modeInput').value,
     transactionId: el('txn').value.trim() || 'N/A',
     installmentStage: el('stage').value,
@@ -1214,7 +1292,7 @@ async function generateProfessionalPDF(itemData) {
   doc.text('PERFORMING ARTS ACADEMY', col2X + (col2Width / 2), headerStartY + 10.5, { align: 'center' });
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.2);
+  doc.setFontSize(8);
   doc.setTextColor(...colMuted);
   doc.text('BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM', col2X + (col2Width / 2), headerStartY + 15, { align: 'center' });
 
@@ -1223,7 +1301,7 @@ async function generateProfessionalPDF(itemData) {
   doc.line(col3X - 4, headerStartY + 2, col3X - 4, headerStartY + 22);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.2);
+  doc.setFontSize(8);
   doc.setTextColor(...colMuted);
   const contactRight = pageWidth - margin;
   const contactWidth = 54;
@@ -1263,7 +1341,7 @@ async function generateProfessionalPDF(itemData) {
   currentY += 6;
 
   const panelWidth = (contentWidth - 4) / 2;
-  const panelHeight = 51;
+  const panelHeight = 54;
   let leftX = margin;
   let rightX = margin + panelWidth + 4;
 
@@ -1281,16 +1359,16 @@ async function generateProfessionalPDF(itemData) {
   doc.line(leftX + 5, currentY + 9.5, leftX + panelWidth - 5, currentY + 9.5);
 
   let p1Y = currentY + 16;
-  const rowGap = 7.4;
+  const rowGap = 8;
 
   const addRow = (x, y, label, val) => {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.8);
+    doc.setFontSize(9.6);
     doc.setTextColor(...colMuted);
     doc.text(label, x + 5, y);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.8);
+    doc.setFontSize(9.6);
     doc.setTextColor(...colEspresso);
     doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
   };
@@ -1310,15 +1388,15 @@ async function generateProfessionalPDF(itemData) {
   doc.line(rightX + 5, currentY + 8, rightX + panelWidth - 5, currentY + 8);
 
   let p2Y_adj = currentY + 13.5;
-  const rowGap2 = 6.1;
+  const rowGap2 = 6.5;
   const addRowSmall = (x, y, label, val) => {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
+    doc.setFontSize(9.2);
     doc.setTextColor(...colMuted);
     doc.text(label, x + 5, y);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
+    doc.setFontSize(9.2);
     doc.setTextColor(...colEspresso);
     doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
   };
@@ -1341,12 +1419,12 @@ async function generateProfessionalPDF(itemData) {
   doc.rect(margin, currentY, 1.2, remHeight, 'F');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
+  doc.setFontSize(9.2);
   doc.setTextColor(...colNavy);
   doc.text('Remarks & Extra Declarations:', margin + 5, currentY + 5.5);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
+  doc.setFontSize(9.2);
   doc.setTextColor(74, 85, 104);
   doc.text('No Remarks', margin + 5, currentY + 11.5);
 
@@ -1358,12 +1436,17 @@ async function generateProfessionalPDF(itemData) {
   doc.roundedRect(margin, currentY, contentWidth, noticeHeight, 1.5, 1.5, 'FD');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(9);
   doc.setTextColor(...colEspresso);
-  doc.text('Official Notice: ', margin + 4, currentY + 5.5);
+  doc.text('Official Notice:', margin + 4, currentY + 6);
   doc.setFont('helvetica', 'normal');
-  doc.text('This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded', margin + 26, currentY + 5.5);
-  doc.text('herein are considered valid and no physical signature or seal is required.', margin + 4, currentY + 10);
+  doc.setFontSize(9);
+  const noticeText = 'This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.';
+  const noticeLines = doc.splitTextToSize(noticeText, contentWidth - 34);
+  doc.text(noticeLines, margin + 31, currentY + 6);
+  if (noticeLines.length > 1) {
+    doc.text('considered valid and no physical signature or seal is required.', margin + 4, currentY + 11);
+  }
 
   currentY += noticeHeight + 6;
 
@@ -1371,29 +1454,30 @@ async function generateProfessionalPDF(itemData) {
   
   doc.setFillColor(250, 251, 252);
   doc.setDrawColor(...colBorder);
-  doc.roundedRect(margin, footerY, 14, 14, 1, 1, 'FD');
+  doc.roundedRect(margin, footerY, 18, 18, 1.2, 1.2, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(6);
+  doc.setFontSize(6.5);
   doc.setTextColor(...colMuted);
-  doc.text('Verified Slip', margin + 2, footerY + 12.5);
+  doc.text('Verified Slip', margin + 2.2, footerY + 15.5);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text(`Generated On : ${itemData.savedAt}`, margin + 18, footerY + 5);
-  doc.text('Secure Mode : Active System Gateway', margin + 18, footerY + 10);
+  doc.setFontSize(9);
+  doc.setTextColor(...colMuted);
+  doc.text(`Generated On: ${itemData.savedAt}`, margin + 23, footerY + 7);
+  doc.text('Secure Mode: Active System Gateway', margin + 23, footerY + 13);
 
-  const sigX = pageWidth - margin - 45;
+  const sigX = pageWidth - margin - 49;
   if (sigBase64) {
-    doc.addImage(sigBase64, 'PNG', sigX + 2, footerY - 4, 38, 14);
+    doc.addImage(sigBase64, 'PNG', sigX + 2, footerY - 5, 43, 16);
   }
   doc.setDrawColor(...colMuted);
   doc.setLineWidth(0.4);
-  doc.line(sigX, footerY + 11, pageWidth - margin, footerY + 11);
+  doc.line(sigX, footerY + 12, pageWidth - margin, footerY + 12);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(9);
   doc.setTextColor(...colNavy);
-  doc.text('AUTHORIZED SIGNATURE', sigX + (45 / 2), footerY + 15, { align: 'center' });
+  doc.text('AUTHORIZED SIGNATURE', sigX + (49 / 2), footerY + 17, { align: 'center' });
 
   doc.save(`${itemData.receiptNo}.pdf`);
 }
@@ -1552,16 +1636,23 @@ function sendWhatsApp() {
   window.open(url, '_blank');
 }
 
+function formatDateForDisplay(value) {
+  if (!value) return '';
+  const parts = value.split('-');
+  if (parts.length !== 3) return value;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
 function formatTodayForReceipt(date = new Date()) {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
-  return `${day}/${month}/${date.getFullYear()}`;
+  return `${date.getFullYear()}-${month}-${day}`;
 }
 
 function initializeNewReceipt() {
   const today = formatTodayForReceipt();
   if (el('date') && !el('date').value) el('date').value = today;
-  if (el('displayDate')) el('displayDate').textContent = today;
+  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(today);
   if (el('receiptNo')) el('receiptNo').textContent = makeReceiptNo();
   if (el('genDateTime')) el('genDateTime').textContent = new Date().toLocaleString('en-IN');
 }
