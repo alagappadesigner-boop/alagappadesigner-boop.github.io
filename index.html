@@ -877,6 +877,57 @@ input::placeholder { font-size: 13px; }
   .signature-block { width: 100%; }
 }
 
+
+/* Official Notice — match the supplied reference image */
+.notice-box {
+  width: 100%;
+  min-height: 88px;
+  border: 1.5px dashed #e9cc82;
+  background: #fffdf7;
+  border-radius: 10px;
+  padding: 17px 26px;
+  margin: 0 0 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  color: #6b6045;
+  font-family: 'Lato', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+.notice-icon {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: #d9ad32;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+.notice-text {
+  flex: 1;
+  min-width: 0;
+  color: #6b6045;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.notice-text strong {
+  color: #65583b;
+  font-size: 16px;
+  font-weight: 800;
+}
+@media (max-width: 640px) {
+  .notice-box { padding: 13px 14px; gap: 10px; min-height: 0; }
+  .notice-text, .notice-text strong { font-size: 14px; }
+}
+
 </style>
 </head>
 <body>
@@ -1430,25 +1481,39 @@ async function generateProfessionalPDF(itemData) {
 
   currentY += remHeight + 4;
 
-  const noticeHeight = 14;
-  doc.setFillColor(255, 252, 243);
-  doc.setDrawColor(...colGold);
-  doc.roundedRect(margin, currentY, contentWidth, noticeHeight, 1.5, 1.5, 'FD');
+  const noticeHeight = 22;
+  doc.setFillColor(255, 253, 247);
+  doc.setDrawColor(233, 204, 130);
+  doc.setLineWidth(0.35);
+  doc.setLineDashPattern([1.2, 1.0], 0);
+  doc.roundedRect(margin, currentY, contentWidth, noticeHeight, 2.2, 2.2, 'FD');
+  doc.setLineDashPattern([], 0);
 
+  // Gold information icon matching the reference.
+  doc.setFillColor(217, 173, 50);
+  doc.circle(margin + 7, currentY + 7.2, 2.4, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(...colEspresso);
-  doc.text('Official Notice:', margin + 4, currentY + 6);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(7.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text('i', margin + 7, currentY + 8.1, { align: 'center' });
+
+  const noticeLabel = 'Official Notice:';
   const noticeText = 'This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.';
-  const noticeLines = doc.splitTextToSize(noticeText, contentWidth - 34);
-  doc.text(noticeLines, margin + 31, currentY + 6);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(101, 88, 59);
+  doc.text(noticeLabel, margin + 13, currentY + 7.2);
+  const labelWidth = doc.getTextWidth(noticeLabel) + 2;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  doc.setTextColor(107, 96, 69);
+  const noticeLines = doc.splitTextToSize(noticeText, contentWidth - 20 - labelWidth);
+  doc.text(noticeLines[0] || '', margin + 13 + labelWidth, currentY + 7.2);
   if (noticeLines.length > 1) {
-    doc.text('considered valid and no physical signature or seal is required.', margin + 4, currentY + 11);
+    doc.text(noticeLines.slice(1), margin + 13, currentY + 13.5);
   }
 
-  currentY += noticeHeight + 6;
+  currentY += noticeHeight + 7;
 
   let footerY = currentY;
   
