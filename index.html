@@ -1444,7 +1444,7 @@ function receiptData(normalizedPhone) {
     paymentMode: el('modeInput').value,
     transactionId: el('txn').value.trim() || 'N/A',
     installmentStage: el('stage').value,
-    savedAt: el('genDateTime').textContent
+    savedAt: el('genDateTime').textContent || new Date().toLocaleString('en-IN')
   };
 }
 
@@ -1985,13 +1985,47 @@ function formatTodayForReceipt(date = new Date()) {
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
+const CURRENT_RECEIPT_META_KEY = 'apaa_current_receipt_meta_v1';
+
+function getOrCreateCurrentReceiptMeta() {
+  // Keep the same receipt number and generated timestamp when the page is refreshed.
+  try {
+    const existing = JSON.parse(localStorage.getItem(CURRENT_RECEIPT_META_KEY) || 'null');
+    if (existing && existing.receiptNo && existing.generatedAt) return existing;
+  } catch (error) {
+    console.warn('Could not read current receipt metadata:', error);
+  }
+
+  const meta = {
+    receiptNo: makeReceiptNo(),
+    generatedAt: new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    })
+  };
+
+  try {
+    localStorage.setItem(CURRENT_RECEIPT_META_KEY, JSON.stringify(meta));
+  } catch (error) {
+    console.warn('Could not persist current receipt metadata:', error);
+  }
+  return meta;
+}
+
 function initializeNewReceipt() {
   const today = formatTodayForReceipt();
   if (el('date') && !el('date').value) el('date').value = today;
   if (el('dateDisplay')) el('dateDisplay').value = formatDateForDisplay(el('date').value || today);
   if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(el('date').value || today);
-  if (el('receiptNo')) el('receiptNo').textContent = makeReceiptNo();
-  if (el('genDateTime')) el('genDateTime').textContent = new Date().toLocaleString('en-IN');
+
+  const receiptMeta = getOrCreateCurrentReceiptMeta();
+  if (el('receiptNo')) el('receiptNo').textContent = receiptMeta.receiptNo;
+  if (el('genDateTime')) el('genDateTime').textContent = receiptMeta.generatedAt;
 }
 
 initializeNewReceipt();
