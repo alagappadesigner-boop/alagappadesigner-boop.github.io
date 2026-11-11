@@ -739,9 +739,10 @@ select option {
   <main class="sheet">
     <header class="receipt-header">
       <!-- Left Academy Logo -->
-      <img src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Logo.png" 
+      <img id="logoLeftImg" src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Logo.png" 
            class="academy-logo" 
            alt="Academy Logo"
+           crossorigin="anonymous"
            onerror="this.onerror=null; this.src='Logo.png';">
 
       <!-- Center Academy Details Block -->
@@ -761,9 +762,10 @@ select option {
       </div>
 
       <!-- Right University Logo -->
-      <img src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Alagappa_University_Logo.png" 
+      <img id="logoRightImg" src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Alagappa_University_Logo.png" 
            class="university-logo" 
            alt="Alagappa University Logo"
+           crossorigin="anonymous"
            onerror="this.onerror=null; this.src='Alagappa_University_Logo.png';">
     </header>
 
@@ -885,9 +887,10 @@ select option {
 
       <div class="signature-block">
         <div class="signature-img-wrap">
-          <img id="authSignature" class="signature-img" 
+          <img id="signatureImg" class="signature-img" 
                src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/signature.png" 
                alt="Authorized Signature" 
+               crossorigin="anonymous"
                onerror="this.onerror=null; this.src='signature.png';">
         </div>
         <div class="sign-line">
@@ -988,7 +991,6 @@ function validateAndNormalizePhone() {
   const phoneInput = el('phone');
   let raw = phoneInput.value.trim();
 
-  // Clear previous error highlight
   phoneInput.classList.remove('field-error');
 
   if (!raw) {
@@ -998,14 +1000,10 @@ function validateAndNormalizePhone() {
     return null;
   }
 
-  // Remove spaces, hyphens, and parentheses for analysis
   let cleaned = raw.replace(/[\s\-\(\)]/g, '');
-
-  // Check country code presence (+91 or 91)
   let digitsOnly = cleaned.replace(/\D/g, '');
 
   if (!cleaned.startsWith('+91') && !cleaned.startsWith('91') && digitsOnly.length === 10) {
-    // Missing +91 country code when 10 digits are provided
     alert("Please enter a valid Indian mobile number with +91 country code.");
     phoneInput.classList.add('field-error');
     phoneInput.focus();
@@ -1047,8 +1045,7 @@ function validateAndNormalizePhone() {
 }
 
 function validateReceipt() {
-  // Clear any existing error highlights
-  document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('field-error'));
 
   if (!el('feeForm').reportValidity()) {
     return false;
@@ -1098,9 +1095,226 @@ function updateSavedCount() {
   el('savedCount').textContent = 'Saved receipts: ' + getSaved().length;
 }
 
-// Complete Print Receipt Workflow: Validate -> Save -> Download PDF -> Clear Form -> Next Receipt No
+// Utility to load image as Base64 for jsPDF embedding
+async function getBase64ImageFromURL(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+// Professional Vector PDF Generator matching reference design
+async function generateProfessionalPDF(itemData) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  // A4 dimensions: 210mm wide x 297mm high
+  const pageWidth = 210;
+  const margin = 15;
+  const contentWidth = pageWidth - (margin * 2);
+
+  // Colors
+  const colBronzeDark = [61, 44, 30];
+  const colBronzeMed = [82, 59, 40];
+  const colGold = [184, 147, 70];
+  const colEspresso = [36, 27, 22];
+  const colPanelBg = [249, 244, 234];
+  const colPanelBorder = [216, 196, 160];
+
+  let currentY = 15;
+
+  // Top Accent Bar
+  doc.setFillColor(61, 44, 30);
+  doc.rect(margin, currentY, contentWidth, 2, 'F');
+  currentY += 6;
+
+  // Header Logos (Load base64)
+  const leftLogoBase64 = await getBase64ImageFromURL(el('logoLeftImg').src);
+  const rightLogoBase64 = await getBase64ImageFromURL(el('logoRightImg').src);
+  const sigBase64 = await getBase64ImageFromURL(el('signatureImg').src);
+
+  if (leftLogoBase64) {
+    doc.addImage(leftLogoBase64, 'PNG', margin, currentY, 26, 16);
+  }
+  if (rightLogoBase64) {
+    doc.addImage(rightLogoBase64, 'PNG', pageWidth - margin - 22, currentY + 1, 22, 14);
+  }
+
+  // Header Center Text
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(...colBronzeDark);
+  doc.text('ALAGAPPA', pageWidth / 2, currentY + 4, { align: 'center' });
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...colBronzeMed);
+  doc.text('PERFORMING ARTS ACADEMY', pageWidth / 2, currentY + 10, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...colGold);
+  doc.text('BHARATHANATYAM   •   CARNATIC VOCAL   •   NATTUVANGAM', pageWidth / 2, currentY + 15, { align: 'center' });
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(89, 71, 61);
+  doc.text('49, Gangadeeshwar Koil St, Purasawalkam, Chennai - 600084  |  Vaishnavi@alagappaarts.com', pageWidth / 2, currentY + 20, { align: 'center' });
+
+  currentY += 24;
+
+  // Gold Divider Line
+  doc.setDrawColor(...colGold);
+  doc.setLineWidth(0.5);
+  doc.line(margin + 20, currentY, pageWidth - margin - 20, currentY);
+  currentY += 8;
+
+  // Subheader: Fee Receipt & Receipt No / Date
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(...colBronzeDark);
+  doc.text('FEE RECEIPT', margin, currentY);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(89, 71, 61);
+  doc.text(`Receipt No: ${itemData.receiptNo}`, pageWidth - margin, currentY - 2, { align: 'right' });
+  doc.text(`Payment Date: ${itemData.paymentDate}`, pageWidth - margin, currentY + 3, { align: 'right' });
+
+  currentY += 10;
+
+  // Two Side-by-Side Panels for Student & Payment Info
+  const panelWidth = (contentWidth - 6) / 2;
+  const panelHeight = 54;
+  let leftX = margin;
+  let rightX = margin + panelWidth + 6;
+
+  // --- Left Panel: Student & Course Details ---
+  doc.setFillColor(...colPanelBg);
+  doc.setDrawColor(...colPanelBorder);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(leftX, currentY, panelWidth, panelHeight, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(...colBronzeDark);
+  doc.text('STUDENT & COURSE DETAILS', leftX + 6, currentY + 8);
+
+  doc.setDrawColor(...colPanelBorder);
+  doc.line(leftX + 6, currentY + 11, leftX + panelWidth - 6, currentY + 11);
+
+  let p1Y = currentY + 18;
+  const rowGap = 7.5;
+
+  const addRow = (x, y, label, val) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(89, 71, 61);
+    doc.text(label, x + 6, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...colEspresso);
+    doc.text(String(val || ''), x + panelWidth - 6, y, { align: 'right' });
+  };
+
+  addRow(leftX, p1Y, 'Student Name:', itemData.studentName);
+  addRow(leftX, p1Y + rowGap, 'Phone Number:', itemData.phone);
+  addRow(leftX, p1Y + (rowGap * 2), 'Course Registered:', itemData.course);
+  addRow(leftX, p1Y + (rowGap * 3), 'Academic Year:', itemData.academicYear);
+
+  // --- Right Panel: Payment Information ---
+  doc.setFillColor(...colPanelBg);
+  doc.setDrawColor(...colPanelBorder);
+  doc.roundedRect(rightX, currentY, panelWidth, panelHeight, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(...colBronzeDark);
+  doc.text('PAYMENT INFORMATION', rightX + 6, currentY + 8);
+
+  doc.line(rightX + 6, currentY + 11, rightX + panelWidth - 6, currentY + 11);
+
+  let p2Y = currentY + 18;
+  addRow(rightX, p2Y, 'Amount Paid:', `Rs. ${itemData.amount.toFixed(2)}`);
+  addRow(rightX, p2Y + rowGap, 'Payment Mode:', itemData.paymentMode);
+  addRow(rightX, p2Y + (rowGap * 2), 'Transaction / UPI ID:', itemData.transactionId);
+  addRow(rightX, p2Y + (rowGap * 3), 'Installment Stage:', itemData.installmentStage);
+
+  currentY += panelHeight + 6;
+
+  // Amount in Words Box
+  doc.setFillColor(235, 245, 240);
+  doc.setDrawColor(158, 209, 183);
+  doc.roundedRect(margin, currentY, contentWidth, 12, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(36, 88, 64);
+  doc.text('Amount in Words:', margin + 6, currentY + 7.5);
+
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(8.5);
+  doc.setTextColor(36, 88, 64);
+  doc.text(itemData.amountInWords, pageWidth - margin - 6, currentY + 7.5, { align: 'right' });
+
+  currentY += 16;
+
+  // Official System Notice & Security Gateway info
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(7.5);
+  doc.setTextColor(113, 128, 150);
+  doc.text('This receipt is valid subject to successful realization of payment. Computer-generated official acknowledgement.', pageWidth / 2, currentY, { align: 'center' });
+  currentY += 4;
+  doc.text(`System Generated on: ${itemData.savedAt}  |  Active Secure Gateway: APAA-PORTAL-V1`, pageWidth / 2, currentY, { align: 'center' });
+
+  currentY += 10;
+
+  // Footer & Authorized Signature
+  doc.setDrawColor(...colPanelBorder);
+  doc.setLineWidth(0.3);
+  doc.line(margin, currentY, pageWidth - margin, currentY);
+  currentY += 6;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(89, 71, 61);
+  doc.text('Thank you for your payment.', margin, currentY + 4);
+  doc.text('For billing queries, contact Vaishnavi@alagappaarts.com', margin, currentY + 9);
+
+  // Signature Block on Right
+  const sigX = pageWidth - margin - 50;
+  if (sigBase64) {
+    doc.addImage(sigBase64, 'PNG', sigX + 5, currentY - 2, 40, 16);
+  }
+  doc.setDrawColor(122, 93, 67);
+  doc.line(sigX, currentY + 16, pageWidth - margin, currentY + 16);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...colBronzeDark);
+  doc.text('Authorized Signature', sigX + 25, currentY + 20, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(89, 71, 61);
+  doc.text('Alagappa Performing Arts Academy', sigX + 25, currentY + 24, { align: 'center' });
+
+  // Save PDF
+  doc.save(`${itemData.receiptNo}.pdf`);
+}
+
+// Complete Print Receipt Workflow: Validate -> Save -> Download Professional PDF -> Clear Form -> Next Receipt No
 async function handlePrintReceiptWorkflow() {
-  // 1. Validate all details and phone number
   if (!validateReceipt()) return;
 
   const normalizedPhone = validateAndNormalizePhone();
@@ -1122,27 +1336,10 @@ async function handlePrintReceiptWorkflow() {
     }
   }
 
-  // 2. Generate and Automatically Download PDF
-  if (!window.html2canvas || !window.jspdf) {
-    alert('PDF export libraries are loading. Please check your connection and try again.');
-    return;
-  }
-
+  // Generate and Automatically Download Professional PDF
   try {
-    const canvas = await html2canvas(document.querySelector('.sheet'), { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-    const imgData = canvas.toDataURL('image/png');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height]
-    });
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    pdf.save((data.receiptNo || 'APAA-Receipt') + '.pdf');
-
-    // 3. Automatically Clear Form & Generate Next Unique Receipt Number upon successful PDF download
+    await generateProfessionalPDF(data);
     clearFormAndResetReceipt();
-
   } catch (err) {
     console.error('PDF Generation Error:', err);
     alert('PDF generation encountered an error. Your receipt record has been saved safely.');
@@ -1154,7 +1351,7 @@ function clearFormAndResetReceipt() {
   el('amountWords').textContent = 'Zero Rupees Only';
   el('date').value = new Date().toISOString().slice(0, 10);
   el('receiptNo').textContent = makeReceiptNo();
-  document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('field-error'));
 }
 
 function renderLedger() {
@@ -1197,64 +1394,7 @@ async function downloadSpecificPDF(index) {
   const saved = getSaved();
   const item = saved[index];
   if (!item) return;
-
-  // Temporarily backup current form state
-  const curReceiptNo = el('receiptNo').textContent;
-  const curStudent = el('student').value;
-  const curPhone = el('phone').value;
-  const curCourse = el('course').value;
-  const curYear = el('year').value;
-  const curAmount = el('amount').value;
-  const curWords = el('amountWords').textContent;
-  const curDate = el('date').value;
-  const curTxn = el('txn').value;
-  const curStage = el('stage').value;
-  const curMode = getMode();
-
-  // Populate form with target receipt values
-  el('receiptNo').textContent = item.receiptNo;
-  el('student').value = item.studentName;
-  el('phone').value = item.phone;
-  el('course').value = item.course || '';
-  el('year').value = item.academicYear || '';
-  el('amount').value = item.amount;
-  el('amountWords').textContent = item.amountInWords;
-  el('date').value = item.paymentDate;
-  el('txn').value = item.transactionId === 'N/A' ? '' : item.transactionId;
-  el('stage').value = item.installmentStage || '';
-  
-  const radio = document.querySelector(`input[name="mode"][value="${item.paymentMode}"]`);
-  if (radio) radio.checked = true;
-
-  // Capture PDF
-  try {
-    const canvas = await html2canvas(document.querySelector('.sheet'), { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-    const imgData = canvas.toDataURL('image/png');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height]
-    });
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    pdf.save((item.receiptNo || 'APAA-Receipt') + '.pdf');
-  } catch (err) {
-    alert('Failed to generate PDF for selected receipt.');
-  } finally {
-    // Restore original form state
-    el('receiptNo').textContent = curReceiptNo;
-    el('student').value = curStudent;
-    el('phone').value = curPhone;
-    el('course').value = curCourse;
-    el('year').value = curYear;
-    el('amount').value = curAmount;
-    el('amountWords').textContent = curWords;
-    el('date').value = curDate;
-    el('txn').value = curTxn;
-    el('stage').value = curStage;
-    const origRadio = document.querySelector(`input[name="mode"][value="${curMode}"]`);
-    if (origRadio) origRadio.checked = true;
-  }
+  await generateProfessionalPDF(item);
 }
 
 // Excel Spreadsheet Export
