@@ -3294,13 +3294,11 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
 
 
 
-// Reliable live eye tracking for every character.
+// APAA live mouse-following eyes — coordinates are calculated in each eye group's
+// own SVG coordinate system, including character animations and responsive scaling.
 (() => {
   const svg = document.getElementById('character-svg');
-  if (!svg) {
-    console.warn('APAA character SVG not found; eye tracking was not initialized.');
-    return;
-  }
+  if (!svg) return;
 
   const pupilIds = [
     'purple-pupil-1', 'purple-pupil-2',
@@ -3309,87 +3307,117 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
     'orange-pupil-1', 'orange-pupil-2'
   ];
 
-  // Read each pupil's true SVG position and the white/dark eye boundary
-  // from the actual artwork. This avoids relying on guessed screen sizes.
   const eyes = pupilIds.map(id => {
     const pupil = document.getElementById(id);
     if (!pupil) return null;
-    const baseEye = pupil.previousElementSibling;
-    if (!baseEye || baseEye.tagName.toLowerCase() !== 'circle') return null;
 
-    const x = Number(pupil.getAttribute('cx'));
-    const y = Number(pupil.getAttribute('cy'));
-    const pupilRadius = Number(pupil.getAttribute('r')) || 3;
-    const eyeRadius = Number(baseEye.getAttribute('r')) || 10;
+    const white = pupil.previousElementSibling;
+    const eyeGroup = pupil.parentElement;
+    if (!white || white.tagName.toLowerCase() !== 'circle' || !eyeGroup) return null;
+
+    const baseX = Number(pupil.getAttribute('cx'));
+    const baseY = Number(pupil.getAttribute('cy'));
+    const pupilRadius = Number(pupil.getAttribute('r')) || 2;
+    const eyeRadius = Number(white.getAttribute('r')) || 8;
 
     return {
       pupil,
-      x, y,
-      range: Math.max(2, eyeRadius - pupilRadius - 1.25)
+      eyeGroup,
+      baseX,
+      baseY,
+      maxTravel: Math.max(1.5, eyeRadius - pupilRadius - 1),
+      x: 0, y: 0,
+      targetX: 0, targetY: 0
     };
   }).filter(Boolean);
 
-  let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-  let raf = 0;
+  if (!eyes.length) {
+    console.warn('APAA eye tracking: no pupil elements were found.');
+    return;
+  }
 
-  function updateEyes() {
-    raf = 0;
-    const matrix = svg.getScreenCTM();
-    if (!matrix || !eyes.length) return;
+  let pointerX = window.innerWidth / 2;
+  let pointerY = window.innerHeight / 2;
+  let frame = 0;
 
-    let point;
-    try {
-      const p = svg.createSVGPoint();
-      p.x = pointer.x;
-      p.y = pointer.y;
-      point = p.matrixTransform(matrix.inverse());
-    } catch (error) {
-      return;
-    }
+  function setPointer(event) {
+    if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    if (!frame) frame = requestAnimationFrame(updateGaze);
+  }
+
+  function updateGaze() {
+    frame = 0;
 
     eyes.forEach(eye => {
-      const dx = point.x - eye.x;
-      const dy = point.y - eye.y;
+      // Use the eye group's own matrix so the gaze remains accurate when the
+      // character floats, rotates, or scales on different screen sizes.
+      const matrix = eye.eyeGroup.getScreenCTM();
+      if (!matrix) return;
+
+      let localPointer;
+      try {
+        const point = svg.createSVGPoint();
+        point.x = pointerX;
+        point.y = pointerY;
+        localPointer = point.matrixTransform(matrix.inverse());
+      } catch (_) {
+        return;
+      }
+
+      const dx = localPointer.x - eye.baseX;
+      const dy = localPointer.y - eye.baseY;
       const distance = Math.hypot(dx, dy) || 1;
-      // Give the pupils a clearly visible movement while keeping them inside
-      // their eye whites.
-      const movement = Math.min(eye.range, Math.max(0, distance * 0.12));
-      const x = eye.x + (dx / distance) * movement;
-      const y = eye.y + (dy / distance) * movement;
-      eye.pupil.setAttribute('cx', x.toFixed(2));
-      eye.pupil.setAttribute('cy', y.toFixed(2));
+      const travel = Math.min(eye.maxTravel, distance);
+      eye.targetX = (dx / distance) * travel;
+      eye.targetY = (dy / distance) * travel;
     });
+
+    // Smoothly ease every pupil toward its target on each animation frame.
+    let stillMoving = false;
+    eyes.forEach(eye => {
+      eye.x += (eye.targetX - eye.x) * 0.32;
+      eye.y += (eye.targetY - eye.y) * 0.32;
+
+      if (Math.abs(eye.targetX - eye.x) > 0.08 ||
+          Math.abs(eye.targetY - eye.y) > 0.08) {
+        stillMoving = true;
+      }
+
+      eye.pupil.setAttribute(
+        'transform',
+        `translate(${eye.x.toFixed(2)} ${eye.y.toFixed(2)})`
+      );
+    });
+
+    if (stillMoving) frame = requestAnimationFrame(updateGaze);
   }
 
-  function trackPointer(event) {
-    if (typeof event.clientX !== 'number' || typeof event.clientY !== 'number') return;
-    pointer.x = event.clientX;
-    pointer.y = event.clientY;
-    if (!raf) raf = requestAnimationFrame(updateEyes);
-  }
-
-  // Capture pointer movement from the whole page, including the login form.
-  window.addEventListener('pointermove', trackPointer, { passive: true });
-  window.addEventListener('mousemove', trackPointer, { passive: true });
-  window.addEventListener('touchmove', event => {
-    if (event.touches && event.touches.length) trackPointer(event.touches[0]);
-  }, { passive: true });
+  // Capture at document level so tracking continues over form controls,
+  // buttons, and both panels of the login page.
+  document.addEventListener('pointermove', setPointer, { passive: true, capture: true });
+  document.addEventListener('mousemove', setPointer, { passive: true, capture: true });
+  document.addEventListener('touchmove', event => {
+    if (event.touches && event.touches.length) setPointer(event.touches[0]);
+  }, { passive: true, capture: true });
 
   window.addEventListener('resize', () => {
-    if (!raf) raf = requestAnimationFrame(updateEyes);
+    if (!frame) frame = requestAnimationFrame(updateGaze);
   }, { passive: true });
 
-  // Re-run after login/logout changes visibility of the login gate.
+  // Recalculate after the login gate is shown or hidden.
   const gate = document.getElementById('apaaLoginGate');
   if (gate && window.MutationObserver) {
     new MutationObserver(() => {
-      if (!raf) raf = requestAnimationFrame(updateEyes);
+      if (!frame) frame = requestAnimationFrame(updateGaze);
     }).observe(gate, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
   }
 
-  // Set an initial gaze and keep recalculating against the actual SVG transform.
-  updateEyes();
+  // Start with a visible gaze and continuously refresh while the pointer moves.
+  updateGaze();
 })();
+
 initializeNewReceipt();
 handlePaymentModeChange();
 updateLiveGeneratedTime();
