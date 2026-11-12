@@ -1964,6 +1964,59 @@ select option { font-size: 14px; color: #243b53; }
   .apaa-shape { animation:none !important; }
 }
 
+
+/* More expressive, natural-looking purple character eyes */
+.apaa-shape-purple .apaa-eye {
+  width: 15px !important;
+  height: 18px !important;
+  top: 18% !important;
+  background: radial-gradient(ellipse at 42% 35%, #fff 0 58%, #f4eaff 78%, #d9c5ff 100%) !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 1px rgba(25,10,55,.18), inset 0 -1px 2px rgba(76,30,130,.12);
+}
+.apaa-shape-purple .apaa-eye:nth-of-type(1) { left: 34% !important; }
+.apaa-shape-purple .apaa-eye:nth-of-type(2) { left: 63% !important; }
+.apaa-shape-purple .apaa-eye i {
+  width: 9px !important;
+  height: 11px !important;
+  left: 3px !important;
+  top: 4px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 35% 28%, #57406f 0 12%, #171323 35%, #090711 100%) !important;
+  box-shadow: 1px 1px 0 rgba(0,0,0,.18);
+}
+.apaa-shape-purple .apaa-eye i::after {
+  content: "";
+  position: absolute;
+  width: 3px; height: 3px;
+  left: 1px; top: 1px;
+  border-radius: 50%;
+  background: #fff;
+}
+.apaa-shape-purple .apaa-mouth {
+  width: 13px !important;
+  height: 8px !important;
+  left: 47% !important;
+  top: 34% !important;
+  border-bottom-width: 3px !important;
+  border-radius: 0 0 55% 55% !important;
+}
+.apaa-shape-black .apaa-eye,
+.apaa-shape-orange .apaa-eye {
+  transition: transform .18s ease, opacity .18s ease;
+}
+.apaa-art-stage.is-looking-away .apaa-shape {
+  animation-play-state: running;
+}
+.apaa-art-stage.is-looking-away .apaa-shape-purple .apaa-mouth {
+  transform: scaleX(.82);
+}
+@media (max-width:760px) {
+  .apaa-shape-purple .apaa-eye { width: 10px !important; height: 13px !important; }
+  .apaa-shape-purple .apaa-eye i { width: 6px !important; height: 8px !important; left: 2px !important; top: 3px !important; }
+}
+
 </style>
 </head>
 <body>
@@ -3105,48 +3158,87 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
 
 
 
-// Let each character's pupils follow the pointer, just like the supplied reference.
+// Interactive character eyes: follow the pointer, but politely look away while password is entered.
 (() => {
   const stage = document.querySelector('.apaa-art-stage');
+  const password = document.getElementById('apaaLoginPassword');
   if (!stage) return;
+
   const faces = [...stage.querySelectorAll('[data-face]')];
-  const moveEyes = (clientX, clientY) => {
-    faces.forEach(face => {
-      const eyes = face.querySelectorAll('.apaa-eye i');
-      eyes.forEach(pupil => {
-        const eye = pupil.parentElement;
+  let lastPointer = { x: window.innerWidth * .72, y: window.innerHeight * .5 };
+  let passwordMode = false;
+
+  function setPupil(pupil, x, y) {
+    pupil.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  function followPointer(clientX, clientY) {
+    lastPointer = { x: clientX, y: clientY };
+    if (passwordMode) return;
+
+    faces.forEach((face, faceIndex) => {
+      const eyes = [...face.querySelectorAll('.apaa-eye')];
+      eyes.forEach((eye, eyeIndex) => {
+        const pupil = eye.querySelector('i');
+        if (!pupil) return;
         const rect = eye.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = clientX - cx, dy = clientY - cy;
+        const dx = clientX - (rect.left + rect.width / 2);
+        const dy = clientY - (rect.top + rect.height / 2);
         const angle = Math.atan2(dy, dx);
-        const distance = Math.min(2.2, Math.hypot(dx, dy) / 85);
-        pupil.style.transform = `translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px)`;
+        const max = faceIndex === 0 ? 4.2 : 2.8;
+        const distance = Math.min(max, Math.hypot(dx, dy) / 72);
+        setPupil(pupil, Math.cos(angle) * distance, Math.sin(angle) * distance);
       });
-    });
-  };
-  document.addEventListener('pointermove', event => {
-    moveEyes(event.clientX, event.clientY);
-    const stageRect = stage.getBoundingClientRect();
-    const px = (event.clientX - (stageRect.left + stageRect.width / 2)) / (stageRect.width / 2);
-    const py = (event.clientY - (stageRect.top + stageRect.height / 2)) / (stageRect.height / 2);
-    faces.forEach((face, index) => {
-      const weight = [1.0, .72, .48, .62][index] || .5;
-      const tilt = Math.max(-7, Math.min(7, px * 5.5 * weight));
+
+      const r = stage.getBoundingClientRect();
+      const px = (clientX - (r.left + r.width / 2)) / Math.max(1, r.width / 2);
+      const tilt = Math.max(-5, Math.min(5, px * 3.5 * ([1,.7,.45,.6][faceIndex] || .5)));
       face.style.setProperty('--cursor-tilt', `${tilt}deg`);
-      face.style.setProperty('--cursor-y', `${Math.max(-5, Math.min(5, py * 3))}px`);
     });
-  }, {passive:true});
-  document.addEventListener('pointerleave', () => {
-    stage.querySelectorAll('.apaa-eye i').forEach(pupil => pupil.style.transform = 'translate(0,0)');
-    faces.forEach(face => face.style.setProperty('--cursor-tilt', '0deg'));
-  });
+  }
+
+  function lookAway() {
+    passwordMode = true;
+    stage.classList.add('is-looking-away');
+    faces.forEach((face, faceIndex) => {
+      const pupils = [...face.querySelectorAll('.apaa-eye i')];
+      pupils.forEach((pupil, eyeIndex) => {
+        // Each character glances away from the password field in a slightly different direction.
+        const directions = [
+          [[-3.2,-1.2],[3.2,-1.2]],   // purple glances outward
+          [[-2.5,1.2],[2.5,1.2]],     // black glances outward and down
+          [[-2.8,-1.0],[2.8,-1.0]],   // orange glances outward
+          [[-2.4,1.5],[2.4,1.5]]      // yellow glances outward and down
+        ];
+        const [x,y] = (directions[faceIndex] || directions[0])[eyeIndex] || [-2,1];
+        setPupil(pupil, x, y);
+      });
+      const awayTilts = [-3, 4, -2, 3];
+      face.style.setProperty('--cursor-tilt', `${awayTilts[faceIndex] || 0}deg`);
+    });
+  }
+
+  function lookBack() {
+    passwordMode = false;
+    stage.classList.remove('is-looking-away');
+    followPointer(lastPointer.x, lastPointer.y);
+  }
+
+  document.addEventListener('pointermove', event => followPointer(event.clientX, event.clientY), { passive: true });
   document.addEventListener('touchmove', event => {
     const touch = event.touches && event.touches[0];
-    if (touch) moveEyes(touch.clientX, touch.clientY);
-  }, {passive:true});
-})();
+    if (touch) followPointer(touch.clientX, touch.clientY);
+  }, { passive: true });
 
+  if (password) {
+    password.addEventListener('focus', lookAway);
+    password.addEventListener('input', lookAway);
+    password.addEventListener('blur', lookBack);
+  }
+
+  // The characters start by looking toward the viewer, then track the cursor.
+  requestAnimationFrame(() => followPointer(lastPointer.x, lastPointer.y));
+})();
 
 initializeNewReceipt();
 handlePaymentModeChange();
