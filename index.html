@@ -1523,9 +1523,177 @@ select option { font-size: 14px; color: #243b53; }
   .form-grid::after { background-size: 155px auto; opacity: .075; }
 }
 
+
+/* APAA simple browser-based login */
+#apaaLoginGate {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(194,153,61,.12), transparent 32%),
+    linear-gradient(135deg, #eef2f7 0%, #f8f6f1 55%, #e9eef5 100%);
+}
+#apaaLoginGate[hidden] { display: none !important; }
+.apaa-login-card {
+  width: min(100%, 410px);
+  padding: 34px 34px 28px;
+  border: 1px solid #dce4ee;
+  border-top: 4px solid #bd963e;
+  border-radius: 16px;
+  background: rgba(255,255,255,.97);
+  box-shadow: 0 22px 65px rgba(19,48,78,.14);
+  animation: apaaLoginAppear .45s ease-out both;
+}
+@keyframes apaaLoginAppear {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.apaa-login-logo {
+  display: block;
+  width: 112px;
+  height: 72px;
+  object-fit: contain;
+  margin: 0 auto 12px;
+}
+.apaa-login-title {
+  margin: 0;
+  text-align: center;
+  color: #123b68;
+  font: 800 25px/1.15 Georgia, 'Times New Roman', serif;
+  letter-spacing: 1.4px;
+}
+.apaa-login-subtitle {
+  margin: 7px 0 24px;
+  text-align: center;
+  color: #b58b32;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+.apaa-login-heading {
+  margin: 0 0 17px;
+  color: #173b61;
+  font-size: 17px;
+  font-weight: 800;
+}
+.apaa-login-field { margin-bottom: 15px; }
+.apaa-login-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #53677e;
+  font-size: 12px;
+  font-weight: 700;
+}
+.apaa-login-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d7e0ea;
+  border-radius: 8px;
+  outline: none;
+  color: #193b60;
+  background: #fff;
+  font: 14px Arial, sans-serif;
+}
+.apaa-login-field input:focus {
+  border-color: #bd963e;
+  box-shadow: 0 0 0 3px rgba(189,150,62,.13);
+}
+.apaa-password-wrap { display: flex; gap: 7px; }
+.apaa-password-wrap input { flex: 1; min-width: 0; }
+.apaa-show-password {
+  border: 1px solid #d7e0ea;
+  border-radius: 8px;
+  padding: 0 11px;
+  background: #f8fafc;
+  color: #173b61;
+  cursor: pointer;
+  font-size: 12px;
+}
+.apaa-login-submit {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 7px;
+  border: 0;
+  border-radius: 8px;
+  background: #123b68;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  cursor: pointer;
+  box-shadow: 0 5px 13px rgba(18,59,104,.18);
+}
+.apaa-login-submit:hover { background: #0c2d50; }
+.apaa-login-error {
+  min-height: 17px;
+  margin: 10px 0 0;
+  color: #b42318;
+  font-size: 12px;
+  text-align: center;
+}
+.apaa-login-foot {
+  margin: 18px 0 0;
+  padding-top: 13px;
+  border-top: 1px solid #edf1f5;
+  color: #8491a0;
+  text-align: center;
+  font-size: 10px;
+}
+.apaa-logout {
+  margin-left: 10px;
+  padding: 6px 11px;
+  border: 1px solid #d7e0ea;
+  border-radius: 18px;
+  background: #fff;
+  color: #123b68;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.apaa-logout:hover { background: #f3f6fa; }
+@media (max-width: 480px) {
+  .apaa-login-card { padding: 27px 21px 23px; }
+}
+
 </style>
 </head>
 <body>
+
+<div id="apaaLoginGate">
+  <section class="apaa-login-card" aria-labelledby="apaaLoginTitle">
+    <img class="apaa-login-logo"
+         src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Logo.png"
+         alt="Alagappa Performing Arts Academy"
+         onerror="this.onerror=null;this.src='Logo.png';">
+    <h1 id="apaaLoginTitle" class="apaa-login-title">ALAGAPPA</h1>
+    <div class="apaa-login-subtitle">PERFORMING ARTS ACADEMY</div>
+    <h2 class="apaa-login-heading">Fee Management Login</h2>
+    <form id="apaaLoginForm" autocomplete="on">
+      <div class="apaa-login-field">
+        <label for="apaaLoginUsername">Username</label>
+        <input id="apaaLoginUsername" name="username" type="text"
+               placeholder="Enter username" autocomplete="username" required>
+      </div>
+      <div class="apaa-login-field">
+        <label for="apaaLoginPassword">Password</label>
+        <div class="apaa-password-wrap">
+          <input id="apaaLoginPassword" name="password" type="password"
+                 placeholder="Enter password" autocomplete="current-password" required>
+          <button class="apaa-show-password" type="button" id="apaaTogglePassword">Show</button>
+        </div>
+      </div>
+      <button class="apaa-login-submit" type="submit">LOGIN</button>
+      <p id="apaaLoginError" class="apaa-login-error" role="alert"></p>
+    </form>
+    <p class="apaa-login-foot">Authorised Staff Only · Alagappa Performing Arts Academy</p>
+  </section>
+</div>
+
 
 <div class="wrap">
   <!-- Saved Status Top Bar -->
@@ -1534,6 +1702,7 @@ select option { font-size: 14px; color: #243b53; }
       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
       <span id="savedCount">Saved receipts: 0</span>
     </div>
+    <button type="button" class="apaa-logout" onclick="apaaLogout()">Logout</button>
   </div>
 
   <!-- Exact Image Replica Sheet Container -->
@@ -2545,6 +2714,64 @@ function initializeNewReceipt() {
   if (el('receiptNo')) el('receiptNo').textContent = receiptMeta.receiptNo;
   if (el('genDateTime')) el('genDateTime').textContent = receiptMeta.generatedAt;
 }
+
+
+/*
+ * SIMPLE BROWSER LOGIN (not server-side security).
+ * Change these two values before deployment.
+ * Anyone with access to the website source can inspect these credentials.
+ */
+const APAA_LOGIN_USERNAME = 'admin';
+const APAA_LOGIN_PASSWORD = 'APAA@123';
+const APAA_LOGIN_SESSION_KEY = 'apaa_fee_portal_logged_in_v1';
+
+function apaaShowApplication() {
+  const gate = document.getElementById('apaaLoginGate');
+  if (gate) gate.hidden = true;
+  document.querySelector('.wrap').style.display = '';
+}
+function apaaShowLogin() {
+  const gate = document.getElementById('apaaLoginGate');
+  if (gate) gate.hidden = false;
+  const app = document.querySelector('.wrap');
+  if (app) app.style.display = 'none';
+  const username = document.getElementById('apaaLoginUsername');
+  if (username) username.focus();
+}
+function apaaLogout() {
+  sessionStorage.removeItem(APAA_LOGIN_SESSION_KEY);
+  apaaShowLogin();
+  const form = document.getElementById('apaaLoginForm');
+  if (form) form.reset();
+  const error = document.getElementById('apaaLoginError');
+  if (error) error.textContent = '';
+}
+document.getElementById('apaaLoginForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const username = document.getElementById('apaaLoginUsername').value.trim();
+  const password = document.getElementById('apaaLoginPassword').value;
+  if (username === APAA_LOGIN_USERNAME && password === APAA_LOGIN_PASSWORD) {
+    sessionStorage.setItem(APAA_LOGIN_SESSION_KEY, 'yes');
+    document.getElementById('apaaLoginError').textContent = '';
+    apaaShowApplication();
+  } else {
+    document.getElementById('apaaLoginError').textContent = 'Incorrect username or password. Please try again.';
+    document.getElementById('apaaLoginPassword').value = '';
+    document.getElementById('apaaLoginPassword').focus();
+  }
+});
+document.getElementById('apaaTogglePassword').addEventListener('click', function() {
+  const field = document.getElementById('apaaLoginPassword');
+  const showing = field.type === 'text';
+  field.type = showing ? 'password' : 'text';
+  this.textContent = showing ? 'Show' : 'Hide';
+});
+if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
+  apaaShowApplication();
+} else {
+  apaaShowLogin();
+}
+
 
 initializeNewReceipt();
 handlePaymentModeChange();
