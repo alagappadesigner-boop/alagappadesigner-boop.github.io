@@ -1298,6 +1298,94 @@ input::placeholder { font-size: 12px; }
   }
 }
 
+
+/* APAA refined typography, form controls and copyable text */
+html, body, .sheet, .sheet * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+.academy-details h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(30px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  line-height: 1.08;
+  color: #123b68;
+}
+.academy-details .academy { font-size: 13px; letter-spacing: 1.7px; }
+.academy-details .courses { font-size: 10px; letter-spacing: .8px; }
+.header-right {
+  font-size: 13px;
+  line-height: 1.75;
+  color: #52657a;
+  padding-left: 18px;
+  overflow-wrap: anywhere;
+}
+.receipt-meta-row {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 4px 6px 8px;
+}
+.receipt-meta-row strong {
+  font-family: 'Lato', Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .25px;
+}
+.panel-title { font-size: 14px; letter-spacing: .65px; }
+label { font-size: 13.5px; line-height: 1.4; }
+input, select { font-size: 14px; min-height: 34px; }
+input::placeholder { font-size: 12.5px; }
+select { cursor: pointer; text-align: right; }
+select option { font-size: 14px; color: #243b53; }
+.field { min-height: 34px; margin-bottom: 15px; }
+.remarks-panel {
+  padding: 16px 19px;
+  border-left-width: 4px;
+  border-radius: 7px;
+}
+.remarks-title { font-size: 14px; margin-bottom: 7px; }
+.remarks-content { font-size: 13.5px; line-height: 1.5; }
+.notice-text, .notice-text strong { font-size: 14px; line-height: 1.55; }
+.receipt-title-block h3 { font-size: 23px; }
+#txnRequiredMark { color: #b45309; font-weight: 800; }
+
+/* Subtle APAA logo watermark: visible through panels, never over text */
+.form-grid {
+  isolation: isolate;
+  position: relative;
+}
+.form-grid::before { content: none !important; }
+.form-grid::after {
+  z-index: 0 !important;
+  opacity: .075 !important;
+  background-size: min(38%, 360px) auto !important;
+  background-position: center center !important;
+  mix-blend-mode: multiply;
+}
+.form-grid .panel {
+  z-index: 1 !important;
+  background: rgba(255,255,255,.84) !important;
+}
+@media (max-width: 760px) {
+  .academy-details h2 { font-size: 27px; }
+  .header-right { font-size: 12px; }
+  label { font-size: 13px; }
+  input, select { font-size: 14px; }
+}
+
+
+.developer-credit {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #e8edf2;
+  text-align: center;
+  color: #7b8794;
+  font-size: 11px;
+  letter-spacing: .25px;
+}
+.developer-credit strong { color: #123b68; font-weight: 800; }
+
 </style>
 </head>
 <body>
@@ -1366,12 +1454,25 @@ input::placeholder { font-size: 12px; }
 
           <div class="field">
             <label for="course">Course Registered *</label>
-            <input id="course" type="text" placeholder="Enter registered course" required>
+            <select id="course" required>
+              <option value="" selected disabled hidden>Select Course</option>
+              <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
+              <option value="Diploma in Nattuvangam">Diploma in Nattuvangam</option>
+              <option value="Certificate Course">Certificate Course</option>
+              <option value="Bachelor in Performing Arts">Bachelor in Performing Arts</option>
+              <option value="Certificate in Bharatanatyam">Certificate in Bharatanatyam</option>
+              <option value="Grade Exam">Grade Exam</option>
+            </select>
           </div>
 
           <div class="field">
             <label for="year">Academic Year *</label>
-            <input id="year" type="text" placeholder="Enter academic year" required>
+            <select id="year" required>
+              <option value="" selected disabled hidden>Select Year</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
           </div>
         </section>
 
@@ -1408,17 +1509,31 @@ input::placeholder { font-size: 12px; }
 
           <div class="field">
             <label for="modeInput">Payment Mode *</label>
-            <input id="modeInput" type="text" placeholder="Cash / UPI / Card / Bank" required>
+            <select id="modeInput" required onchange="handlePaymentModeChange()">
+              <option value="" selected disabled hidden>Select Payment Mode</option>
+              <option value="CASH">CASH</option>
+              <option value="UPI">UPI</option>
+              <option value="CARD">CARD</option>
+              <option value="BANK">BANK</option>
+            </select>
           </div>
 
           <div class="field">
-            <label for="txn">TXN / UPI ID</label>
-            <input id="txn" type="text" placeholder="Enter transaction reference (if applicable)">
+            <label for="txn">TXN / UPI ID <span id="txnRequiredMark" hidden>*</span></label>
+            <input id="txn" type="text" placeholder="Not required for Cash" autocomplete="off">
           </div>
 
           <div class="field">
             <label for="stage">Installment Stage *</label>
-            <input id="stage" type="text" placeholder="Enter installment stage" required>
+            <select id="stage" required>
+              <option value="" selected disabled hidden>Select Installment</option>
+              <option value="1st Installment">1st Installment</option>
+              <option value="2nd Installment Stage">2nd Installment Stage</option>
+              <option value="3rd Installment Stage">3rd Installment Stage</option>
+              <option value="4th Installment">4th Installment</option>
+              <option value="5th Installment Stage">5th Installment Stage</option>
+              <option value="6th Installment Stage">6th Installment Stage</option>
+            </select>
           </div>
         </section>
       </div>
@@ -1462,6 +1577,8 @@ input::placeholder { font-size: 12px; }
         <div class="sign-line">AUTHORIZED SIGNATURE</div>
       </div>
     </div>
+
+    <div class="developer-credit">Designed &amp; Developed by <strong>Easwaran Prasanth</strong></div>
   </main>
 
   <!-- Student Ledger Section -->
@@ -1611,6 +1728,25 @@ function validateAndNormalizePhone() {
   return normalized;
 }
 
+
+function handlePaymentModeChange() {
+  const mode = (el('modeInput').value || '').toUpperCase();
+  const needsTransaction = ['UPI', 'CARD', 'BANK'].includes(mode);
+  const txn = el('txn');
+  const mark = el('txnRequiredMark');
+
+  txn.required = needsTransaction;
+  txn.placeholder = needsTransaction
+    ? 'Enter transaction ID (required)'
+    : 'Not required for Cash';
+  if (mark) mark.hidden = !needsTransaction;
+
+  if (!needsTransaction && mode === 'CASH') {
+    txn.value = '';
+    txn.classList.remove('field-error');
+  }
+}
+
 function validateReceipt() {
   document.querySelectorAll('.field-error').forEach(e => e.classList.remove('field-error'));
 
@@ -1620,6 +1756,14 @@ function validateReceipt() {
 
   const normalizedPhone = validateAndNormalizePhone();
   if (!normalizedPhone) {
+    return false;
+  }
+
+  handlePaymentModeChange();
+  const selectedMode = (el('modeInput').value || '').toUpperCase();
+  if (['UPI', 'CARD', 'BANK'].includes(selectedMode) && !el('txn').value.trim()) {
+    alert(`Transaction ID is required when the payment mode is ${selectedMode}. Please enter the transaction ID.`);
+    el('txn').focus();
     return false;
   }
 
@@ -1710,7 +1854,7 @@ async function generateProfessionalPDF(itemData) {
   }
 
   doc.setFont('times', 'bold');
-  doc.setFontSize(18);
+  doc.setFontSize(21);
   doc.setTextColor(...colNavy);
   doc.text('ALAGAPPA', col2X + (col2Width / 2), headerStartY + 4.5, { align: 'center' });
 
@@ -1729,10 +1873,10 @@ async function generateProfessionalPDF(itemData) {
   doc.line(col3X - 4, headerStartY + 2, col3X - 4, headerStartY + 22);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
+  doc.setFontSize(9.5);
   doc.setTextColor(...colMuted);
   const contactRight = pageWidth - margin;
-  const contactWidth = 54;
+  const contactWidth = 58;
   const contactLines = [
     '49, Gangadeeshwar Koil St,',
     'Purasawalkam, Chennai - 600084',
@@ -2235,6 +2379,7 @@ function initializeNewReceipt() {
 }
 
 initializeNewReceipt();
+handlePaymentModeChange();
 updateLiveGeneratedTime();
 setInterval(updateLiveGeneratedTime, 1000);
 updateSavedCount();
