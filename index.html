@@ -1863,6 +1863,107 @@ select option { font-size: 14px; color: #243b53; }
   .apaa-shape { animation:none !important; }
 }
 
+
+/* Reference-matched geometric characters: flat colours, expressive motion */
+.apaa-art-stage {
+  width: min(560px, 94%) !important;
+  height: 430px !important;
+  top: 54% !important;
+}
+.apaa-art-glow { display:none !important; }
+.apaa-floating-dot { display:none !important; }
+.apaa-shape {
+  filter: none !important;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.apaa-shape-purple {
+  width: 126px !important; height: 218px !important;
+  left: 34% !important; top: 17% !important;
+  border-radius: 0 !important;
+  background: #5410e8 !important;
+  animation: refPurple 3.8s ease-in-out infinite !important;
+}
+.apaa-shape-purple::before { display:none !important; }
+.apaa-shape-purple::after { display:none !important; }
+.apaa-shape-black {
+  width: 76px !important; height: 158px !important;
+  left: 53% !important; top: 34% !important;
+  border-radius: 0 !important;
+  background: #171719 !important;
+  animation: refBlack 3.4s ease-in-out infinite !important;
+}
+.apaa-shape-black::before,.apaa-shape-black::after,
+.apaa-shape-orange::before,.apaa-shape-orange::after,
+.apaa-shape-yellow::before,.apaa-shape-yellow::after { display:none !important; }
+.apaa-shape-orange {
+  width: 226px !important; height: 112px !important;
+  left: 16% !important; top: 61% !important;
+  border-radius: 150px 150px 0 0 !important;
+  background: #f36b24 !important;
+  animation: refOrange 4.2s ease-in-out infinite !important;
+}
+.apaa-shape-yellow {
+  width: 92px !important; height: 158px !important;
+  left: 67% !important; top: 51% !important;
+  border-radius: 54px 54px 0 0 !important;
+  background: #e8cf12 !important;
+  animation: refYellow 3.9s ease-in-out infinite !important;
+}
+.apaa-eye {
+  top: 18% !important; left: 34% !important;
+  width: 8px !important; height: 8px !important;
+  background: #fff !important; overflow:visible !important;
+}
+.apaa-eye:nth-of-type(2) { left: 63% !important; }
+.apaa-eye i {
+  width: 4px !important; height: 4px !important;
+  left: 2px !important; top: 2px !important;
+  background: #171719 !important;
+  transition: transform .09s linear;
+}
+.apaa-shape-purple .apaa-eye { top: 18% !important; width:7px !important;height:7px !important;background:#f3b7ff !important; }
+.apaa-shape-black .apaa-eye { top: 9% !important; width:8px !important;height:8px !important;background:#fff !important; }
+.apaa-shape-orange .apaa-eye { top: 25% !important; width:8px !important;height:8px !important;background:#23191a !important; }
+.apaa-shape-orange .apaa-eye i { background:#fff !important; }
+.apaa-shape-yellow .apaa-eye {
+  top: 14% !important; left: 20% !important; width:35px !important;height:3px !important;
+  background:#27231b !important;border-radius:0 !important;
+}
+.apaa-shape-yellow .apaa-eye:nth-of-type(2) { display:none !important; }
+.apaa-shape-yellow .apaa-eye i { display:none !important; }
+.apaa-mouth { display:block !important; left:47% !important; top:32% !important; width:12px !important;height:7px !important;border-bottom:3px solid #24191b !important; }
+.apaa-shape-black .apaa-mouth { top:21% !important; border-color:#fff !important; }
+.apaa-shape-yellow .apaa-mouth { display:none !important; }
+@keyframes refPurple {
+  0%,100% { transform:translateY(0) rotate(calc(-2deg + var(--cursor-tilt, 0deg))) scaleY(1); }
+  35% { transform:translateY(-9px) rotate(calc(1deg + var(--cursor-tilt, 0deg))) scaleY(1.015); }
+  65% { transform:translateY(2px) rotate(calc(-1deg + var(--cursor-tilt, 0deg))) scaleY(.99); }
+}
+@keyframes refBlack {
+  0%,100% { transform:translateY(0) rotate(calc(1deg + var(--cursor-tilt, 0deg))); }
+  50% { transform:translateY(-7px) rotate(calc(-2deg + var(--cursor-tilt, 0deg))); }
+}
+@keyframes refOrange {
+  0%,100% { transform:translateY(0) scaleY(1) rotate(var(--cursor-tilt, 0deg)); }
+  45% { transform:translateY(-5px) scaleY(1.035) rotate(var(--cursor-tilt, 0deg)); }
+  70% { transform:translateY(1px) scaleY(.985) rotate(var(--cursor-tilt, 0deg)); }
+}
+@keyframes refYellow {
+  0%,100% { transform:translateY(0) rotate(calc(-1deg + var(--cursor-tilt, 0deg))); }
+  50% { transform:translateY(-8px) rotate(calc(2deg + var(--cursor-tilt, 0deg))); }
+}
+@media (max-width:760px) {
+  .apaa-art-stage { width:330px !important;height:255px !important;top:56% !important; }
+  .apaa-shape-purple { width:75px !important;height:138px !important; }
+  .apaa-shape-black { width:47px !important;height:100px !important; }
+  .apaa-shape-orange { width:135px !important;height:68px !important; }
+  .apaa-shape-yellow { width:55px !important;height:98px !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .apaa-shape { animation:none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -3024,9 +3125,21 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
       });
     });
   };
-  document.addEventListener('pointermove', event => moveEyes(event.clientX, event.clientY), {passive:true});
+  document.addEventListener('pointermove', event => {
+    moveEyes(event.clientX, event.clientY);
+    const stageRect = stage.getBoundingClientRect();
+    const px = (event.clientX - (stageRect.left + stageRect.width / 2)) / (stageRect.width / 2);
+    const py = (event.clientY - (stageRect.top + stageRect.height / 2)) / (stageRect.height / 2);
+    faces.forEach((face, index) => {
+      const weight = [1.0, .72, .48, .62][index] || .5;
+      const tilt = Math.max(-7, Math.min(7, px * 5.5 * weight));
+      face.style.setProperty('--cursor-tilt', `${tilt}deg`);
+      face.style.setProperty('--cursor-y', `${Math.max(-5, Math.min(5, py * 3))}px`);
+    });
+  }, {passive:true});
   document.addEventListener('pointerleave', () => {
     stage.querySelectorAll('.apaa-eye i').forEach(pupil => pupil.style.transform = 'translate(0,0)');
+    faces.forEach(face => face.style.setProperty('--cursor-tilt', '0deg'));
   });
   document.addEventListener('touchmove', event => {
     const touch = event.touches && event.touches[0];
