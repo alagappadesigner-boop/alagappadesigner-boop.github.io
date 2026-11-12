@@ -1524,174 +1524,336 @@ select option { font-size: 14px; color: #243b53; }
 }
 
 
-/* APAA simple browser-based login */
+/* APAA animated split-screen login — CSS/SVG animation, no external video */
 #apaaLoginGate {
   position: fixed;
   inset: 0;
   z-index: 100000;
   display: grid;
   place-items: center;
-  padding: 22px;
+  padding: clamp(12px, 3vw, 36px);
+  overflow: auto;
   background:
-    radial-gradient(circle at 15% 15%, rgba(194,153,61,.12), transparent 32%),
-    linear-gradient(135deg, #eef2f7 0%, #f8f6f1 55%, #e9eef5 100%);
+    radial-gradient(circle at 8% 10%, rgba(208,165,47,.15), transparent 28%),
+    linear-gradient(135deg, #edf2f8 0%, #f8f7f3 52%, #e8edf4 100%);
 }
 #apaaLoginGate[hidden] { display: none !important; }
-.apaa-login-card {
-  width: min(100%, 410px);
-  padding: 34px 34px 28px;
-  border: 1px solid #dce4ee;
-  border-top: 4px solid #bd963e;
-  border-radius: 16px;
-  background: rgba(255,255,255,.97);
-  box-shadow: 0 22px 65px rgba(19,48,78,.14);
-  animation: apaaLoginAppear .45s ease-out both;
+.apaa-login-layout {
+  width: min(1120px, 100%);
+  min-height: min(650px, calc(100vh - 48px));
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+  overflow: hidden;
+  border: 1px solid rgba(18,59,104,.12);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 28px 90px rgba(17,43,73,.18);
+  animation: apaaLayoutIn .65s cubic-bezier(.2,.75,.25,1) both;
 }
-@keyframes apaaLoginAppear {
-  from { opacity: 0; transform: translateY(12px) scale(.985); }
+@keyframes apaaLayoutIn {
+  from { opacity: 0; transform: translateY(18px) scale(.985); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.apaa-login-visual {
+  position: relative;
+  min-height: 590px;
+  padding: clamp(28px, 4vw, 54px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 50% 52%, rgba(255,255,255,.98) 0 34%, rgba(246,244,250,.96) 70%),
+    #f5f3f8;
+}
+.apaa-login-visual::before,
+.apaa-login-visual::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(18,59,104,.08);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+}
+.apaa-login-visual::before { width: 470px; height: 470px; left: 50%; top: 48%; transform: translate(-50%,-50%); }
+.apaa-login-visual::after { width: 590px; height: 590px; left: 50%; top: 48%; transform: translate(-50%,-50%); }
+.apaa-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  z-index: 3;
 }
 .apaa-login-logo {
   display: block;
-  width: 112px;
-  height: 72px;
+  width: 88px;
+  height: 60px;
   object-fit: contain;
-  margin: 0 auto 12px;
 }
-.apaa-login-title {
-  margin: 0;
-  text-align: center;
-  color: #123b68;
-  font: 800 25px/1.15 Georgia, 'Times New Roman', serif;
+.apaa-login-brand-copy { color: #123b68; }
+.apaa-login-brand-copy strong {
+  display: block;
+  font: 800 19px/1.1 Georgia,serif;
   letter-spacing: 1.4px;
 }
-.apaa-login-subtitle {
-  margin: 7px 0 24px;
-  text-align: center;
-  color: #b58b32;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-}
-.apaa-login-heading {
-  margin: 0 0 17px;
-  color: #173b61;
-  font-size: 17px;
-  font-weight: 800;
-}
-.apaa-login-field { margin-bottom: 15px; }
-.apaa-login-field label {
+.apaa-login-brand-copy span {
   display: block;
-  margin-bottom: 7px;
-  color: #53677e;
-  font-size: 12px;
-  font-weight: 700;
+  margin-top: 5px;
+  color: #b58b32;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.35px;
+}
+.apaa-art-stage {
+  position: absolute;
+  width: min(500px, 88%);
+  height: 390px;
+  left: 50%;
+  top: 51%;
+  transform: translate(-50%,-50%);
+}
+.apaa-art-glow {
+  position: absolute;
+  width: 310px;
+  height: 310px;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%,-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(208,165,47,.15), rgba(116,74,226,.06) 55%, transparent 72%);
+  animation: apaaGlow 5s ease-in-out infinite alternate;
+}
+@keyframes apaaGlow { from { transform:translate(-50%,-50%) scale(.88); opacity:.65; } to { transform:translate(-50%,-50%) scale(1.12); opacity:1; } }
+.apaa-shape {
+  position: absolute;
+  filter: drop-shadow(0 18px 15px rgba(25,35,60,.13));
+  transform-origin: 50% 85%;
+}
+.apaa-shape-purple {
+  width: 112px; height: 185px; left: 30%; top: 27%;
+  border-radius: 10px 10px 7px 7px;
+  background: linear-gradient(150deg,#8c43ff,#6126d9);
+  transform: rotate(7deg);
+  animation: apaaPurple 4.8s ease-in-out infinite;
+}
+.apaa-shape-purple::before {
+  content:""; position:absolute; width:8px; height:8px; border-radius:50%;
+  background:#17152b; top:42px; left:32px;
+  box-shadow: 34px 0 #17152b;
+}
+.apaa-shape-purple::after {
+  content:""; position:absolute; width:24px; height:9px; left:43px; top:63px;
+  border-bottom:3px solid #17152b; border-radius:50%;
+}
+@keyframes apaaPurple {
+  0%,100% { transform:translateY(0) rotate(7deg); }
+  50% { transform:translateY(-22px) rotate(-5deg); }
+}
+.apaa-shape-black {
+  width: 74px; height: 126px; left: 51%; top: 43%;
+  border-radius: 8px; background: linear-gradient(145deg,#31313b,#171923);
+  transform: rotate(-5deg);
+  animation: apaaBlack 3.8s ease-in-out infinite;
+}
+.apaa-shape-black::before {
+  content:""; position:absolute; width:6px; height:6px; border-radius:50%;
+  background:#fff; top:35px; left:20px; box-shadow:24px 0 #fff;
+}
+.apaa-shape-black::after {
+  content:""; position:absolute; width:20px; height:8px; top:53px; left:27px;
+  border-bottom:2px solid #fff; border-radius:50%;
+}
+@keyframes apaaBlack { 0%,100% { transform:translateY(0) rotate(-5deg); } 50% { transform:translateY(-13px) rotate(5deg); } }
+.apaa-shape-orange {
+  width: 150px; height: 82px; left: 17%; top: 66%;
+  border-radius: 100px 100px 18px 18px;
+  background: linear-gradient(135deg,#ff9b43,#f36b22);
+  animation: apaaOrange 4.2s ease-in-out infinite;
+}
+.apaa-shape-orange::before {
+  content:""; position:absolute; width:7px; height:7px; border-radius:50%;
+  top:32px; left:48px; background:#2a1c24; box-shadow:35px 0 #2a1c24;
+}
+.apaa-shape-orange::after {
+  content:""; position:absolute; width:20px; height:8px; top:46px; left:65px;
+  border-bottom:3px solid #2a1c24; border-radius:50%;
+}
+@keyframes apaaOrange { 0%,100% { transform:translateY(0) rotate(0); } 50% { transform:translateY(-10px) rotate(-3deg); } }
+.apaa-shape-yellow {
+  width: 82px; height: 112px; left: 63%; top: 56%;
+  border-radius: 42px 42px 9px 9px;
+  background: linear-gradient(145deg,#ffdb26,#eab900);
+  animation: apaaYellow 4.4s ease-in-out infinite;
+}
+.apaa-shape-yellow::before {
+  content:""; position:absolute; width:6px; height:6px; border-radius:50%;
+  top:34px; left:20px; background:#2a1c24; box-shadow:28px 0 #2a1c24;
+}
+.apaa-shape-yellow::after {
+  content:""; position:absolute; width:18px; height:7px; top:49px; left:31px;
+  border-bottom:2px solid #2a1c24; border-radius:50%;
+}
+@keyframes apaaYellow { 0%,100% { transform:translateY(0) rotate(4deg); } 50% { transform:translateY(-18px) rotate(-4deg); } }
+.apaa-floating-dot {
+  position:absolute; width:13px; height:13px; border-radius:4px;
+  background:#d0a52f; opacity:.8; animation: apaaDot 6s ease-in-out infinite;
+}
+.apaa-floating-dot.one { left:15%; top:35%; }
+.apaa-floating-dot.two { right:13%; top:28%; width:9px;height:9px;background:#7840e8;animation-delay:-2s; }
+.apaa-floating-dot.three { right:18%; bottom:12%; width:11px;height:11px;background:#f47b32;animation-delay:-4s; }
+@keyframes apaaDot { 0%,100% { transform:translate3d(0,0,0) rotate(0); } 50% { transform:translate3d(10px,-22px,0) rotate(90deg); } }
+.apaa-login-caption {
+  position: relative; z-index: 3; max-width: 420px;
+  color:#53677e; font-size:13px; line-height:1.65;
+}
+.apaa-login-caption strong { color:#123b68; }
+.apaa-login-panel {
+  display:flex; align-items:center; justify-content:center;
+  padding: clamp(30px, 4vw, 58px);
+  background:#fff;
+}
+.apaa-login-card {
+  width:100%; max-width:370px; padding:0;
+  border:0; border-radius:0; background:transparent; box-shadow:none;
+  animation: apaaFormIn .75s .12s ease both;
+}
+@keyframes apaaFormIn { from { opacity:0; transform:translateX(18px); } to { opacity:1; transform:translateX(0); } }
+.apaa-login-card > .apaa-login-logo { display:none; }
+.apaa-login-title {
+  margin:0; text-align:left; color:#123b68;
+  font:800 27px/1.15 Georgia,'Times New Roman',serif; letter-spacing:1.2px;
+}
+.apaa-login-subtitle {
+  margin:7px 0 42px; text-align:left; color:#b58b32;
+  font-size:11px; font-weight:800; letter-spacing:1.5px;
+}
+.apaa-login-heading { margin:0 0 8px; color:#173b61; font-size:22px; font-weight:800; }
+.apaa-login-intro { margin:0 0 28px; color:#8290a0; font-size:13px; line-height:1.5; }
+.apaa-login-field { margin-bottom:19px; }
+.apaa-login-field label {
+  display:block; margin-bottom:8px; color:#53677e; font-size:12px; font-weight:700;
 }
 .apaa-login-field input {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid #d7e0ea;
-  border-radius: 8px;
-  outline: none;
-  color: #193b60;
-  background: #fff;
-  font: 14px Arial, sans-serif;
+  box-sizing:border-box; width:100%; min-height:49px; padding:12px 14px;
+  border:1px solid #d7e0ea; border-radius:9px; outline:none;
+  color:#193b60; background:#fbfcfe; font:14px Arial,sans-serif;
+  transition:border-color .2s,box-shadow .2s,background .2s;
 }
 .apaa-login-field input:focus {
-  border-color: #bd963e;
-  box-shadow: 0 0 0 3px rgba(189,150,62,.13);
+  border-color:#bd963e; background:#fff; box-shadow:0 0 0 4px rgba(189,150,62,.12);
 }
-.apaa-password-wrap { display: flex; gap: 7px; }
-.apaa-password-wrap input { flex: 1; min-width: 0; }
+.apaa-password-wrap { display:flex; gap:8px; }
+.apaa-password-wrap input { flex:1; min-width:0; }
 .apaa-show-password {
-  border: 1px solid #d7e0ea;
-  border-radius: 8px;
-  padding: 0 11px;
-  background: #f8fafc;
-  color: #173b61;
-  cursor: pointer;
-  font-size: 12px;
+  border:1px solid #d7e0ea; border-radius:9px; padding:0 13px;
+  background:#f8fafc; color:#173b61; cursor:pointer; font-size:12px;
 }
 .apaa-login-submit {
-  width: 100%;
-  min-height: 46px;
-  margin-top: 7px;
-  border: 0;
-  border-radius: 8px;
-  background: #123b68;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: .4px;
-  cursor: pointer;
-  box-shadow: 0 5px 13px rgba(18,59,104,.18);
+  width:100%; min-height:50px; margin-top:6px; border:0; border-radius:9px;
+  background:linear-gradient(100deg,#123b68,#1c5488); color:#fff;
+  font-size:14px; font-weight:800; letter-spacing:1px; cursor:pointer;
+  box-shadow:0 9px 20px rgba(18,59,104,.19);
+  transition:transform .2s,box-shadow .2s,filter .2s;
 }
-.apaa-login-submit:hover { background: #0c2d50; }
-.apaa-login-error {
-  min-height: 17px;
-  margin: 10px 0 0;
-  color: #b42318;
-  font-size: 12px;
-  text-align: center;
-}
+.apaa-login-submit:hover { transform:translateY(-2px); box-shadow:0 13px 24px rgba(18,59,104,.24); filter:brightness(1.06); }
+.apaa-login-error { min-height:18px; margin:11px 0 0; color:#b42318; font-size:12px; text-align:left; }
 .apaa-login-foot {
-  margin: 18px 0 0;
-  padding-top: 13px;
-  border-top: 1px solid #edf1f5;
-  color: #8491a0;
-  text-align: center;
-  font-size: 10px;
+  margin:26px 0 0; padding-top:16px; border-top:1px solid #edf1f5;
+  color:#8491a0; text-align:left; font-size:10px; line-height:1.5;
 }
 .apaa-logout {
-  margin-left: 10px;
-  padding: 6px 11px;
-  border: 1px solid #d7e0ea;
-  border-radius: 18px;
-  background: #fff;
-  color: #123b68;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
+  margin-left:10px; padding:6px 11px; border:1px solid #d7e0ea;
+  border-radius:18px; background:#fff; color:#123b68;
+  font-size:11px; font-weight:700; cursor:pointer;
 }
-.apaa-logout:hover { background: #f3f6fa; }
-@media (max-width: 480px) {
-  .apaa-login-card { padding: 27px 21px 23px; }
+.apaa-logout:hover { background:#f3f6fa; }
+@media (max-width: 760px) {
+  #apaaLoginGate { padding:10px; }
+  .apaa-login-layout { grid-template-columns:1fr; min-height:0; max-width:480px; }
+  .apaa-login-visual { min-height:300px; padding:23px 25px; }
+  .apaa-login-logo { width:67px; height:46px; }
+  .apaa-login-brand-copy strong { font-size:16px; }
+  .apaa-login-brand-copy span { font-size:8px; }
+  .apaa-art-stage { width:300px; height:230px; top:58%; }
+  .apaa-art-glow { width:200px; height:200px; }
+  .apaa-shape-purple { width:67px; height:112px; }
+  .apaa-shape-black { width:46px; height:78px; }
+  .apaa-shape-orange { width:90px; height:50px; }
+  .apaa-shape-yellow { width:50px; height:70px; }
+  .apaa-login-caption { font-size:11px; max-width:330px; }
+  .apaa-login-panel { padding:30px 26px 34px; }
+  .apaa-login-subtitle { margin-bottom:27px; }
+  .apaa-login-heading { font-size:20px; }
 }
-
+@media (max-width: 380px) {
+  .apaa-login-visual { min-height:265px; }
+  .apaa-login-panel { padding:25px 20px 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apaa-login-layout, .apaa-login-card, .apaa-art-glow, .apaa-shape, .apaa-floating-dot {
+    animation:none !important; transition:none !important;
+  }
+}
 </style>
 </head>
 <body>
 
 <div id="apaaLoginGate">
-  <section class="apaa-login-card" aria-labelledby="apaaLoginTitle">
-    <img class="apaa-login-logo"
-         src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Logo.png"
-         alt="Alagappa Performing Arts Academy"
-         onerror="this.onerror=null;this.src='Logo.png';">
-    <h1 id="apaaLoginTitle" class="apaa-login-title">ALAGAPPA</h1>
-    <div class="apaa-login-subtitle">PERFORMING ARTS ACADEMY</div>
-    <h2 class="apaa-login-heading">Fee Management Login</h2>
-    <form id="apaaLoginForm" autocomplete="on">
-      <div class="apaa-login-field">
-        <label for="apaaLoginUsername">Username</label>
-        <input id="apaaLoginUsername" name="username" type="text"
-               placeholder="Enter username" autocomplete="username" required>
-      </div>
-      <div class="apaa-login-field">
-        <label for="apaaLoginPassword">Password</label>
-        <div class="apaa-password-wrap">
-          <input id="apaaLoginPassword" name="password" type="password"
-                 placeholder="Enter password" autocomplete="current-password" required>
-          <button class="apaa-show-password" type="button" id="apaaTogglePassword">Show</button>
+  <div class="apaa-login-layout">
+    <section class="apaa-login-visual" aria-label="Alagappa Performing Arts Academy">
+      <div class="apaa-login-brand">
+        <img class="apaa-login-logo"
+             src="https://raw.githubusercontent.com/alagappadesigner-boop/alagappadesigner-boop.github.io/main/Logo.png"
+             alt="Alagappa Performing Arts Academy"
+             onerror="this.onerror=null;this.src='Logo.png';">
+        <div class="apaa-login-brand-copy">
+          <strong>ALAGAPPA</strong>
+          <span>PERFORMING ARTS ACADEMY</span>
         </div>
       </div>
-      <button class="apaa-login-submit" type="submit">LOGIN</button>
-      <p id="apaaLoginError" class="apaa-login-error" role="alert"></p>
-    </form>
-    <p class="apaa-login-foot">Authorised Staff Only · Alagappa Performing Arts Academy</p>
-  </section>
+      <div class="apaa-art-stage" aria-hidden="true">
+        <div class="apaa-art-glow"></div>
+        <span class="apaa-floating-dot one"></span>
+        <span class="apaa-floating-dot two"></span>
+        <span class="apaa-floating-dot three"></span>
+        <div class="apaa-shape apaa-shape-purple"></div>
+        <div class="apaa-shape apaa-shape-black"></div>
+        <div class="apaa-shape apaa-shape-orange"></div>
+        <div class="apaa-shape apaa-shape-yellow"></div>
+      </div>
+      <div class="apaa-login-caption">
+        <strong>Where tradition meets excellence.</strong><br>
+        A dedicated space to manage academy fee receipts with clarity and confidence.
+      </div>
+    </section>
+    <section class="apaa-login-panel">
+      <section class="apaa-login-card" aria-labelledby="apaaLoginTitle">
+        <h1 id="apaaLoginTitle" class="apaa-login-title">ALAGAPPA</h1>
+        <div class="apaa-login-subtitle">PERFORMING ARTS ACADEMY</div>
+        <h2 class="apaa-login-heading">Welcome Back!</h2>
+        <p class="apaa-login-intro">Sign in to access the APAA Fee Receipt Generator.</p>
+        <form id="apaaLoginForm" autocomplete="on">
+          <div class="apaa-login-field">
+            <label for="apaaLoginUsername">Username</label>
+            <input id="apaaLoginUsername" name="username" type="text"
+                   placeholder="Enter username" autocomplete="username" required>
+          </div>
+          <div class="apaa-login-field">
+            <label for="apaaLoginPassword">Password</label>
+            <div class="apaa-password-wrap">
+              <input id="apaaLoginPassword" name="password" type="password"
+                     placeholder="Enter password" autocomplete="current-password" required>
+              <button class="apaa-show-password" type="button" id="apaaTogglePassword">Show</button>
+            </div>
+          </div>
+          <button class="apaa-login-submit" type="submit">SIGN IN</button>
+          <p id="apaaLoginError" class="apaa-login-error" role="alert"></p>
+        </form>
+        <p class="apaa-login-foot">Authorised Staff Only · Alagappa Performing Arts Academy</p>
+      </section>
+    </section>
+  </div>
 </div>
 
 
