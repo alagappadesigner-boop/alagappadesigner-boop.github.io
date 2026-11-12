@@ -1795,6 +1795,74 @@ select option { font-size: 14px; color: #243b53; }
     animation:none !important; transition:none !important;
   }
 }
+
+
+/* Reference-inspired minimal character animation + cursor-tracking eyes */
+.apaa-login-visual { background:#e9e7eb !important; }
+.apaa-login-visual::before,.apaa-login-visual::after { display:none; }
+.apaa-art-stage {
+  width: min(390px, 92%); height: 290px; top: 52%;
+  transform: translate(-50%,-50%); z-index:2;
+}
+.apaa-art-glow,.apaa-floating-dot { display:none; }
+.apaa-shape { filter:none; transform-origin:50% 100%; }
+.apaa-shape-purple {
+  left:22%; top:12%; width:63px; height:91px; border-radius:0;
+  background:#5410e9; animation: apaaPurple 5.2s ease-in-out infinite;
+}
+.apaa-shape-black {
+  left:43%; top:27%; width:39px; height:97px; border-radius:0;
+  background:#17171c; animation: apaaBlack 4.5s ease-in-out infinite;
+}
+.apaa-shape-orange {
+  left:11%; top:55%; width:105px; height:55px;
+  border-radius:105px 105px 0 0; background:#f36d2c;
+  animation: apaaOrange 4.8s ease-in-out infinite;
+}
+.apaa-shape-yellow {
+  left:62%; top:39%; width:44px; height:71px;
+  border-radius:24px 24px 0 0; background:#efd51b;
+  animation: apaaYellow 5s ease-in-out infinite;
+}
+.apaa-shape-purple::before,.apaa-shape-purple::after,
+.apaa-shape-black::before,.apaa-shape-black::after,
+.apaa-shape-orange::before,.apaa-shape-orange::after,
+.apaa-shape-yellow::before,.apaa-shape-yellow::after { display:none; }
+.apaa-eye {
+  position:absolute; top:25%; left:30%; width:7px; height:7px;
+  border-radius:50%; background:#fff; display:block; overflow:hidden;
+}
+.apaa-eye:nth-of-type(2) { left:62%; }
+.apaa-eye i {
+  position:absolute; width:3px; height:3px; border-radius:50%;
+  background:#201b27; left:2px; top:2px; display:block;
+  transform:translate(0,0); will-change:transform;
+}
+.apaa-shape-purple .apaa-eye { width:5px;height:5px;background:#f6d7ff;top:38%; }
+.apaa-shape-purple .apaa-eye i { width:2px;height:2px;left:1.5px;top:1.5px;background:#24152f; }
+.apaa-shape-black .apaa-eye { top:13%; width:7px;height:7px;background:#fff; }
+.apaa-shape-black .apaa-eye i { width:3px;height:3px;background:#17171c; }
+.apaa-shape-orange .apaa-eye { top:43%; width:7px;height:7px;background:#261c20; }
+.apaa-shape-orange .apaa-eye i { width:2px;height:2px;background:#fff; }
+.apaa-shape-yellow .apaa-eye { top:24%; width:19px;height:3px; border-radius:0;background:#28221b; overflow:visible; }
+.apaa-shape-yellow .apaa-eye:nth-of-type(2) { display:none; }
+.apaa-shape-yellow .apaa-eye i { display:none; }
+.apaa-mouth { position:absolute; left:47%; top:55%; width:10px;height:5px;
+  border-bottom:2px solid #2a1c24;border-radius:0 0 50% 50%; }
+.apaa-shape-black .apaa-mouth { border-color:#fff; width:8px; top:34%; }
+.apaa-shape-purple .apaa-mouth { border-color:#24152f; top:55%; width:7px; }
+.apaa-shape-yellow .apaa-mouth { display:none; }
+@media (max-width:760px) {
+  .apaa-art-stage { width:300px;height:225px;top:57%; }
+  .apaa-shape-purple { width:54px;height:78px; }
+  .apaa-shape-black { width:34px;height:83px; }
+  .apaa-shape-orange { width:91px;height:48px; }
+  .apaa-shape-yellow { width:39px;height:63px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apaa-shape { animation:none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1817,10 +1885,10 @@ select option { font-size: 14px; color: #243b53; }
         <span class="apaa-floating-dot one"></span>
         <span class="apaa-floating-dot two"></span>
         <span class="apaa-floating-dot three"></span>
-        <div class="apaa-shape apaa-shape-purple"></div>
-        <div class="apaa-shape apaa-shape-black"></div>
-        <div class="apaa-shape apaa-shape-orange"></div>
-        <div class="apaa-shape apaa-shape-yellow"></div>
+        <div class="apaa-shape apaa-shape-purple" data-face="purple"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
+        <div class="apaa-shape apaa-shape-black" data-face="black"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
+        <div class="apaa-shape apaa-shape-orange" data-face="orange"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
+        <div class="apaa-shape apaa-shape-yellow" data-face="yellow"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
       </div>
       <div class="apaa-login-caption">
         <strong>Where tradition meets excellence.</strong><br>
@@ -2933,6 +3001,38 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
 } else {
   apaaShowLogin();
 }
+
+
+
+// Let each character's pupils follow the pointer, just like the supplied reference.
+(() => {
+  const stage = document.querySelector('.apaa-art-stage');
+  if (!stage) return;
+  const faces = [...stage.querySelectorAll('[data-face]')];
+  const moveEyes = (clientX, clientY) => {
+    faces.forEach(face => {
+      const eyes = face.querySelectorAll('.apaa-eye i');
+      eyes.forEach(pupil => {
+        const eye = pupil.parentElement;
+        const rect = eye.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = clientX - cx, dy = clientY - cy;
+        const angle = Math.atan2(dy, dx);
+        const distance = Math.min(2.2, Math.hypot(dx, dy) / 85);
+        pupil.style.transform = `translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px)`;
+      });
+    });
+  };
+  document.addEventListener('pointermove', event => moveEyes(event.clientX, event.clientY), {passive:true});
+  document.addEventListener('pointerleave', () => {
+    stage.querySelectorAll('.apaa-eye i').forEach(pupil => pupil.style.transform = 'translate(0,0)');
+  });
+  document.addEventListener('touchmove', event => {
+    const touch = event.touches && event.touches[0];
+    if (touch) moveEyes(touch.clientX, touch.clientY);
+  }, {passive:true});
+})();
 
 
 initializeNewReceipt();
