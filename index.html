@@ -2818,260 +2818,240 @@ async function generateProfessionalPDF(itemData) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-  const pageWidth = 210;
-  const margin = 12;
-  const contentWidth = pageWidth - (margin * 2);
+  const W = 210, H = 297, margin = 12, contentW = W - margin * 2;
+  const navy = [18, 59, 104], gold = [207, 170, 55];
+  const muted = [112, 126, 139], dark = [49, 61, 73];
+  const border = [224, 231, 238], pale = [249, 250, 252];
 
-  const colNavy = [18, 59, 104];
-  const colGold = [208, 165, 47];
-  const colEspresso = [36, 27, 22];
-  const colMuted = [98, 114, 130];
-  const colBorder = [227, 233, 239];
+  const logo = await getBase64ImageFromURL(el('logoLeftImg')?.src || 'Logo.png');
+  const signature = await getBase64ImageFromURL(el('signatureImg')?.src || 'signature.png');
 
-  let currentY = 12;
-
-  const leftLogoBase64 = await getBase64ImageFromURL(el('logoLeftImg').src);
-  const sigBase64 = await getBase64ImageFromURL(el('signatureImg').src);
-
-  const col1X = margin;
-  const col2X = margin + 47;
-  const col2Width = 84;
-  const col3X = margin + 133;
-  const col3Width = 53;
-
-  let headerStartY = currentY;
-
-  if (leftLogoBase64) {
-    doc.addImage(leftLogoBase64, 'PNG', col1X, headerStartY + 1, 38, 20);
+  // Build a subtle, transparent academy watermark from the existing academy logo.
+  let watermark = null;
+  if (logo) {
+    try {
+      const image = new Image();
+      image.src = logo;
+      await new Promise(resolve => { image.onload = resolve; image.onerror = resolve; });
+      if (image.complete && image.naturalWidth) {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.globalAlpha = 0.075;
+        ctx.drawImage(image, 0, 0);
+        watermark = canvas.toDataURL('image/png');
+      }
+    } catch (e) { console.warn('Watermark could not be prepared:', e); }
   }
 
-  doc.setFont('times', 'bold');
-  doc.setFontSize(21);
-  doc.setTextColor(...colNavy);
-  doc.text('ALAGAPPA', col2X + (col2Width / 2), headerStartY + 4.5, { align: 'center' });
-
-  doc.setFont('times', 'bold');
-  doc.setFontSize(10.5);
-  doc.setTextColor(...colGold);
-  doc.text('PERFORMING ARTS ACADEMY', col2X + (col2Width / 2), headerStartY + 10.5, { align: 'center' });
-
+  // ── Institutional header: academy logo | centred identity | contact details
+  if (logo) doc.addImage(logo, 'PNG', 13, 14, 31, 27);
+  doc.setTextColor(...navy);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(...colMuted);
-  doc.text('BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM', col2X + (col2Width / 2), headerStartY + 15, { align: 'center' });
+  doc.setFontSize(17.5);
+  doc.text('ALAGAPPA', 105, 22, { align: 'center' });
+  doc.setTextColor(...gold);
+  doc.setFontSize(9.2);
+  doc.text('PERFORMING ARTS ACADEMY', 105, 28, { align: 'center' });
+  doc.setTextColor(...muted);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.2);
+  doc.text('BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM', 105, 33.5, { align: 'center' });
 
-  doc.setDrawColor(...colBorder);
+  doc.setDrawColor(...border);
   doc.setLineWidth(0.3);
-  doc.line(col3X - 4, headerStartY + 2, col3X - 4, headerStartY + 22);
+  doc.line(164, 15, 164, 40);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.2);
+  doc.setTextColor(...muted);
+  doc.text('49, Gangadeeshwar Koil St,', 198, 19, { align: 'right' });
+  doc.text('Purasawalkam, Chennai - 600084', 198, 23, { align: 'right' });
+  doc.text('+91 73558-596403', 198, 28, { align: 'right' });
+  doc.text('vaishnavi@alagappaarts.com', 198, 33, { align: 'right' });
+
+  doc.setDrawColor(...gold);
+  doc.setLineWidth(0.65);
+  doc.line(margin, 45, W - margin, 45);
+
+  // ── Receipt heading and metadata
+  doc.setTextColor(...navy);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(17);
+  doc.text('FEE RECEIPT', W / 2, 59, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
-  doc.setTextColor(...colMuted);
-  const contactRight = pageWidth - margin;
-  const contactWidth = 58;
-  const contactLines = [
-    '49, Gangadeeshwar Koil St,',
-    'Purasawalkam, Chennai - 600084',
-    '+91 73558-596403',
-    'vaishnavi@alagappaarts.com'
-  ];
-  let contactY = headerStartY + 5;
-  contactLines.forEach((line) => {
-    const wrapped = doc.splitTextToSize(line, contactWidth);
-    doc.text(wrapped, contactRight, contactY, { align: 'right', maxWidth: contactWidth });
-    contactY += wrapped.length * 3.6;
-  });
+  doc.setFontSize(8.8);
+  doc.setTextColor(...dark);
+  doc.text(`Receipt No: ${itemData.receiptNo}`, margin, 70);
+  doc.text(`Receipt Date: ${itemData.paymentDate}`, W - margin, 70, { align: 'right' });
+  doc.setDrawColor(...border);
+  doc.setLineWidth(0.25);
+  doc.line(margin, 77, W - margin, 77);
 
-  currentY += 24;
-
-  doc.setDrawColor(...colGold);
-  doc.setLineWidth(0.5);
-  doc.line(margin, currentY, pageWidth - margin, currentY);
-  currentY += 6;
-
-  doc.setFont('times', 'bold');
-  doc.setFontSize(16);
-  doc.setTextColor(...colNavy);
-  doc.text('FEE RECEIPT', pageWidth / 2, currentY, { align: 'center' });
-
-  currentY += 5;
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(...colMuted);
-  doc.text(`Receipt No: ${itemData.receiptNo}`, margin, currentY);
-  doc.text(`Receipt Date: ${itemData.paymentDate}`, pageWidth - margin, currentY, { align: 'right' });
-
-  currentY += 6;
-
-  const panelWidth = (contentWidth - 4) / 2;
-  const panelHeight = 61;
-  let leftX = margin;
-  let rightX = margin + panelWidth + 4;
+  // ── Two equal information panels
+  const panelY = 84, panelH = 72, gap = 6;
+  const panelW = (contentW - gap) / 2;
+  const leftX = margin, rightX = margin + panelW + gap;
 
   doc.setFillColor(255, 255, 255);
-  doc.setDrawColor(...colBorder);
+  doc.setDrawColor(...border);
   doc.setLineWidth(0.3);
-  doc.roundedRect(leftX, currentY, panelWidth, panelHeight, 1.5, 1.5, 'FD');
+  doc.roundedRect(leftX, panelY, panelW, panelH, 1.5, 1.5, 'FD');
+  doc.roundedRect(rightX, panelY, panelW, panelH, 1.5, 1.5, 'FD');
 
-  doc.setFont('times', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(...colNavy);
-  doc.text('STUDENT & COURSE DETAILS', leftX + 5, currentY + 7);
+  // Place watermark above panel backgrounds but below all receipt text.
+  if (watermark) {
+    doc.addImage(watermark, 'PNG', 72, 105, 66, 68);
+  }
 
-  doc.setDrawColor(...colBorder);
-  doc.line(leftX + 5, currentY + 9.5, leftX + panelWidth - 5, currentY + 9.5);
-
-  let p1Y = currentY + 16;
-  const rowGap = 8;
-
-  const addRow = (x, y, label, val) => {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9.6);
-    doc.setTextColor(...colMuted);
-    doc.text(label, x + 5, y);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9.6);
-    doc.setTextColor(...colEspresso);
-    doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
-  };
-
-  addRow(leftX, p1Y, 'Student Name *', itemData.studentName);
-  addRow(leftX, p1Y + rowGap, 'Phone Number *', itemData.phone);
-  addRow(leftX, p1Y + (rowGap * 2), 'Course Registered *', itemData.course);
-  addRow(leftX, p1Y + (rowGap * 3), 'Academic Year *', itemData.academicYear);
-
-  doc.setFillColor(255, 255, 255);
-  doc.setDrawColor(...colBorder);
-  doc.roundedRect(rightX, currentY, panelWidth, panelHeight, 1.5, 1.5, 'FD');
-  doc.setFont('times', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(...colNavy);
-  doc.text('PAYMENT INFORMATION', rightX + 5, currentY + 6);
-  doc.line(rightX + 5, currentY + 8, rightX + panelWidth - 5, currentY + 8);
-
-  let p2Y_adj = currentY + 13.5;
-  const rowGap2 = 6.5;
-  const addRowSmall = (x, y, label, val) => {
+  const panelTitle = (x, title) => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9.2);
-    doc.setTextColor(...colMuted);
+    doc.setTextColor(...navy);
+    doc.text(title, x + 5, panelY + 8);
+    doc.setDrawColor(...border);
+    doc.setLineWidth(0.25);
+    doc.line(x + 5, panelY + 12, x + panelW - 5, panelY + 12);
+  };
+  panelTitle(leftX, 'STUDENT & COURSE DETAILS');
+  panelTitle(rightX, 'PAYMENT INFORMATION');
+
+  const addPanelRow = (x, y, label, value, valueWidth, fontSize = 8.5) => {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(fontSize);
+    doc.setTextColor(...muted);
     doc.text(label, x + 5, y);
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9.2);
-    doc.setTextColor(...colEspresso);
-    doc.text(String(val || ''), x + panelWidth - 5, y, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(fontSize);
+    doc.setTextColor(...dark);
+    const val = String(value == null || value === '' ? '—' : value);
+    const lines = doc.splitTextToSize(val, valueWidth);
+    const maxLines = 2;
+    const visibleLines = lines.slice(0, maxLines);
+    doc.text(visibleLines, x + panelW - 5, y, { align: 'right', lineHeightFactor: 1.12 });
   };
 
-  addRowSmall(rightX, p2Y_adj, 'Amount Paid *', `Rs. ${String(itemData.amount).replace(/,/g, '')}`);
-  addRowSmall(rightX, p2Y_adj + rowGap2, 'Amount in Words', itemData.amountInWords);
-  addRowSmall(rightX, p2Y_adj + (rowGap2 * 2), 'Payment Date *', itemData.paymentDate);
-  addRowSmall(rightX, p2Y_adj + (rowGap2 * 3), 'Payment Mode *', itemData.paymentMode);
-  addRowSmall(rightX, p2Y_adj + (rowGap2 * 4), 'TXN / UPI ID', itemData.transactionId);
-  addRowSmall(rightX, p2Y_adj + (rowGap2 * 5), 'Installment Stage *', itemData.installmentStage);
+  const leftValueWidth = panelW - 43;
+  addPanelRow(leftX, panelY + 22, 'Student Name *', itemData.studentName, leftValueWidth);
+  addPanelRow(leftX, panelY + 34, 'Phone Number *', itemData.phone, leftValueWidth);
+  addPanelRow(leftX, panelY + 46, 'Course Registered *', itemData.course, leftValueWidth);
+  addPanelRow(leftX, panelY + 58, 'Academic Year *', itemData.academicYear, leftValueWidth);
 
-  currentY += panelHeight + 6;
+  const rightValueWidth = panelW - 43;
+  const rightRows = [
+    ['Amount Paid *', `₹ ${String(itemData.amount).replace(/,/g, '')}`],
+    ['Amount in Words', itemData.amountInWords],
+    ['Payment Date *', itemData.paymentDate],
+    ['Payment Mode *', itemData.paymentMode],
+    ['TXN / UPI ID', itemData.transactionId],
+    ['Installment Stage *', itemData.installmentStage]
+  ];
+  rightRows.forEach((row, i) => addPanelRow(rightX, panelY + 19 + i * 8.4, row[0], row[1], rightValueWidth, 8.1));
 
-  const remHeight = 16;
-  doc.setFillColor(250, 251, 252);
-  doc.setDrawColor(...colBorder);
-  doc.roundedRect(margin, currentY, contentWidth, remHeight, 1.5, 1.5, 'FD');
-  
-  doc.setFillColor(...colGold);
-  doc.rect(margin, currentY, 1.2, remHeight, 'F');
-
+  // ── Remarks panel
+  const remarksY = 163, remarksH = 22;
+  doc.setFillColor(...pale);
+  doc.setDrawColor(...border);
+  doc.roundedRect(margin, remarksY, contentW, remarksH, 1.5, 1.5, 'FD');
+  doc.setFillColor(...gold);
+  doc.rect(margin, remarksY, 1.1, remarksH, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.2);
-  doc.setTextColor(...colNavy);
-  doc.text('Remarks & Extra Declarations:', margin + 5, currentY + 5.5);
+  doc.setFontSize(8.6);
+  doc.setTextColor(...navy);
+  doc.text('Remarks & Extra Declarations:', margin + 5, remarksY + 7);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.3);
+  doc.setTextColor(...dark);
+  doc.text('No Remarks', margin + 5, remarksY + 15);
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.2);
-  doc.setTextColor(74, 85, 104);
-  doc.text('No Remarks', margin + 5, currentY + 11.5);
-
-  currentY += remHeight + 4;
-
-  const noticeHeight = 22;
+  // ── Official notice
+  const noticeY = 192, noticeH = 19;
   doc.setFillColor(255, 253, 247);
-  doc.setDrawColor(233, 204, 130);
-  doc.setLineWidth(0.35);
-  doc.setLineDashPattern([1.2, 1.0], 0);
-  doc.roundedRect(margin, currentY, contentWidth, noticeHeight, 2.2, 2.2, 'FD');
+  doc.setDrawColor(232, 205, 139);
+  doc.setLineWidth(0.3);
+  doc.setLineDashPattern([1, 0.8], 0);
+  doc.roundedRect(margin, noticeY, contentW, noticeH, 1.8, 1.8, 'FD');
   doc.setLineDashPattern([], 0);
 
-  // Gold information icon matching the reference.
-  doc.setFillColor(217, 173, 50);
-  doc.circle(margin + 7, currentY + 7.2, 2.4, 'F');
+  doc.setFillColor(...gold);
+  doc.circle(margin + 6.5, noticeY + 7.5, 2.2, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
+  doc.setFontSize(7);
   doc.setTextColor(255, 255, 255);
-  doc.text('i', margin + 7, currentY + 8.1, { align: 'center' });
+  doc.text('i', margin + 6.5, noticeY + 8.3, { align: 'center' });
 
   const noticeLabel = 'Official Notice:';
-  const noticeText = 'This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.';
+  const noticeCopy = 'This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.';
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10.5);
-  doc.setTextColor(101, 88, 59);
-  doc.text(noticeLabel, margin + 13, currentY + 7.2);
-  const labelWidth = doc.getTextWidth(noticeLabel) + 2;
+  doc.setFontSize(8.2);
+  doc.setTextColor(91, 82, 62);
+  doc.text(noticeLabel, margin + 12, noticeY + 7.2);
+  const labelW = doc.getTextWidth(noticeLabel) + 1.5;
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10.5);
-  doc.setTextColor(107, 96, 69);
-  const noticeLines = doc.splitTextToSize(noticeText, contentWidth - 20 - labelWidth);
-  doc.text(noticeLines[0] || '', margin + 13 + labelWidth, currentY + 7.2);
+  doc.setFontSize(8.2);
+  doc.setTextColor(101, 92, 73);
+  const noticeLines = doc.splitTextToSize(noticeCopy, contentW - 18 - labelW);
+  doc.text(noticeLines[0] || '', margin + 12 + labelW, noticeY + 7.2);
   if (noticeLines.length > 1) {
-    doc.text(noticeLines.slice(1), margin + 13, currentY + 13.5);
+    doc.text(noticeLines.slice(1), margin + 12, noticeY + 12.8, { lineHeightFactor: 1.15 });
   }
 
-  currentY += noticeHeight + 7;
-
-  let footerY = currentY;
-  
+  // ── Verification and signature footer, aligned on one baseline
+  const footerY = 220;
   doc.setFillColor(250, 251, 252);
-  doc.setDrawColor(...colBorder);
-  doc.roundedRect(margin, footerY, 25, 25, 1.6, 1.6, 'FD');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.2);
-  doc.setTextColor(...colMuted);
-  doc.text('Verified Slip', margin + 3.5, footerY + 21);
+  doc.setDrawColor(...border);
+  doc.roundedRect(margin, footerY, 18, 23, 1.4, 1.4, 'FD');
+
+  // Small QR-style verification mark to match the supplied reference.
+  doc.setFillColor(185, 195, 204);
+  const qrX = margin + 5, qrY = footerY + 4, q = 2.4;
+  [[0,0],[6,0],[0,6]].forEach(([dx,dy]) => {
+    doc.rect(qrX + dx, qrY + dy, q, q, 'F');
+    doc.setFillColor(250, 251, 252);
+    doc.rect(qrX + dx + .55, qrY + dy + .55, q - 1.1, q - 1.1, 'F');
+    doc.setFillColor(185, 195, 204);
+  });
+  doc.rect(qrX + 7, qrY + 7, 1.5, 1.5, 'F');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.2);
+  doc.setTextColor(...muted);
+  doc.text('Verified Slip', margin + 9, footerY + 20, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(...colMuted);
-  doc.text(`Generated On: ${itemData.savedAt}`, margin + 31, footerY + 9);
-  doc.text('Secure Mode: Active System Gateway', margin + 31, footerY + 16);
+  doc.setFontSize(8.2);
+  doc.setTextColor(...muted);
+  doc.text(`Generated On: ${itemData.savedAt}`, margin + 25, footerY + 10);
+  doc.text('Secure Mode: Active System Gateway', margin + 25, footerY + 17);
 
-  const sigX = pageWidth - margin - 49;
-  if (sigBase64) {
-    doc.addImage(sigBase64, 'PNG', sigX + 2, footerY - 5, 43, 16);
-  }
-  doc.setDrawColor(...colMuted);
-  doc.setLineWidth(0.4);
-  doc.line(sigX, footerY + 12, pageWidth - margin, footerY + 12);
-
+  const sigX = W - margin - 53;
+  if (signature) doc.addImage(signature, 'PNG', sigX + 2, footerY - 2, 49, 15);
+  doc.setDrawColor(77, 91, 105);
+  doc.setLineWidth(0.35);
+  doc.line(sigX, footerY + 15, W - margin, footerY + 15);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(...colNavy);
-  doc.text('AUTHORIZED SIGNATURE', sigX + (49 / 2), footerY + 17, { align: 'center' });
+  doc.setFontSize(8.2);
+  doc.setTextColor(...navy);
+  doc.text('AUTHORIZED SIGNATURE', sigX + 26.5, footerY + 21, { align: 'center' });
 
-  const thankY = footerY + 31;
-  doc.setDrawColor(...colBorder);
-  doc.line(margin, thankY, pageWidth - margin, thankY);
+  // ── Thank-you footer
+  const thankDividerY = 253;
+  doc.setDrawColor(...border);
+  doc.setLineWidth(0.25);
+  doc.line(margin, thankDividerY, W - margin, thankDividerY);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(...colGold);
-  doc.text('THANK YOU!', pageWidth / 2, thankY + 6, { align: 'center' });
+  doc.setFontSize(9.5);
+  doc.setTextColor(...gold);
+  doc.text('THANK YOU!', W / 2, thankDividerY + 8, { align: 'center' });
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.setTextColor(...colMuted);
-  const thankText = 'We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.';
-  doc.text(doc.splitTextToSize(thankText, contentWidth - 10), pageWidth / 2, thankY + 11, { align: 'center' });
+  doc.setFontSize(7.4);
+  doc.setTextColor(...muted);
+  const thankCopy = 'We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.';
+  doc.text(doc.splitTextToSize(thankCopy, contentW - 12), W / 2, thankDividerY + 14, { align: 'center', lineHeightFactor: 1.2 });
 
   doc.save(`${itemData.receiptNo}.pdf`);
-  return true; // PDF download has been initiated successfully
+  return true;
 }
 
 function resetFeeFormAfterSuccessfulReceipt() {
