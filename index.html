@@ -3305,56 +3305,65 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
 
 
 
-// Interactive SVG character controller integrated from the supplied code.
+// Interactive SVG character controller: pupils continuously track the pointer.
+// Password focus/typing does not change the characters' gaze or animation state.
 (() => {
-  const gate = document.getElementById('apaaLoginGate');
   const svg = document.getElementById('character-svg');
-  const password = document.getElementById('apaaLoginPassword');
-  if (!gate || !svg) return;
-  const pupils = [
-    ['purple-pupil-1',185,170,5.2],['purple-pupil-2',215,170,5.2],
-    ['black-pupil-1',252,215,5.5],['black-pupil-2',282,215,5.5],
-    ['yellow-pupil-1',326,254,3],['yellow-pupil-2',351,254,3],
-    ['orange-pupil-1',126,329,3.5],['orange-pupil-2',166,329,3.5]
-  ].map(([id,cx,cy,max])=>({el:document.getElementById(id),cx,cy,max})).filter(p=>p.el);
-  const shocks=[...svg.querySelectorAll('.facial-feature')];
-  let mode='normal', last={x:innerWidth*.7,y:innerHeight*.5};
+  if (!svg) return;
 
-  function moveEyes(x,y) {
-    last={x,y}; if(mode!=='normal') return;
-    const r=svg.getBoundingClientRect(), sx=r.width/500, sy=r.height/420;
-    pupils.forEach(p=>{
-      const dx=x-(r.left+p.cx*sx), dy=y-(r.top+p.cy*sy);
-      const a=Math.atan2(dy,dx), d=Math.min(p.max,Math.hypot(dx,dy)/28);
-      p.el.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`;
+  const pupils = [
+    ['purple-pupil-1',185,170,7], ['purple-pupil-2',215,170,7],
+    ['black-pupil-1',252,215,6], ['black-pupil-2',282,215,6],
+    ['yellow-pupil-1',326,254,4], ['yellow-pupil-2',351,254,4],
+    ['orange-pupil-1',126,329,4.5], ['orange-pupil-2',166,329,4.5]
+  ].map(([id,cx,cy,max]) => ({el:document.getElementById(id),cx,cy,max}))
+   .filter(p => p.el);
+
+  let pointer = {x:250,y:210};
+  let raf = 0;
+
+  function trackPointer(event) {
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const local = point.matrixTransform(matrix.inverse());
+    pointer = {x:local.x,y:local.y};
+    if (!raf) raf = requestAnimationFrame(updatePupils);
+  }
+
+  function updatePupils() {
+    raf = 0;
+    pupils.forEach(p => {
+      const dx = pointer.x - p.cx;
+      const dy = pointer.y - p.cy;
+      const distance = Math.hypot(dx,dy) || 1;
+      // Smoothly limit pupil travel so each pupil stays inside its eye.
+      const travel = Math.min(p.max, distance / 9);
+      const tx = (dx / distance) * travel;
+      const ty = (dy / distance) * travel;
+      p.el.setAttribute('transform', `translate(${tx.toFixed(2)} ${ty.toFixed(2)})`);
     });
   }
-  function lookAway() {
-    mode='away'; gate.classList.add('bending-away'); gate.classList.remove('shocked-state');
-    shocks.forEach(el=>el.classList.add('opacity-0'));
-    const directions=[[-4,-2],[-3,2],[3,-2],[3,2]];
-    pupils.forEach((p,i)=>{const d=directions[Math.floor(i/2)]||[-3,-2];p.el.style.transform=`translate(${d[0]}px,${d[1]}px)`;});
+
+  // Track the real mouse/touch pointer across the page, not just over the artwork.
+  window.addEventListener('pointermove', trackPointer, {passive:true});
+  window.addEventListener('pointerdown', trackPointer, {passive:true});
+  window.addEventListener('resize', () => {
+    if (!raf) raf = requestAnimationFrame(updatePupils);
+  }, {passive:true});
+
+  // Initialise at the current pointer position; no password-specific gaze changes.
+  const initialX = window.innerWidth * 0.72;
+  const initialY = window.innerHeight * 0.5;
+  const matrix = svg.getScreenCTM();
+  if (matrix) {
+    const point = svg.createSVGPoint(); point.x=initialX; point.y=initialY;
+    const local=point.matrixTransform(matrix.inverse());
+    pointer={x:local.x,y:local.y};
   }
-  function lookSurprised() {
-    mode='shocked'; gate.classList.remove('bending-away'); gate.classList.add('shocked-state');
-    shocks.forEach(el=>el.classList.remove('opacity-0'));
-    pupils.forEach(p=>p.el.style.transform=`translate(${p.max*.65}px,0px)`);
-  }
-  function normal() {
-    mode='normal'; gate.classList.remove('bending-away','shocked-state');
-    shocks.forEach(el=>el.classList.add('opacity-0')); moveEyes(last.x,last.y);
-  }
-  document.addEventListener('pointermove',e=>moveEyes(e.clientX,e.clientY),{passive:true});
-  if(password) {
-    password.addEventListener('focus',()=>password.type==='password'?lookAway():lookSurprised());
-    password.addEventListener('input',()=>password.type==='password'?lookAway():lookSurprised());
-    password.addEventListener('blur',normal);
-  }
-  const toggle=document.getElementById('apaaTogglePassword');
-  if(toggle) toggle.addEventListener('click',()=>requestAnimationFrame(()=> {
-    if(document.activeElement===password) password.type==='password'?lookAway():lookSurprised();
-  }));
-  requestAnimationFrame(()=>moveEyes(last.x,last.y));
+  updatePupils();
 })();
 
 initializeNewReceipt();
