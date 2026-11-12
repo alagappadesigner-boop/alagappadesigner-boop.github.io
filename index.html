@@ -2009,9 +2009,6 @@ select option { font-size: 14px; color: #243b53; }
 .apaa-art-stage.is-looking-away .apaa-shape {
   animation-play-state: running;
 }
-.apaa-art-stage.is-looking-away .apaa-shape-purple .apaa-mouth {
-  transform: scaleX(.82);
-}
 @media (max-width:760px) {
   .apaa-shape-purple .apaa-eye { width: 10px !important; height: 13px !important; }
   .apaa-shape-purple .apaa-eye i { width: 6px !important; height: 8px !important; left: 2px !important; top: 3px !important; }
@@ -2032,14 +2029,6 @@ select option { font-size: 14px; color: #243b53; }
 @keyframes apaaSvgFloatOrange { 0%,100%{translate:0 0} 50%{translate:0 -5px} }
 .eye-pupil { transition:transform .16s ease-out; }
 .facial-feature { transition:opacity .25s ease,transform .25s ease; }
-#apaaLoginGate.bending-away #purple-character { transform:skewX(-12deg) rotate(-8deg) translate(-13px,5px); }
-#apaaLoginGate.bending-away #black-character { transform:skewX(-14deg) rotate(-10deg) translate(-18px,8px); }
-#apaaLoginGate.bending-away #yellow-character { transform:skewX(-10deg) rotate(-12deg) translate(-15px,9px); }
-#apaaLoginGate.bending-away #orange-character { transform:skewX(-6deg) rotate(-6deg) translate(-9px,3px); }
-#apaaLoginGate.shocked-state #purple-character { transform:rotate(3deg) scale(1.035) translate(4px,-7px); }
-#apaaLoginGate.shocked-state #black-character { transform:rotate(4deg) scale(1.04) translate(7px,-8px); }
-#apaaLoginGate.shocked-state #yellow-character { transform:rotate(5deg) scale(1.04) translate(8px,-5px); }
-#apaaLoginGate.shocked-state #orange-character { transform:rotate(2deg) scale(1.02) translate(2px,-3px); }
 @media (prefers-reduced-motion:reduce) {
  #character-svg .character-group,.eye-pupil,.facial-feature { animation:none!important;transition:none!important; }
 }
@@ -3305,65 +3294,78 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
 
 
 
-// Interactive SVG character controller: pupils continuously track the pointer.
-// Password focus/typing does not change the characters' gaze or animation state.
+// Robust mouse tracking for all SVG character pupils.
+// Uses the SVG's rendered bounding box rather than getScreenCTM(),
+// so it also works when the login layout scales responsively.
 (() => {
   const svg = document.getElementById('character-svg');
   if (!svg) return;
 
+  const viewBox = svg.viewBox && svg.viewBox.baseVal;
+  const vb = viewBox && viewBox.width ? viewBox : { x: 0, y: 0, width: 500, height: 420 };
   const pupils = [
-    ['purple-pupil-1',185,170,7], ['purple-pupil-2',215,170,7],
-    ['black-pupil-1',252,215,6], ['black-pupil-2',282,215,6],
-    ['yellow-pupil-1',326,254,4], ['yellow-pupil-2',351,254,4],
-    ['orange-pupil-1',126,329,4.5], ['orange-pupil-2',166,329,4.5]
-  ].map(([id,cx,cy,max]) => ({el:document.getElementById(id),cx,cy,max}))
-   .filter(p => p.el);
+    { id: 'purple-pupil-1', x: 185, y: 170, range: 6.5 },
+    { id: 'purple-pupil-2', x: 215, y: 170, range: 6.5 },
+    { id: 'black-pupil-1', x: 252, y: 215, range: 6 },
+    { id: 'black-pupil-2', x: 282, y: 215, range: 6 },
+    { id: 'yellow-pupil-1', x: 326, y: 254, range: 4 },
+    { id: 'yellow-pupil-2', x: 351, y: 254, range: 4 },
+    { id: 'orange-pupil-1', x: 126, y: 329, range: 4 },
+    { id: 'orange-pupil-2', x: 166, y: 329, range: 4 }
+  ].map(p => ({ ...p, node: document.getElementById(p.id) }))
+   .filter(p => p.node);
 
-  let pointer = {x:250,y:210};
-  let raf = 0;
+  let pointerClient = { x: window.innerWidth * 0.75, y: window.innerHeight * 0.5 };
+  let frame = 0;
 
-  function trackPointer(event) {
-    const matrix = svg.getScreenCTM();
-    if (!matrix) return;
-    const point = svg.createSVGPoint();
-    point.x = event.clientX;
-    point.y = event.clientY;
-    const local = point.matrixTransform(matrix.inverse());
-    pointer = {x:local.x,y:local.y};
-    if (!raf) raf = requestAnimationFrame(updatePupils);
-  }
+  function renderGaze() {
+    frame = 0;
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
 
-  function updatePupils() {
-    raf = 0;
+    // Convert screen pointer coordinates directly into the SVG viewBox.
+    const px = vb.x + ((pointerClient.x - rect.left) / rect.width) * vb.width;
+    const py = vb.y + ((pointerClient.y - rect.top) / rect.height) * vb.height;
+
     pupils.forEach(p => {
-      const dx = pointer.x - p.cx;
-      const dy = pointer.y - p.cy;
-      const distance = Math.hypot(dx,dy) || 1;
-      // Smoothly limit pupil travel so each pupil stays inside its eye.
-      const travel = Math.min(p.max, distance / 9);
-      const tx = (dx / distance) * travel;
-      const ty = (dy / distance) * travel;
-      p.el.setAttribute('transform', `translate(${tx.toFixed(2)} ${ty.toFixed(2)})`);
+      const dx = px - p.x;
+      const dy = py - p.y;
+      const length = Math.hypot(dx, dy) || 1;
+      const travel = Math.min(p.range, length / 12);
+      const nx = p.x + (dx / length) * travel;
+      const ny = p.y + (dy / length) * travel;
+      // Updating cx/cy directly is more reliable than SVG transform attributes.
+      p.node.setAttribute('cx', nx.toFixed(2));
+      p.node.setAttribute('cy', ny.toFixed(2));
     });
   }
 
-  // Track the real mouse/touch pointer across the page, not just over the artwork.
-  window.addEventListener('pointermove', trackPointer, {passive:true});
-  window.addEventListener('pointerdown', trackPointer, {passive:true});
-  window.addEventListener('resize', () => {
-    if (!raf) raf = requestAnimationFrame(updatePupils);
-  }, {passive:true});
-
-  // Initialise at the current pointer position; no password-specific gaze changes.
-  const initialX = window.innerWidth * 0.72;
-  const initialY = window.innerHeight * 0.5;
-  const matrix = svg.getScreenCTM();
-  if (matrix) {
-    const point = svg.createSVGPoint(); point.x=initialX; point.y=initialY;
-    const local=point.matrixTransform(matrix.inverse());
-    pointer={x:local.x,y:local.y};
+  function onPointerMove(event) {
+    pointerClient.x = event.clientX;
+    pointerClient.y = event.clientY;
+    if (!frame) frame = requestAnimationFrame(renderGaze);
   }
-  updatePupils();
+
+  // Listen on document/window so pointer tracking works over both the artwork
+  // and the username/password panel. Mouse fallback covers older browsers.
+  document.addEventListener('pointermove', onPointerMove, { passive: true, capture: true });
+  document.addEventListener('mousemove', onPointerMove, { passive: true, capture: true });
+  document.addEventListener('touchmove', event => {
+    if (event.touches && event.touches[0]) onPointerMove(event.touches[0]);
+  }, { passive: true, capture: true });
+  window.addEventListener('resize', () => {
+    if (!frame) frame = requestAnimationFrame(renderGaze);
+  }, { passive: true });
+
+  // Recalculate when the login gate becomes visible after a logout/session change.
+  const gate = document.getElementById('apaaLoginGate');
+  if (gate && window.MutationObserver) {
+    new MutationObserver(() => {
+      if (!frame) frame = requestAnimationFrame(renderGaze);
+    }).observe(gate, { attributes: true, attributeFilter: ['hidden', 'class', 'style'] });
+  }
+
+  renderGaze();
 })();
 
 initializeNewReceipt();
