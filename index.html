@@ -3071,6 +3071,30 @@ async function generateProfessionalPDF(itemData) {
   doc.text(doc.splitTextToSize(thankText, contentWidth - 10), pageWidth / 2, thankY + 11, { align: 'center' });
 
   doc.save(`${itemData.receiptNo}.pdf`);
+  return true; // PDF download has been initiated successfully
+}
+
+function resetFeeFormAfterSuccessfulReceipt() {
+  const form = el('feeForm');
+  if (form) form.reset();
+
+  // Restore the default country code and today's payment date.
+  if (el('countryCode')) el('countryCode').value = '+91';
+  const today = formatTodayForReceipt();
+  if (el('date')) el('date').value = today;
+  if (el('dateDisplay')) el('dateDisplay').value = formatDateForDisplay(today);
+  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(today);
+
+  if (el('amountWords')) el('amountWords').textContent = 'Amount in words will appear here';
+  if (el('txn')) el('txn').value = '';
+  if (el('phone')) el('phone').value = '';
+  if (el('paymentCalendar')) el('paymentCalendar').hidden = true;
+  document.querySelectorAll('.field-error').forEach(node => node.classList.remove('field-error'));
+  handlePaymentModeChange();
+
+  // Create a fresh receipt number only after the old receipt is safely saved and downloaded.
+  try { localStorage.removeItem(CURRENT_RECEIPT_META_KEY); } catch (e) { console.warn('Could not rotate receipt metadata:', e); }
+  initializeNewReceipt();
 }
 
 async function handlePrintReceiptWorkflow() {
@@ -3101,10 +3125,16 @@ async function handlePrintReceiptWorkflow() {
   }
 
   try {
-    await generateProfessionalPDF(data);
+    const downloadStarted = await generateProfessionalPDF(data);
+    if (downloadStarted) {
+      resetFeeFormAfterSuccessfulReceipt();
+      alert('Receipt saved and PDF download started successfully. The form is ready for the next payment.');
+    } else {
+      throw new Error('PDF download was not initiated.');
+    }
   } catch (pdfError) {
     console.error('PDF Generation Error:', pdfError);
-    alert('The receipt was saved to Student Ledger, but PDF download failed. Please use Download Receipt in the ledger to try again. Your entered details have been kept.');
+    alert('The receipt was saved to Student Ledger, but PDF generation or download failed. Your entered details have been kept. You can download it from the Student Ledger.');
   }
 }
 
@@ -3453,6 +3483,8 @@ function apaaShowLogin() {
   if (gate) gate.hidden = false;
   const app = document.querySelector('.wrap');
   if (app) app.style.display = 'none';
+  const sig = document.getElementById('signatureImg');
+  if (sig) { sig.removeAttribute('src'); sig.dataset.authLoaded = ''; }
   const username = document.getElementById('apaaLoginUsername');
   if (username) username.focus();
 }
@@ -3626,5 +3658,51 @@ setInterval(updateLiveGeneratedTime, 1000);
 updateSavedCount();
 renderLedger();
 </script>
+
+<style>
+/* Discourage casual copying/saving from the on-screen receipt.
+   This is a UI deterrent only, not a security boundary. */
+.wrap, .wrap .sheet, .wrap .sheet * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+.wrap input, .wrap textarea, .wrap select, .wrap [contenteditable="true"] {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+#signatureImg {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+</style>
+<script>
+(function protectVisibleReceiptFromCasualCopying() {
+  const appRoot = document.querySelector('.wrap');
+  if (!appRoot) return;
+
+  const isFormControl = node => node && node.closest &&
+    node.closest('input, textarea, select, [contenteditable="true"]');
+
+  appRoot.addEventListener('contextmenu', event => {
+    if (event.target.closest('#signatureImg, .signature-block, .sheet')) {
+      event.preventDefault();
+    }
+  });
+  appRoot.addEventListener('dragstart', event => {
+    if (event.target.closest('#signatureImg, .signature-block, .sheet')) event.preventDefault();
+  });
+  appRoot.addEventListener('copy', event => {
+    const selection = window.getSelection();
+    if (!isFormControl(event.target) && selection && appRoot.contains(selection.anchorNode)) {
+      event.preventDefault();
+    }
+  });
+  appRoot.addEventListener('selectstart', event => {
+    if (!isFormControl(event.target)) event.preventDefault();
+  });
+})();
+</script>
+
 </body>
 </html>
