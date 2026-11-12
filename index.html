@@ -3294,80 +3294,102 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
 
 
 
-// Robust mouse tracking for all SVG character pupils.
-// Uses the SVG's rendered bounding box rather than getScreenCTM(),
-// so it also works when the login layout scales responsively.
+// Reliable live eye tracking for every character.
 (() => {
   const svg = document.getElementById('character-svg');
-  if (!svg) return;
+  if (!svg) {
+    console.warn('APAA character SVG not found; eye tracking was not initialized.');
+    return;
+  }
 
-  const viewBox = svg.viewBox && svg.viewBox.baseVal;
-  const vb = viewBox && viewBox.width ? viewBox : { x: 0, y: 0, width: 500, height: 420 };
-  const pupils = [
-    { id: 'purple-pupil-1', x: 185, y: 170, range: 6.5 },
-    { id: 'purple-pupil-2', x: 215, y: 170, range: 6.5 },
-    { id: 'black-pupil-1', x: 252, y: 215, range: 6 },
-    { id: 'black-pupil-2', x: 282, y: 215, range: 6 },
-    { id: 'yellow-pupil-1', x: 326, y: 254, range: 4 },
-    { id: 'yellow-pupil-2', x: 351, y: 254, range: 4 },
-    { id: 'orange-pupil-1', x: 126, y: 329, range: 4 },
-    { id: 'orange-pupil-2', x: 166, y: 329, range: 4 }
-  ].map(p => ({ ...p, node: document.getElementById(p.id) }))
-   .filter(p => p.node);
+  const pupilIds = [
+    'purple-pupil-1', 'purple-pupil-2',
+    'black-pupil-1', 'black-pupil-2',
+    'yellow-pupil-1', 'yellow-pupil-2',
+    'orange-pupil-1', 'orange-pupil-2'
+  ];
 
-  let pointerClient = { x: window.innerWidth * 0.75, y: window.innerHeight * 0.5 };
-  let frame = 0;
+  // Read each pupil's true SVG position and the white/dark eye boundary
+  // from the actual artwork. This avoids relying on guessed screen sizes.
+  const eyes = pupilIds.map(id => {
+    const pupil = document.getElementById(id);
+    if (!pupil) return null;
+    const baseEye = pupil.previousElementSibling;
+    if (!baseEye || baseEye.tagName.toLowerCase() !== 'circle') return null;
 
-  function renderGaze() {
-    frame = 0;
-    const rect = svg.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
+    const x = Number(pupil.getAttribute('cx'));
+    const y = Number(pupil.getAttribute('cy'));
+    const pupilRadius = Number(pupil.getAttribute('r')) || 3;
+    const eyeRadius = Number(baseEye.getAttribute('r')) || 10;
 
-    // Convert screen pointer coordinates directly into the SVG viewBox.
-    const px = vb.x + ((pointerClient.x - rect.left) / rect.width) * vb.width;
-    const py = vb.y + ((pointerClient.y - rect.top) / rect.height) * vb.height;
+    return {
+      pupil,
+      x, y,
+      range: Math.max(2, eyeRadius - pupilRadius - 1.25)
+    };
+  }).filter(Boolean);
 
-    pupils.forEach(p => {
-      const dx = px - p.x;
-      const dy = py - p.y;
-      const length = Math.hypot(dx, dy) || 1;
-      const travel = Math.min(p.range, length / 12);
-      const nx = p.x + (dx / length) * travel;
-      const ny = p.y + (dy / length) * travel;
-      // Updating cx/cy directly is more reliable than SVG transform attributes.
-      p.node.setAttribute('cx', nx.toFixed(2));
-      p.node.setAttribute('cy', ny.toFixed(2));
+  let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  let raf = 0;
+
+  function updateEyes() {
+    raf = 0;
+    const matrix = svg.getScreenCTM();
+    if (!matrix || !eyes.length) return;
+
+    let point;
+    try {
+      const p = svg.createSVGPoint();
+      p.x = pointer.x;
+      p.y = pointer.y;
+      point = p.matrixTransform(matrix.inverse());
+    } catch (error) {
+      return;
+    }
+
+    eyes.forEach(eye => {
+      const dx = point.x - eye.x;
+      const dy = point.y - eye.y;
+      const distance = Math.hypot(dx, dy) || 1;
+      // Give the pupils a clearly visible movement while keeping them inside
+      // their eye whites.
+      const movement = Math.min(eye.range, Math.max(0, distance * 0.12));
+      const x = eye.x + (dx / distance) * movement;
+      const y = eye.y + (dy / distance) * movement;
+      eye.pupil.setAttribute('cx', x.toFixed(2));
+      eye.pupil.setAttribute('cy', y.toFixed(2));
     });
   }
 
-  function onPointerMove(event) {
-    pointerClient.x = event.clientX;
-    pointerClient.y = event.clientY;
-    if (!frame) frame = requestAnimationFrame(renderGaze);
+  function trackPointer(event) {
+    if (typeof event.clientX !== 'number' || typeof event.clientY !== 'number') return;
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+    if (!raf) raf = requestAnimationFrame(updateEyes);
   }
 
-  // Listen on document/window so pointer tracking works over both the artwork
-  // and the username/password panel. Mouse fallback covers older browsers.
-  document.addEventListener('pointermove', onPointerMove, { passive: true, capture: true });
-  document.addEventListener('mousemove', onPointerMove, { passive: true, capture: true });
-  document.addEventListener('touchmove', event => {
-    if (event.touches && event.touches[0]) onPointerMove(event.touches[0]);
-  }, { passive: true, capture: true });
-  window.addEventListener('resize', () => {
-    if (!frame) frame = requestAnimationFrame(renderGaze);
+  // Capture pointer movement from the whole page, including the login form.
+  window.addEventListener('pointermove', trackPointer, { passive: true });
+  window.addEventListener('mousemove', trackPointer, { passive: true });
+  window.addEventListener('touchmove', event => {
+    if (event.touches && event.touches.length) trackPointer(event.touches[0]);
   }, { passive: true });
 
-  // Recalculate when the login gate becomes visible after a logout/session change.
+  window.addEventListener('resize', () => {
+    if (!raf) raf = requestAnimationFrame(updateEyes);
+  }, { passive: true });
+
+  // Re-run after login/logout changes visibility of the login gate.
   const gate = document.getElementById('apaaLoginGate');
   if (gate && window.MutationObserver) {
     new MutationObserver(() => {
-      if (!frame) frame = requestAnimationFrame(renderGaze);
-    }).observe(gate, { attributes: true, attributeFilter: ['hidden', 'class', 'style'] });
+      if (!raf) raf = requestAnimationFrame(updateEyes);
+    }).observe(gate, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
   }
 
-  renderGaze();
+  // Set an initial gaze and keep recalculating against the actual SVG transform.
+  updateEyes();
 })();
-
 initializeNewReceipt();
 handlePaymentModeChange();
 updateLiveGeneratedTime();
