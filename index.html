@@ -379,9 +379,22 @@ select option {
 /* Footer and Signature Section */
 .receipt-footer-area {
   display: flex;
+  width: 100%;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  gap: 24px;
   margin-bottom: 14px;
+}
+.qr-signature-group {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.signature-block {
+  flex: 0 0 240px;
+  width: 240px;
+  margin-left: auto;
+  align-self: center;
+  text-align: center;
 }
 
 .qr-signature-group {
@@ -1103,6 +1116,20 @@ input::placeholder { font-size: 13px; }
   .meta-info-text { font-size: 13px; }
 }
 
+
+@media (max-width: 680px) {
+  .receipt-footer-area {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .signature-block {
+    width: min(240px, 100%);
+    flex-basis: auto;
+    margin-left: auto;
+    align-self: flex-end;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1444,7 +1471,7 @@ function receiptData(normalizedPhone) {
     paymentMode: el('modeInput').value,
     transactionId: el('txn').value.trim() || 'N/A',
     installmentStage: el('stage').value,
-    savedAt: el('genDateTime').textContent || new Date().toLocaleString('en-IN')
+    savedAt: formatLiveGeneratedTime(new Date())
   };
 }
 
@@ -1987,26 +2014,32 @@ function formatTodayForReceipt(date = new Date()) {
 
 const CURRENT_RECEIPT_META_KEY = 'apaa_current_receipt_meta_v1';
 
+function formatLiveGeneratedTime(date = new Date()) {
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+}
+
 function getOrCreateCurrentReceiptMeta() {
-  // Keep the same receipt number and generated timestamp when the page is refreshed.
+  // Keep the receipt number stable after refresh; the clock itself remains live.
   try {
     const existing = JSON.parse(localStorage.getItem(CURRENT_RECEIPT_META_KEY) || 'null');
-    if (existing && existing.receiptNo && existing.generatedAt) return existing;
+    if (existing && existing.receiptNo) {
+      return { receiptNo: existing.receiptNo, generatedAt: formatLiveGeneratedTime() };
+    }
   } catch (error) {
     console.warn('Could not read current receipt metadata:', error);
   }
 
   const meta = {
     receiptNo: makeReceiptNo(),
-    generatedAt: new Date().toLocaleString('en-IN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    })
+    generatedAt: formatLiveGeneratedTime()
   };
 
   try {
@@ -2015,6 +2048,11 @@ function getOrCreateCurrentReceiptMeta() {
     console.warn('Could not persist current receipt metadata:', error);
   }
   return meta;
+}
+
+function updateLiveGeneratedTime() {
+  const timeElement = el('genDateTime');
+  if (timeElement) timeElement.textContent = formatLiveGeneratedTime();
 }
 
 function initializeNewReceipt() {
@@ -2029,6 +2067,8 @@ function initializeNewReceipt() {
 }
 
 initializeNewReceipt();
+updateLiveGeneratedTime();
+setInterval(updateLiveGeneratedTime, 1000);
 updateSavedCount();
 renderLedger();
 </script>
