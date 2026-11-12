@@ -2017,6 +2017,33 @@ select option { font-size: 14px; color: #243b53; }
   .apaa-shape-purple .apaa-eye i { width: 6px !important; height: 8px !important; left: 2px !important; top: 3px !important; }
 }
 
+
+/* Integrated interactive SVG character scene from the supplied code */
+.apaa-art-stage { display:flex; align-items:center; justify-content:center; }
+#character-svg { display:block; width:100%; height:auto; max-height:390px; overflow:visible; }
+#character-svg .character-group { transition:transform .55s cubic-bezier(.34,1.56,.64,1); transform-box:view-box; }
+#character-svg #purple-character { animation:apaaSvgFloatPurple 4.6s ease-in-out infinite; }
+#character-svg #black-character { animation:apaaSvgFloatBlack 3.8s ease-in-out infinite; }
+#character-svg #yellow-character { animation:apaaSvgFloatYellow 4.3s ease-in-out infinite; }
+#character-svg #orange-character { animation:apaaSvgFloatOrange 4.1s ease-in-out infinite; }
+@keyframes apaaSvgFloatPurple { 0%,100%{translate:0 0;rotate:0deg} 50%{translate:0 -10px;rotate:-1deg} }
+@keyframes apaaSvgFloatBlack { 0%,100%{translate:0 0} 50%{translate:0 -7px} }
+@keyframes apaaSvgFloatYellow { 0%,100%{translate:0 0;rotate:0deg} 50%{translate:0 -8px;rotate:2deg} }
+@keyframes apaaSvgFloatOrange { 0%,100%{translate:0 0} 50%{translate:0 -5px} }
+.eye-pupil { transition:transform .16s ease-out; }
+.facial-feature { transition:opacity .25s ease,transform .25s ease; }
+#apaaLoginGate.bending-away #purple-character { transform:skewX(-12deg) rotate(-8deg) translate(-13px,5px); }
+#apaaLoginGate.bending-away #black-character { transform:skewX(-14deg) rotate(-10deg) translate(-18px,8px); }
+#apaaLoginGate.bending-away #yellow-character { transform:skewX(-10deg) rotate(-12deg) translate(-15px,9px); }
+#apaaLoginGate.bending-away #orange-character { transform:skewX(-6deg) rotate(-6deg) translate(-9px,3px); }
+#apaaLoginGate.shocked-state #purple-character { transform:rotate(3deg) scale(1.035) translate(4px,-7px); }
+#apaaLoginGate.shocked-state #black-character { transform:rotate(4deg) scale(1.04) translate(7px,-8px); }
+#apaaLoginGate.shocked-state #yellow-character { transform:rotate(5deg) scale(1.04) translate(8px,-5px); }
+#apaaLoginGate.shocked-state #orange-character { transform:rotate(2deg) scale(1.02) translate(2px,-3px); }
+@media (prefers-reduced-motion:reduce) {
+ #character-svg .character-group,.eye-pupil,.facial-feature { animation:none!important;transition:none!important; }
+}
+
 </style>
 </head>
 <body>
@@ -2035,15 +2062,135 @@ select option { font-size: 14px; color: #243b53; }
         </div>
       </div>
       <div class="apaa-art-stage" aria-hidden="true">
-        <div class="apaa-art-glow"></div>
-        <span class="apaa-floating-dot one"></span>
-        <span class="apaa-floating-dot two"></span>
-        <span class="apaa-floating-dot three"></span>
-        <div class="apaa-shape apaa-shape-purple" data-face="purple"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
-        <div class="apaa-shape apaa-shape-black" data-face="black"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
-        <div class="apaa-shape apaa-shape-orange" data-face="orange"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
-        <div class="apaa-shape apaa-shape-yellow" data-face="yellow"><span class="apaa-eye"><i></i></span><span class="apaa-eye"><i></i></span><span class="apaa-mouth"></span></div>
-      </div>
+        <svg id="character-svg" viewBox="0 0 500 420" class="w-full h-auto drop-shadow-md overflow-visible">
+          
+          <!-- Ground Shadow -->
+          <ellipse cx="250" cy="385" rx="215" ry="12" fill="#E2D1C3" opacity="0.65"/>
+
+          <!-- ================= 1. PURPLE TALL BLOB (BEHIND LEFT) ================= -->
+          <g id="purple-character" class="character-group interactive-blob" style="transform-origin: 200px 380px;">
+            <!-- Body -->
+            <path d="M 160 110 C 160 90, 240 80, 240 110 L 245 380 L 155 380 Z" fill="#6C5CE7" />
+            
+            <!-- Eyes Group -->
+            <g id="purple-eyes">
+              <!-- Left Eye Base -->
+              <circle cx="185" cy="170" r="11" fill="white"/>
+              <circle id="purple-pupil-1" class="eye-pupil" cx="185" cy="170" r="5" fill="#1E1E24"/>
+              
+              <!-- Right Eye Base -->
+              <circle cx="215" cy="170" r="11" fill="white"/>
+              <circle id="purple-pupil-2" class="eye-pupil" cx="215" cy="170" r="5" fill="#1E1E24"/>
+
+              <!-- Shock Wide Eyes Overlay -->
+              <circle id="purple-shock-eye-1" class="facial-feature opacity-0" cx="185" cy="170" r="15" fill="white" stroke="#1E1E24" stroke-width="2"/>
+              <circle id="purple-shock-pupil-1" class="facial-feature opacity-0" cx="185" cy="170" r="2.5" fill="#1E1E24"/>
+              <circle id="purple-shock-eye-2" class="facial-feature opacity-0" cx="215" cy="170" r="15" fill="white" stroke="#1E1E24" stroke-width="2"/>
+              <circle id="purple-shock-pupil-2" class="facial-feature opacity-0" cx="215" cy="170" r="2.5" fill="#1E1E24"/>
+            </g>
+            
+            <!-- Mouths -->
+            <path id="purple-mouth" d="M 195 192 Q 200 197 205 192" stroke="#1E1E24" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <circle id="purple-shock-mouth" class="facial-feature opacity-0" cx="200" cy="194" r="5" fill="#1E1E24"/>
+          </g>
+
+          <!-- ================= 2. BLACK MIDDLE BLOB (CENTER) ================= -->
+          <g id="black-character" class="character-group interactive-blob" style="transform-origin: 265px 380px;">
+            <!-- Body -->
+            <path d="M 225 170 C 225 145, 305 145, 305 170 L 310 380 L 220 380 Z" fill="#18181B" />
+            
+            <!-- Eyes Group -->
+            <g id="black-eyes">
+              <!-- Left Eye -->
+              <circle cx="252" cy="215" r="12" fill="white"/>
+              <circle id="black-pupil-1" class="eye-pupil" cx="252" cy="215" r="5.5" fill="#18181B"/>
+              
+              <!-- Right Eye -->
+              <circle cx="282" cy="215" r="12" fill="white"/>
+              <circle id="black-pupil-2" class="eye-pupil" cx="282" cy="215" r="5.5" fill="#18181B"/>
+
+              <!-- Shock Wide Eyes Overlay -->
+              <circle id="black-shock-eye-1" class="facial-feature opacity-0" cx="252" cy="215" r="15" fill="white"/>
+              <circle id="black-shock-pupil-1" class="facial-feature opacity-0" cx="252" cy="215" r="2" fill="#18181B"/>
+              <circle id="black-shock-eye-2" class="facial-feature opacity-0" cx="282" cy="215" r="15" fill="white"/>
+              <circle id="black-shock-pupil-2" class="facial-feature opacity-0" cx="282" cy="215" r="2" fill="#18181B"/>
+            </g>
+
+            <!-- Mouths -->
+            <path id="black-mouth" d="M 262 236 Q 267 240 272 236" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <ellipse id="black-shock-mouth" class="facial-feature opacity-0" cx="267" cy="238" rx="4" ry="6" fill="white"/>
+          </g>
+
+          <!-- ================= 3. YELLOW BLOB (RIGHT PILL) ================= -->
+          <g id="yellow-character" class="character-group interactive-blob" style="transform-origin: 337px 380px;">
+            <!-- Body Pill Shape -->
+            <rect x="300" y="210" width="75" height="170" rx="37.5" fill="#FBBF24"/>
+            
+            <!-- Eyes Group -->
+            <g id="yellow-eyes">
+              <!-- Left Eye -->
+              <circle cx="325" cy="255" r="8" fill="#18181B"/>
+              <circle id="yellow-pupil-1" class="eye-pupil" cx="326" cy="254" r="2.5" fill="white"/>
+              
+              <!-- Right Eye -->
+              <circle cx="350" cy="255" r="8" fill="#18181B"/>
+              <circle id="yellow-pupil-2" class="eye-pupil" cx="351" cy="254" r="2.5" fill="white"/>
+
+              <!-- Shocked Wide Eyes -->
+              <circle id="yellow-shock-eye-1" class="facial-feature opacity-0" cx="325" cy="255" r="10" fill="#18181B"/>
+              <circle id="yellow-shock-pupil-1" class="facial-feature opacity-0" cx="326" cy="254" r="1.5" fill="white"/>
+              <circle id="yellow-shock-eye-2" class="facial-feature opacity-0" cx="350" cy="255" r="10" fill="#18181B"/>
+              <circle id="yellow-shock-pupil-2" class="facial-feature opacity-0" cx="351" cy="254" r="1.5" fill="white"/>
+            </g>
+
+            <!-- Mouth -->
+            <path id="yellow-mouth" d="M 334 272 Q 338 275 342 272" stroke="#18181B" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <circle id="yellow-shock-mouth" class="facial-feature opacity-0" cx="338" cy="273" r="3.5" fill="#18181B"/>
+          </g>
+
+          <!-- ================= 4. ORANGE BLOB (BOTTOM LEFT FRONT) ================= -->
+          <g id="orange-character" class="character-group interactive-blob" style="transform-origin: 150px 380px;">
+            <!-- Dome Body -->
+            <path d="M 60 380 A 100 100 0 0 1 240 380 Z" fill="#FF7A3C"/>
+            
+            <!-- Eyes Group -->
+            <g id="orange-eyes">
+              <!-- Left Eye -->
+              <circle cx="125" cy="330" r="9" fill="#1E1E24"/>
+              <circle id="orange-pupil-1" class="eye-pupil" cx="126" cy="329" r="3" fill="white"/>
+              
+              <!-- Right Eye -->
+              <circle cx="165" cy="330" r="9" fill="#1E1E24"/>
+              <circle id="orange-pupil-2" class="eye-pupil" cx="166" cy="329" r="3" fill="white"/>
+
+              <!-- Shocked Wide Eyes -->
+              <circle id="orange-shock-eye-1" class="facial-feature opacity-0" cx="125" cy="330" r="12" fill="#1E1E24"/>
+              <circle id="orange-shock-pupil-1" class="facial-feature opacity-0" cx="126" cy="329" r="1.5" fill="white"/>
+              <circle id="orange-shock-eye-2" class="facial-feature opacity-0" cx="165" cy="330" r="12" fill="#1E1E24"/>
+              <circle id="orange-shock-pupil-2" class="facial-feature opacity-0" cx="166" cy="329" r="1.5" fill="white"/>
+            </g>
+
+            <!-- Smile Mouth -->
+            <path id="orange-mouth" d="M 140 345 Q 145 352 150 345" stroke="#1E1E24" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <circle id="orange-shock-mouth" class="facial-feature opacity-0" cx="145" cy="347" r="4" fill="#1E1E24"/>
+
+            <!-- Cute Blush Spots -->
+            <ellipse cx="112" cy="340" rx="6" ry="4" fill="#FF5200" opacity="0.4"/>
+            <ellipse cx="178" cy="340" rx="6" ry="4" fill="#FF5200" opacity="0.4"/>
+          </g>
+
+          <!-- Shock Surprise Marks & Sweat Drop -->
+          <g id="shock-sweat-drop" class="facial-feature opacity-0" transform="translate(195, 105)">
+            <path d="M 0 10 C -4 10, -6 16, 0 22 C 6 16, 4 10, 0 10 Z" fill="#38BDF8"/>
+          </g>
+          
+          <g id="shock-marks" class="facial-feature opacity-0" transform="translate(267, 105)">
+            <path d="M -15 -10 L -12 5 M -15 12 L -15 15" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 15 -10 L 12 5 M 15 12 L 15 15" stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+          </g>
+
+        </svg>
+            </div>
       <div class="apaa-login-caption">
         <strong>Where tradition meets excellence.</strong><br>
         A dedicated space to manage academy fee receipts with clarity and confidence.
@@ -3158,86 +3305,56 @@ if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
 
 
 
-// Interactive character eyes: follow the pointer, but politely look away while password is entered.
+// Interactive SVG character controller integrated from the supplied code.
 (() => {
-  const stage = document.querySelector('.apaa-art-stage');
+  const gate = document.getElementById('apaaLoginGate');
+  const svg = document.getElementById('character-svg');
   const password = document.getElementById('apaaLoginPassword');
-  if (!stage) return;
+  if (!gate || !svg) return;
+  const pupils = [
+    ['purple-pupil-1',185,170,5.2],['purple-pupil-2',215,170,5.2],
+    ['black-pupil-1',252,215,5.5],['black-pupil-2',282,215,5.5],
+    ['yellow-pupil-1',326,254,3],['yellow-pupil-2',351,254,3],
+    ['orange-pupil-1',126,329,3.5],['orange-pupil-2',166,329,3.5]
+  ].map(([id,cx,cy,max])=>({el:document.getElementById(id),cx,cy,max})).filter(p=>p.el);
+  const shocks=[...svg.querySelectorAll('.facial-feature')];
+  let mode='normal', last={x:innerWidth*.7,y:innerHeight*.5};
 
-  const faces = [...stage.querySelectorAll('[data-face]')];
-  let lastPointer = { x: window.innerWidth * .72, y: window.innerHeight * .5 };
-  let passwordMode = false;
-
-  function setPupil(pupil, x, y) {
-    pupil.style.transform = `translate(${x}px, ${y}px)`;
-  }
-
-  function followPointer(clientX, clientY) {
-    lastPointer = { x: clientX, y: clientY };
-    if (passwordMode) return;
-
-    faces.forEach((face, faceIndex) => {
-      const eyes = [...face.querySelectorAll('.apaa-eye')];
-      eyes.forEach((eye, eyeIndex) => {
-        const pupil = eye.querySelector('i');
-        if (!pupil) return;
-        const rect = eye.getBoundingClientRect();
-        const dx = clientX - (rect.left + rect.width / 2);
-        const dy = clientY - (rect.top + rect.height / 2);
-        const angle = Math.atan2(dy, dx);
-        const max = faceIndex === 0 ? 4.2 : 2.8;
-        const distance = Math.min(max, Math.hypot(dx, dy) / 72);
-        setPupil(pupil, Math.cos(angle) * distance, Math.sin(angle) * distance);
-      });
-
-      const r = stage.getBoundingClientRect();
-      const px = (clientX - (r.left + r.width / 2)) / Math.max(1, r.width / 2);
-      const tilt = Math.max(-5, Math.min(5, px * 3.5 * ([1,.7,.45,.6][faceIndex] || .5)));
-      face.style.setProperty('--cursor-tilt', `${tilt}deg`);
+  function moveEyes(x,y) {
+    last={x,y}; if(mode!=='normal') return;
+    const r=svg.getBoundingClientRect(), sx=r.width/500, sy=r.height/420;
+    pupils.forEach(p=>{
+      const dx=x-(r.left+p.cx*sx), dy=y-(r.top+p.cy*sy);
+      const a=Math.atan2(dy,dx), d=Math.min(p.max,Math.hypot(dx,dy)/28);
+      p.el.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`;
     });
   }
-
   function lookAway() {
-    passwordMode = true;
-    stage.classList.add('is-looking-away');
-    faces.forEach((face, faceIndex) => {
-      const pupils = [...face.querySelectorAll('.apaa-eye i')];
-      pupils.forEach((pupil, eyeIndex) => {
-        // Each character glances away from the password field in a slightly different direction.
-        const directions = [
-          [[-3.2,-1.2],[3.2,-1.2]],   // purple glances outward
-          [[-2.5,1.2],[2.5,1.2]],     // black glances outward and down
-          [[-2.8,-1.0],[2.8,-1.0]],   // orange glances outward
-          [[-2.4,1.5],[2.4,1.5]]      // yellow glances outward and down
-        ];
-        const [x,y] = (directions[faceIndex] || directions[0])[eyeIndex] || [-2,1];
-        setPupil(pupil, x, y);
-      });
-      const awayTilts = [-3, 4, -2, 3];
-      face.style.setProperty('--cursor-tilt', `${awayTilts[faceIndex] || 0}deg`);
-    });
+    mode='away'; gate.classList.add('bending-away'); gate.classList.remove('shocked-state');
+    shocks.forEach(el=>el.classList.add('opacity-0'));
+    const directions=[[-4,-2],[-3,2],[3,-2],[3,2]];
+    pupils.forEach((p,i)=>{const d=directions[Math.floor(i/2)]||[-3,-2];p.el.style.transform=`translate(${d[0]}px,${d[1]}px)`;});
   }
-
-  function lookBack() {
-    passwordMode = false;
-    stage.classList.remove('is-looking-away');
-    followPointer(lastPointer.x, lastPointer.y);
+  function lookSurprised() {
+    mode='shocked'; gate.classList.remove('bending-away'); gate.classList.add('shocked-state');
+    shocks.forEach(el=>el.classList.remove('opacity-0'));
+    pupils.forEach(p=>p.el.style.transform=`translate(${p.max*.65}px,0px)`);
   }
-
-  document.addEventListener('pointermove', event => followPointer(event.clientX, event.clientY), { passive: true });
-  document.addEventListener('touchmove', event => {
-    const touch = event.touches && event.touches[0];
-    if (touch) followPointer(touch.clientX, touch.clientY);
-  }, { passive: true });
-
-  if (password) {
-    password.addEventListener('focus', lookAway);
-    password.addEventListener('input', lookAway);
-    password.addEventListener('blur', lookBack);
+  function normal() {
+    mode='normal'; gate.classList.remove('bending-away','shocked-state');
+    shocks.forEach(el=>el.classList.add('opacity-0')); moveEyes(last.x,last.y);
   }
-
-  // The characters start by looking toward the viewer, then track the cursor.
-  requestAnimationFrame(() => followPointer(lastPointer.x, lastPointer.y));
+  document.addEventListener('pointermove',e=>moveEyes(e.clientX,e.clientY),{passive:true});
+  if(password) {
+    password.addEventListener('focus',()=>password.type==='password'?lookAway():lookSurprised());
+    password.addEventListener('input',()=>password.type==='password'?lookAway():lookSurprised());
+    password.addEventListener('blur',normal);
+  }
+  const toggle=document.getElementById('apaaTogglePassword');
+  if(toggle) toggle.addEventListener('click',()=>requestAnimationFrame(()=> {
+    if(document.activeElement===password) password.type==='password'?lookAway():lookSurprised();
+  }));
+  requestAnimationFrame(()=>moveEyes(last.x,last.y));
 })();
 
 initializeNewReceipt();
