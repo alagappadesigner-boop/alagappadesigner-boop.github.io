@@ -2749,8 +2749,8 @@ function apaaLogout() {
 document.getElementById('apaaLoginForm').addEventListener('submit', function(event) {
   event.preventDefault();
   const username = document.getElementById('apaaLoginUsername').value.trim();
-  const password = document.getElementById('apaaLoginPassword').value;
-  if (username === APAA_LOGIN_USERNAME && password === APAA_LOGIN_PASSWORD) {
+  const password = document.getElementById('apaaLoginPassword').value.trim();
+  if (username.toLowerCase() === APAA_LOGIN_USERNAME.toLowerCase() && password === APAA_LOGIN_PASSWORD) {
     sessionStorage.setItem(APAA_LOGIN_SESSION_KEY, 'yes');
     document.getElementById('apaaLoginError').textContent = '';
     apaaShowApplication();
