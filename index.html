@@ -2033,6 +2033,132 @@ select option { font-size: 14px; color: #243b53; }
  #character-svg .character-group,.eye-pupil,.facial-feature { animation:none!important;transition:none!important; }
 }
 
+
+/* Final login refinement: polished inputs, clear icon controls and responsive spacing */
+.apaa-login-layout {
+  min-height: min(680px, calc(100vh - 48px));
+  border-radius: 26px;
+  box-shadow: 0 32px 90px rgba(17,43,73,.16), 0 5px 18px rgba(17,43,73,.06);
+}
+.apaa-login-visual {
+  background:
+    radial-gradient(ellipse at 52% 48%, rgba(255,255,255,.55), transparent 54%),
+    linear-gradient(145deg,#eeecf0 0%,#e8e5eb 100%) !important;
+}
+.apaa-login-panel {
+  padding: clamp(34px, 4.5vw, 64px);
+  background: linear-gradient(160deg,#fff 0%,#fcfdff 100%);
+}
+.apaa-login-card { max-width: 390px; }
+.apaa-login-title {
+  font-size: clamp(29px,3vw,34px);
+  letter-spacing: 1.5px;
+}
+.apaa-login-subtitle { margin-bottom: 38px; font-size: 11px; letter-spacing: 1.7px; }
+.apaa-login-heading { font-size: 23px; letter-spacing: -.3px; }
+.apaa-login-intro { margin-bottom: 30px; font-size: 13.5px; }
+.apaa-login-field { margin-bottom: 21px; }
+.apaa-login-field label { font-size: 12px; margin-bottom: 9px; }
+.apaa-input-icon-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.apaa-input-icon {
+  position: absolute;
+  z-index: 2;
+  left: 15px;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #8a9aab;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  transition: stroke .2s ease;
+}
+.apaa-input-icon-wrap:focus-within .apaa-input-icon { stroke: #b58b32; }
+.apaa-login-field .apaa-input-icon-wrap > input {
+  width: 100%;
+  min-height: 52px;
+  padding: 13px 15px 13px 45px;
+  border: 1px solid #d9e2ec;
+  border-radius: 11px;
+  background: #f9fbfd;
+  color: #193b60;
+  font: 14px 'Lato',Arial,sans-serif;
+  text-align: left;
+  box-shadow: 0 1px 2px rgba(20,40,60,.025);
+}
+.apaa-login-field .apaa-input-icon-wrap > input::placeholder {
+  color: #9aa9ba;
+  font-size: 13px;
+}
+.apaa-login-field .apaa-input-icon-wrap > input:focus {
+  border-color: #c39a3b;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(208,165,47,.13), 0 4px 14px rgba(18,59,104,.05);
+}
+.apaa-password-wrap { display:block; }
+.apaa-password-input-wrap > input { padding-right: 52px !important; }
+.apaa-show-password {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #64788d;
+  cursor: pointer;
+  transition: color .18s ease, background .18s ease, transform .18s ease;
+}
+.apaa-show-password:hover {
+  color: #123b68;
+  background: #edf3f8;
+  transform: translateY(-50%) scale(1.04);
+}
+.apaa-eye-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.apaa-login-submit {
+  min-height: 54px;
+  margin-top: 8px;
+  border-radius: 11px;
+  font-size: 14px;
+  letter-spacing: 1.15px;
+  background: linear-gradient(105deg,#123b68 0%,#1d578d 100%);
+  box-shadow: 0 10px 22px rgba(18,59,104,.2);
+}
+.apaa-login-submit:active { transform: translateY(0) scale(.99); }
+.apaa-login-error { min-height: 19px; }
+.apaa-login-foot {
+  margin-top: 31px;
+  padding-top: 18px;
+  font-size: 10.5px;
+}
+.apaa-login-brand-copy strong { font-size: 20px; }
+.apaa-login-brand-copy span { font-size: 10px; }
+@media (max-width:760px) {
+  .apaa-login-layout { border-radius: 20px; }
+  .apaa-login-panel { padding: 30px 25px 34px; }
+  .apaa-login-subtitle { margin-bottom: 28px; }
+  .apaa-login-foot { margin-top: 24px; }
+}
+
 </style>
 </head>
 <body>
@@ -2194,15 +2320,24 @@ select option { font-size: 14px; color: #243b53; }
         <form id="apaaLoginForm" autocomplete="on">
           <div class="apaa-login-field">
             <label for="apaaLoginUsername">Username</label>
-            <input id="apaaLoginUsername" name="username" type="text"
-                   placeholder="Enter username" autocomplete="username" required>
+            <div class="apaa-input-icon-wrap">
+              <svg class="apaa-input-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c.5-3.5 3.3-5.5 7.2-5.5s6.7 2 7.2 5.5"/></svg>
+              <input id="apaaLoginUsername" name="username" type="text"
+                     placeholder="Enter username" autocomplete="username" required>
+            </div>
           </div>
           <div class="apaa-login-field">
             <label for="apaaLoginPassword">Password</label>
             <div class="apaa-password-wrap">
-              <input id="apaaLoginPassword" name="password" type="password"
-                     placeholder="Enter password" autocomplete="current-password" required>
-              <button class="apaa-show-password" type="button" id="apaaTogglePassword">Show</button>
+              <div class="apaa-input-icon-wrap apaa-password-input-wrap">
+                <svg class="apaa-input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                <input id="apaaLoginPassword" name="password" type="password"
+                       placeholder="Enter password" autocomplete="current-password" required>
+                <button class="apaa-show-password" type="button" id="apaaTogglePassword"
+                        aria-label="Show password" aria-pressed="false" title="Show password">
+                  <svg class="apaa-eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg>
+                </button>
+              </div>
             </div>
           </div>
           <button class="apaa-login-submit" type="submit">SIGN IN</button>
@@ -3284,7 +3419,12 @@ document.getElementById('apaaTogglePassword').addEventListener('click', function
   const field = document.getElementById('apaaLoginPassword');
   const showing = field.type === 'text';
   field.type = showing ? 'password' : 'text';
-  this.textContent = showing ? 'Show' : 'Hide';
+  this.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+  this.setAttribute('title', showing ? 'Show password' : 'Hide password');
+  this.setAttribute('aria-pressed', String(!showing));
+  this.innerHTML = showing
+    ? '<svg class="apaa-eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg>'
+    : '<svg class="apaa-eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.6 6.2A10.7 10.7 0 0 1 12 6c6.1 0 9.5 6 9.5 6a15 15 0 0 1-3 3.5M6.2 6.3C3.8 7.8 2.5 12 2.5 12s3.4 6 9.5 6c1 0 1.9-.2 2.7-.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
 });
 if (sessionStorage.getItem(APAA_LOGIN_SESSION_KEY) === 'yes') {
   apaaShowApplication();
