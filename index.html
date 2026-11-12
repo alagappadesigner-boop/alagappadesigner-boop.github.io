@@ -1386,6 +1386,36 @@ select option { font-size: 14px; color: #243b53; }
 }
 .developer-credit strong { color: #123b68; font-weight: 800; }
 
+
+/* Dropdown sizing and alignment refinement */
+.panel select {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 5px 24px 5px 8px;
+  font-size: 14px !important;
+  line-height: 1.35;
+  text-align: right;
+  text-align-last: right;
+  border-bottom: 1px solid #dbe4ef;
+  border-radius: 4px;
+  background-color: rgba(255,255,255,.82);
+}
+.panel select option {
+  font-family: 'Lato', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 7px 10px;
+  text-align: left;
+}
+.panel .field {
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 10px;
+}
+.panel .field > select {
+  justify-self: stretch;
+}
+
 </style>
 </head>
 <body>
@@ -1469,9 +1499,9 @@ select option { font-size: 14px; color: #243b53; }
             <label for="year">Academic Year *</label>
             <select id="year" required>
               <option value="" selected disabled hidden>Select Year</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
+              <option value="1 Year">1 Year</option>
+              <option value="2 Year">2 Year</option>
+              <option value="3 Year">3 Year</option>
             </select>
           </div>
         </section>
@@ -1521,19 +1551,6 @@ select option { font-size: 14px; color: #243b53; }
           <div class="field">
             <label for="txn">TXN / UPI ID <span id="txnRequiredMark" hidden>*</span></label>
             <input id="txn" type="text" placeholder="Not required for Cash" autocomplete="off">
-          </div>
-
-          <div class="field">
-            <label for="stage">Installment Stage *</label>
-            <select id="stage" required>
-              <option value="" selected disabled hidden>Select Installment</option>
-              <option value="1st Installment">1st Installment</option>
-              <option value="2nd Installment Stage">2nd Installment Stage</option>
-              <option value="3rd Installment Stage">3rd Installment Stage</option>
-              <option value="4th Installment">4th Installment</option>
-              <option value="5th Installment Stage">5th Installment Stage</option>
-              <option value="6th Installment Stage">6th Installment Stage</option>
-            </select>
           </div>
         </section>
       </div>
@@ -1782,7 +1799,6 @@ function receiptData(normalizedPhone) {
     paymentDate: formatDateForDisplay(el('date').value),
     paymentMode: el('modeInput').value,
     transactionId: el('txn').value.trim() || 'N/A',
-    installmentStage: el('stage').value,
     savedAt: formatLiveGeneratedTime(new Date())
   };
 }
@@ -1978,7 +1994,6 @@ async function generateProfessionalPDF(itemData) {
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 2), 'Payment Date *', itemData.paymentDate);
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 3), 'Payment Mode *', itemData.paymentMode);
   addRowSmall(rightX, p2Y_adj + (rowGap2 * 4), 'TXN / UPI ID', itemData.transactionId);
-  addRowSmall(rightX, p2Y_adj + (rowGap2 * 5), 'Installment Stage *', itemData.installmentStage);
 
   currentY += panelHeight + 6;
 
@@ -2180,7 +2195,6 @@ function downloadExcel() {
     ['Payment Date', 'paymentDate'],
     ['Payment Mode', 'paymentMode'],
     ['Transaction ID', 'transactionId'],
-    ['Installment Stage', 'installmentStage'],
     ['Saved Timestamp', 'savedAt']
   ];
 
