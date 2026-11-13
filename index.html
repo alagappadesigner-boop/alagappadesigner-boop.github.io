@@ -2963,13 +2963,13 @@ async function generateProfessionalPDF(itemData) {
   }
 
   // ── Header: large academy logo | centred academy identity | contact details
-  const logoH = 29;
-  const logoW = Math.min(39, logoH * logoRatio);
+  const logoH = 33;
+  const logoW = Math.min(45, logoH * logoRatio);
   if (logo) doc.addImage(logo, 'PNG', 13, 10, logoW, logoH);
 
   doc.setTextColor(...navy);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(20);
+  doc.setFontSize(21);
   doc.text('ALAGAPPA', 105, 20, { align: 'center' });
   doc.setTextColor(...gold);
   doc.setFontSize(10.5);
@@ -2983,7 +2983,7 @@ async function generateProfessionalPDF(itemData) {
   doc.setLineWidth(0.35);
   doc.line(163, 11, 163, 40);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.2);
+  doc.setFontSize(8.8);
   doc.setTextColor(...muted);
   doc.text('49, Gangadeeshwar Koil St,', 198, 17, { align: 'right' });
   doc.text('Purasawalkam, Chennai - 600084', 198, 22, { align: 'right' });
@@ -2997,11 +2997,11 @@ async function generateProfessionalPDF(itemData) {
   // ── Receipt title and metadata
   doc.setTextColor(...navy);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(19);
+  doc.setFontSize(21);
   doc.text('FEE RECEIPT', W / 2, 61, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(...dark);
   doc.text(`Receipt No: ${itemData.receiptNo || '—'}`, margin, 73);
   doc.text(`Receipt Date: ${itemData.paymentDate || '—'}`, W - margin, 73, { align: 'right' });
@@ -3029,7 +3029,7 @@ async function generateProfessionalPDF(itemData) {
 
   const panelTitle = (x, title) => {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.2);
+    doc.setFontSize(11.2);
     doc.setTextColor(...navy);
     doc.text(title, x + 5, panelY + 9);
     doc.setDrawColor(...border);
@@ -3056,11 +3056,11 @@ async function generateProfessionalPDF(itemData) {
     });
   };
 
-  const leftValueWidth = panelW - 43;
-  addPanelRow(leftX, panelY + 25, 'Student Name *', itemData.studentName, leftValueWidth, 9.4);
-  addPanelRow(leftX, panelY + 38, 'Phone Number *', itemData.phone, leftValueWidth, 9.4);
-  addPanelRow(leftX, panelY + 51, 'Course Registered *', itemData.course, leftValueWidth, 9.1);
-  addPanelRow(leftX, panelY + 64, 'Academic Year *', itemData.academicYear, leftValueWidth, 9.4);
+  const leftValueWidth = panelW - 40;
+  addPanelRow(leftX, panelY + 25, 'Student Name *', itemData.studentName, leftValueWidth, 10.2);
+  addPanelRow(leftX, panelY + 38, 'Phone Number *', itemData.phone, leftValueWidth, 10.2);
+  addPanelRow(leftX, panelY + 51, 'Course Registered *', itemData.course, leftValueWidth, 9.8);
+  addPanelRow(leftX, panelY + 64, 'Academic Year *', itemData.academicYear, leftValueWidth, 10.2);
 
   // Normalize the amount before formatting, preventing spaced/duplicated digits.
   const rawAmount = String(itemData.amount ?? '').replace(/[^\d.]/g, '');
@@ -3069,7 +3069,7 @@ async function generateProfessionalPDF(itemData) {
     ? `₹ ${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(numericAmount)}`
     : `₹ ${String(itemData.amount ?? '').trim() || '—'}`;
 
-  const rightValueWidth = panelW - 43;
+  const rightValueWidth = panelW - 39;
   const rightRows = [
     ['Amount Paid *', formattedAmount],
     ['Amount in Words', itemData.amountInWords],
@@ -3079,7 +3079,21 @@ async function generateProfessionalPDF(itemData) {
     ['Installment Stage *', itemData.installmentStage]
   ];
   rightRows.forEach((row, i) => {
-    addPanelRow(rightX, panelY + 22 + i * 9.1, row[0], row[1], rightValueWidth, 9.0);
+    const y = panelY + 22 + i * 9.1;
+    if (i === 0) {
+      // Use "Rs." rather than the unsupported rupee glyph in jsPDF's
+      // built-in Helvetica font. This avoids broken/spaced currency output.
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.2);
+      doc.setTextColor(...muted);
+      doc.text(row[0], rightX + 5, y);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.8);
+      doc.setTextColor(...dark);
+      doc.text(String(row[1]).replace(/^₹\\s*/, 'Rs. '), rightX + panelW - 5, y, { align: 'right' });
+    } else {
+      addPanelRow(rightX, y, row[0], row[1], rightValueWidth, 9.8);
+    }
   });
 
   // ── Remarks
@@ -3095,7 +3109,7 @@ async function generateProfessionalPDF(itemData) {
   doc.setTextColor(...navy);
   doc.text('Remarks & Extra Declarations:', margin + 5, remarksY + 8);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
+  doc.setFontSize(10.2);
   doc.setTextColor(...dark);
   doc.text(doc.splitTextToSize(itemData.remarks || 'No Remarks', contentW - 10).slice(0, 2), margin + 5, remarksY + 17);
 
@@ -3118,12 +3132,12 @@ async function generateProfessionalPDF(itemData) {
   const noticeLabel = 'Official Notice:';
   const noticeCopy = 'This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.';
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.2);
+  doc.setFontSize(9.8);
   doc.setTextColor(91, 82, 62);
   doc.text(noticeLabel, margin + 12, noticeY + 8);
   const labelW = doc.getTextWidth(noticeLabel) + 2;
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.2);
+  doc.setFontSize(9.8);
   doc.setTextColor(101, 92, 73);
   const noticeLines = doc.splitTextToSize(noticeCopy, contentW - 20 - labelW);
   doc.text(noticeLines[0] || '', margin + 12 + labelW, noticeY + 8);
@@ -3153,7 +3167,7 @@ async function generateProfessionalPDF(itemData) {
   doc.text('Verified Slip', margin + 13.5, footerY + 26, { align: 'center' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.2);
+  doc.setFontSize(9.8);
   doc.setTextColor(...muted);
   doc.text(`Generated On: ${itemData.savedAt || '—'}`, margin + 33, footerY + 12);
   doc.text('Secure Mode: Active System Gateway', margin + 33, footerY + 20);
