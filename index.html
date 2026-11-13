@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alagappa Performing Arts Academy | Official Fee Receipt System</title>
+<title>APAA Fee Receipt Generator | Unified Edition</title>
 
 <!-- External Export Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2185,6 +2185,101 @@ select option { font-size: 14px; color: #243b53; }
 @media(prefers-reduced-motion:reduce){.wrap.apaa-reveal *{animation:none!important;transition:none!important}}
 
 </style>
+<style>
+/* Final footer visibility correction: verified badge and signature stay fully visible. */
+.receipt-footer-area {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 142px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 24px !important;
+  overflow: visible !important;
+  padding: 22px 10px 18px !important;
+  box-sizing: border-box !important;
+}
+.qr-signature-group {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  align-items: center !important;
+  gap: 22px !important;
+  overflow: visible !important;
+}
+.qr-box {
+  display: flex !important;
+  flex: 0 0 88px !important;
+  width: 88px !important;
+  height: 88px !important;
+  min-width: 88px !important;
+  min-height: 88px !important;
+  box-sizing: border-box !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  padding: 8px !important;
+}
+.qr-box svg {
+  display: block !important;
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 auto !important;
+}
+.qr-box span {
+  display: block !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  margin-top: 5px !important;
+}
+.meta-info-text {
+  display: block !important;
+  min-width: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.65 !important;
+  overflow-wrap: anywhere !important;
+}
+.signature-block {
+  display: block !important;
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  align-self: center !important;
+  text-align: center !important;
+}
+.signature-img-wrap {
+  display: flex !important;
+  height: 58px !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+.signature-img {
+  display: block !important;
+  max-width: 210px !important;
+  max-height: 54px !important;
+  object-fit: contain !important;
+}
+@media (max-width: 680px) {
+  .receipt-footer-area {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 18px !important;
+  }
+  .qr-signature-group {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+  .signature-block {
+    width: min(240px, 100%) !important;
+    flex-basis: auto !important;
+    margin-left: auto !important;
+    align-self: flex-end !important;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -2529,6 +2624,10 @@ select option { font-size: 14px; color: #243b53; }
           </div>
         </section>
       </div>
+      <div class="remarks-entry" style="margin:14px 0 0;">
+        <label for="remarksInput" style="display:block;margin:0 0 6px;font-weight:700;color:#123b68;font-size:13px;">Remarks &amp; Extra Declarations</label>
+        <textarea id="remarksInput" rows="2" maxlength="240" placeholder="Enter remarks (leave blank to show No Remarks)" style="width:100%;resize:vertical;border:1px solid #e3e9ef;border-radius:6px;padding:10px 12px;font:inherit;font-size:13px;color:#2d3748;background:#fff;"></textarea>
+      </div>
     </form>
 
     <!-- Remarks Panel -->
@@ -2582,6 +2681,12 @@ select option { font-size: 14px; color: #243b53; }
       <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
         <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
         Print Receipt
+      </button>
+      <button class="btn btn-primary" type="button" onclick="downloadCurrentPDF()">
+        Download Current PDF
+      </button>
+      <button class="btn btn-danger" type="button" onclick="clearCurrentForm()">
+        Clear Current Form
       </button>
       <button class="btn btn-secondary" type="button" onclick="downloadExcel()">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -2775,6 +2880,7 @@ function receiptData(normalizedPhone) {
     paymentMode: el('modeInput').value,
     transactionId: el('txn').value.trim() || 'N/A',
     installmentStage: el('installment').value,
+    remarks: (el('remarksInput')?.value || '').trim() || 'No Remarks',
     savedAt: formatLiveGeneratedTime(new Date())
   };
 }
@@ -2991,7 +3097,7 @@ async function generateProfessionalPDF(itemData) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(...dark);
-  doc.text(itemData.remarks || 'No Remarks', margin + 5, remarksY + 17);
+  doc.text(doc.splitTextToSize(itemData.remarks || 'No Remarks', contentW - 10).slice(0, 2), margin + 5, remarksY + 17);
 
   // ── Official notice
   const noticeY = 204, noticeH = 21;
@@ -3098,6 +3204,8 @@ async function generateProfessionalPDF(itemData) {
 function resetFeeFormAfterSuccessfulReceipt() {
   const form = el('feeForm');
   if (form) form.reset();
+  if (el('remarksInput')) el('remarksInput').value = '';
+  if (el('remarksContent')) el('remarksContent').textContent = 'No Remarks';
 
   // Restore the default country code and today's payment date.
   if (el('countryCode')) el('countryCode').value = '+91';
@@ -3157,6 +3265,36 @@ async function handlePrintReceiptWorkflow() {
     console.error('PDF Generation Error:', pdfError);
     alert('The receipt was saved to Student Ledger, but PDF generation or download failed. Your entered details have been kept. You can download it from the Student Ledger.');
   }
+}
+
+async function downloadCurrentPDF() {
+  if (!validateReceipt()) return;
+  const normalizedPhone = validateAndNormalizePhone();
+  if (!normalizedPhone) return;
+  try {
+    await generateProfessionalPDF(receiptData(normalizedPhone));
+  } catch (error) {
+    console.error('Current PDF download failed:', error);
+    alert('PDF download could not be completed. Your entered details have been kept.');
+  }
+}
+
+function clearCurrentForm() {
+  if (!confirm('Clear the current receipt form? Saved receipt history will not be affected.')) return;
+  const form = el('feeForm');
+  if (form) form.reset();
+  if (el('remarksInput')) el('remarksInput').value = '';
+  if (el('remarksContent')) el('remarksContent').textContent = 'No Remarks';
+  if (el('countryCode')) el('countryCode').value = '+91';
+  if (el('date')) el('date').value = formatTodayForReceipt();
+  if (el('dateDisplay')) el('dateDisplay').value = formatDateForDisplay(el('date').value);
+  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(el('date').value);
+  if (el('amountWords')) el('amountWords').textContent = 'Amount in words will appear here';
+  if (el('paymentCalendar')) el('paymentCalendar').hidden = true;
+  document.querySelectorAll('.field-error').forEach(node => node.classList.remove('field-error'));
+  handlePaymentModeChange();
+  try { localStorage.removeItem(CURRENT_RECEIPT_META_KEY); } catch (error) {}
+  initializeNewReceipt();
 }
 
 function clearAllRecords() {
@@ -3678,6 +3816,13 @@ updateLiveGeneratedTime();
 setInterval(updateLiveGeneratedTime, 1000);
 updateSavedCount();
 renderLedger();
+
+// Keep the receipt preview synchronized with the editable remarks field.
+if (el('remarksInput')) {
+  el('remarksInput').addEventListener('input', () => {
+    if (el('remarksContent')) el('remarksContent').textContent = el('remarksInput').value.trim() || 'No Remarks';
+  });
+}
 </script>
 
 <style>
@@ -3726,99 +3871,5 @@ renderLedger();
 </script>
 
 </body>
+
 </html>
-<style>
-/* Final footer visibility correction: verified badge and signature stay fully visible. */
-.receipt-footer-area {
-  display: flex !important;
-  width: 100% !important;
-  min-height: 142px !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 24px !important;
-  overflow: visible !important;
-  padding: 22px 10px 18px !important;
-  box-sizing: border-box !important;
-}
-.qr-signature-group {
-  display: flex !important;
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  align-items: center !important;
-  gap: 22px !important;
-  overflow: visible !important;
-}
-.qr-box {
-  display: flex !important;
-  flex: 0 0 88px !important;
-  width: 88px !important;
-  height: 88px !important;
-  min-width: 88px !important;
-  min-height: 88px !important;
-  box-sizing: border-box !important;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: visible !important;
-  padding: 8px !important;
-}
-.qr-box svg {
-  display: block !important;
-  width: 34px !important;
-  height: 34px !important;
-  flex: 0 0 auto !important;
-}
-.qr-box span {
-  display: block !important;
-  font-size: 10px !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
-  margin-top: 5px !important;
-}
-.meta-info-text {
-  display: block !important;
-  min-width: 0 !important;
-  font-size: 13px !important;
-  line-height: 1.65 !important;
-  overflow-wrap: anywhere !important;
-}
-.signature-block {
-  display: block !important;
-  flex: 0 0 240px !important;
-  width: 240px !important;
-  max-width: 100% !important;
-  margin-left: auto !important;
-  align-self: center !important;
-  text-align: center !important;
-}
-.signature-img-wrap {
-  display: flex !important;
-  height: 58px !important;
-  align-items: flex-end !important;
-  justify-content: center !important;
-  overflow: visible !important;
-}
-.signature-img {
-  display: block !important;
-  max-width: 210px !important;
-  max-height: 54px !important;
-  object-fit: contain !important;
-}
-@media (max-width: 680px) {
-  .receipt-footer-area {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 18px !important;
-  }
-  .qr-signature-group {
-    width: 100% !important;
-    justify-content: flex-start !important;
-    flex-wrap: wrap !important;
-  }
-  .signature-block {
-    width: min(240px, 100%) !important;
-    flex-basis: auto !important;
-    margin-left: auto !important;
-    align-self: flex-end !important;
-  }
-}
-</style>
