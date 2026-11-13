@@ -2280,6 +2280,34 @@ select option { font-size: 14px; color: #243b53; }
   }
 }
 </style>
+
+<style id="apaa-a4-print-settings">
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+@media print {
+  html, body {
+    width: 210mm !important;
+    min-width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .receipt-container, #receipt, .receipt-paper {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
+    box-shadow: none !important;
+    page-break-after: avoid !important;
+    break-after: avoid-page !important;
+  }
+}
+</style>
+
 </head>
 <body>
 
@@ -2923,7 +2951,7 @@ async function getBase64ImageFromURL(url) {
 
 async function generateProfessionalPDF(itemData) {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [210, 297], compress: true });
 
   const W = 210, margin = 12, contentW = W - margin * 2;
   const navy = [18, 59, 104], gold = [207, 170, 55];
