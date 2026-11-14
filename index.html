@@ -3302,14 +3302,14 @@ async function generateProfessionalPNG(itemData) {
   host.style.cssText = 'position:fixed;left:-20000px;top:0;z-index:-1;';
   host.innerHTML = `
     <div id="apaa-landscape-export" style="
-      width:1485px;height:1050px;box-sizing:border-box;position:relative;overflow:hidden;
-      padding:42px 50px 30px;background:#fff;color:#172b4d;
+      width:1670px;height:1180px;box-sizing:border-box;position:relative;overflow:hidden;
+      padding:38px 52px 34px;background:#fff;color:#172b4d;
       font-family:Lato,Arial,sans-serif;">
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0;">
-        <img src="${safe(logoSrc)}" style="width:430px;max-height:360px;object-fit:contain;opacity:.055;">
+        <img src="${safe(logoSrc)}" style="width:540px;max-height:450px;object-fit:contain;opacity:.105;">
       </div>
       <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;">
-        <header style="height:142px;display:grid;grid-template-columns:300px 1fr 330px;align-items:center;border-bottom:5px solid #d6a91c;padding-bottom:20px;">
+        <header style="height:150px;display:grid;grid-template-columns:300px 1fr 330px;align-items:center;border-bottom:5px solid #d6a91c;padding-bottom:20px;">
           <div style="display:flex;align-items:center;height:125px;">
             <img src="${safe(logoSrc)}" style="max-width:260px;max-height:125px;object-fit:contain;">
           </div>
@@ -3332,8 +3332,8 @@ async function generateProfessionalPNG(itemData) {
           <div>Receipt Date: <b style="color:#0d3472;">${safe(itemData.paymentDate)}</b></div>
         </div>
 
-        <section style="display:grid;grid-template-columns:1fr 1fr;gap:42px;height:365px;">
-          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.86);">
+        <section style="display:grid;grid-template-columns:1fr 1fr;gap:42px;height:385px;">
+          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.70);">
             <div style="height:66px;display:flex;align-items:center;padding:0 32px;background:#eaf2fc;color:#123b68;font-size:28px;font-weight:800;">STUDENT &amp; COURSE DETAILS</div>
             <div style="padding:10px 30px;">
               ${[
@@ -3344,7 +3344,7 @@ async function generateProfessionalPNG(itemData) {
               ].map(([label,value])=>`<div style="height:68px;display:grid;grid-template-columns:37% 5% 58%;align-items:center;border-bottom:1px solid #d8e1ec;font-size:23px;"><span style="color:#526176;">${safe(label)}</span><b style="text-align:center;color:#172b4d;">:</b><span style="font-weight:600;color:#172b4d;padding-left:12px;">${safe(value)}</span></div>`).join('')}
             </div>
           </div>
-          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.86);">
+          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.70);">
             <div style="height:66px;display:flex;align-items:center;padding:0 32px;background:#eaf2fc;color:#123b68;font-size:28px;font-weight:800;">PAYMENT INFORMATION</div>
             <div style="padding:5px 28px;">
               ${rows.map(([label,value,bold])=>`<div style="height:48px;display:grid;grid-template-columns:37% 5% 58%;align-items:center;border-bottom:1px solid #d8e1ec;font-size:21px;"><span style="color:#526176;">${safe(label)}</span><b style="text-align:center;color:#172b4d;">:</b><span style="font-weight:${bold?'800':'600'};font-size:${bold?'24px':'21px'};color:#172b4d;padding-left:12px;">${safe(value)}</span></div>`).join('')}
@@ -3352,17 +3352,17 @@ async function generateProfessionalPNG(itemData) {
           </div>
         </section>
 
-        <section style="margin-top:26px;min-height:80px;display:flex;align-items:center;border:2px solid #d4dfec;border-left:12px solid #d6a91c;border-radius:12px;background:#f7f9fc;padding:0 28px;font-size:23px;">
+        <section style="margin-top:26px;min-height:76px;display:flex;align-items:center;border:2px solid #d4dfec;border-left:12px solid #d6a91c;border-radius:12px;background:#f7f9fc;padding:0 28px;font-size:23px;">
           <b style="color:#123b68;margin-right:28px;">Remarks &amp; Extra Declarations:</b>
           <span style="color:#172b4d;">${safe(itemData.remarks || 'No Remarks')}</span>
         </section>
 
-        <section style="margin-top:22px;min-height:86px;display:flex;align-items:center;border:2px dashed #e0b84d;border-radius:14px;background:#fffdf7;padding:10px 28px;font-size:19px;line-height:1.45;color:#5d594b;">
+        <section style="margin-top:22px;min-height:82px;display:flex;align-items:center;border:2px dashed #e0b84d;border-radius:14px;background:#fffdf7;padding:10px 28px;font-size:19px;line-height:1.45;color:#5d594b;">
           <span style="width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:#d6a91c;color:white;font-weight:800;font-size:28px;display:flex;align-items:center;justify-content:center;margin-right:20px;">i</span>
           <span><b>Official Notice:</b> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.</span>
         </section>
 
-        <section style="margin-top:26px;height:135px;display:grid;grid-template-columns:185px 1fr 420px;align-items:center;">
+        <section style="margin-top:26px;height:128px;display:grid;grid-template-columns:185px 1fr 420px;align-items:center;">
           <div style="width:135px;height:120px;border:2px solid #cbd9ea;border-radius:12px;background:#f7f9fc;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#75849a;">
             <div style="font-size:44px;letter-spacing:5px;line-height:1;">▦</div>
             <div style="font-size:17px;margin-top:8px;">Verified Slip</div>
@@ -3405,10 +3405,10 @@ async function generateProfessionalPNG(itemData) {
       useCORS: true,
       allowTaint: false,
       logging: false,
-      width: 1485,
-      height: 1050,
-      windowWidth: 1600,
-      windowHeight: 1200
+      width: 1670,
+      height: 1180,
+      windowWidth: 1800,
+      windowHeight: 1350
     });
 
     const blob = await new Promise((resolve, reject) => {
