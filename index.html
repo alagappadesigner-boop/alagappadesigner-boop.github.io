@@ -18,6 +18,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 
 <style>
+.ledger-download-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
 :root {
   --bg-cream: #f4f6f9;
   --paper-white: #FFFFFF;
@@ -2707,11 +2709,11 @@ select option { font-size: 14px; color: #243b53; }
   <section class="ledger-section">
     <div class="ledger-actions-bar">
       <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
-        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-        Print Receipt
+        <svg viewBox="0 0 24 24"><path d="M4 3h16v18H4z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg>
+        Print Receipt (PNG)
       </button>
-      <button class="btn btn-primary" type="button" onclick="downloadCurrentPDF()">
-        Download Current PDF
+      <button class="btn btn-secondary" type="button" onclick="downloadCurrentPDF()">
+        Download PDF (A4)
       </button>
       <button class="btn btn-danger" type="button" onclick="clearCurrentForm()">
         Clear Current Form
@@ -2720,9 +2722,9 @@ select option { font-size: 14px; color: #243b53; }
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
         Download Excel
       </button>
-      <button class="btn btn-whatsapp" type="button" onclick="sendWhatsApp()">
+      <button class="btn btn-whatsapp" type="button" onclick="shareCurrentReceiptPDF()">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-        WhatsApp
+        WhatsApp Share (PDF)
       </button>
     </div>
 
@@ -3127,7 +3129,7 @@ async function captureReceiptCanvas(itemData) {
 
     return await window.html2canvas(clone, {
       backgroundColor: '#ffffff',
-      scale: 1,
+      scale: 2,
       useCORS: true,
       allowTaint: false,
       logging: false,
@@ -3142,311 +3144,131 @@ async function captureReceiptCanvas(itemData) {
 }
 
 async function generateProfessionalPNG(itemData) {
-  if (typeof window.html2canvas !== 'function') {
-    throw new Error('Image export library is not available. Please refresh the page and try again.');
-  }
-
-  const safe = value => String(value == null || String(value).trim() === '' ? '—' : value)
-    .replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-
-  const logoSrc = el('logoLeftImg')?.currentSrc || el('logoLeftImg')?.src || 'Logo.png';
-  const signatureSrc = el('signatureImg')?.currentSrc || el('signatureImg')?.src || 'signature.png';
-
-  const amountNumber = Number(String(itemData.amount ?? '').replace(/[^\d.]/g, ''));
-  const amountText = Number.isFinite(amountNumber)
-    ? `₹ ${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amountNumber)}`
-    : `₹ ${safe(itemData.amount)}`;
-
-  const paymentMode = safe(itemData.paymentMode);
-  const txnText = itemData.transactionId ||
-    (String(itemData.paymentMode).toUpperCase() === 'CASH' ? 'Not required for Cash' : '—');
-
-  const studentRows = [
-    ['Student Name *', itemData.studentName],
-    ['Phone Number *', itemData.phone],
-    ['Course Registered *', itemData.course],
-    ['Academic Year *', itemData.academicYear]
-  ];
-  const paymentRows = [
-    ['Amount Paid *', amountText],
-    ['Amount in Words', itemData.amountInWords],
-    ['Payment Date *', itemData.paymentDate],
-    ['Payment Mode *', paymentMode],
-    ['TXN / UPI ID', txnText],
-    ['Installment Stage *', itemData.installmentStage]
-  ];
-
-  const renderRows = (rows, payment = false) => rows.map(([label, value], index) => `
-    <div class="detail-row ${payment && index === 0 ? 'amount-row' : ''}">
-      <span class="detail-label">${safe(label)}</span>
-      <span class="detail-colon">:</span>
-      <span class="detail-value">${safe(value)}</span>
-    </div>`).join('');
-
-  const host = document.createElement('div');
-  host.style.cssText = 'position:fixed;left:-20000px;top:0;z-index:-1;width:1240px;height:1754px;overflow:hidden;';
-  host.innerHTML = `
-    <style>
-      #apaa-a4-export, #apaa-a4-export * { box-sizing:border-box; }
-      #apaa-a4-export {
-        position:relative; width:1240px; height:1754px; overflow:hidden;
-        padding:58px 66px 46px; background:#fff; color:#27364a;
-        font-family:Arial,Helvetica,sans-serif; -webkit-font-smoothing:antialiased;
-      }
-      #apaa-a4-export .watermark {
-        position:absolute; z-index:0; pointer-events:none; width:520px; height:520px;
-        object-fit:contain; left:50%; top:51%; transform:translate(-50%,-50%); opacity:.04;
-      }
-      #apaa-a4-export .content { position:relative; z-index:1; height:100%; display:flex; flex-direction:column; }
-      #apaa-a4-export .header {
-        display:grid; grid-template-columns:190px minmax(0,1fr) 290px; align-items:center; gap:20px;
-        padding-bottom:25px; border-bottom:4px solid #d6aa27;
-      }
-      #apaa-a4-export .logo { display:block; width:180px; max-height:135px; object-fit:contain; object-position:left center; }
-      #apaa-a4-export .academy { text-align:center; min-width:0; }
-      #apaa-a4-export .academy h1 {
-        margin:0; color:#173f6b; font:700 43px/1.12 Georgia,'Times New Roman',serif; letter-spacing:.5px;
-      }
-      #apaa-a4-export .academy .sub {
-        margin-top:8px; color:#c59616; font-size:22px; line-height:1.25; font-weight:700; letter-spacing:1px;
-      }
-      #apaa-a4-export .academy .courses {
-        margin-top:10px; color:#697586; font-size:14px; line-height:1.45; letter-spacing:.3px; white-space:nowrap;
-      }
-      #apaa-a4-export .contact {
-        border-left:2px solid #d8e0e8; padding-left:22px; text-align:right; color:#657386;
-        font-size:15px; line-height:1.75; overflow-wrap:anywhere;
-      }
-      #apaa-a4-export .title {
-        margin:31px 0 23px; color:#173f6b; text-align:center; font-size:37px;
-        line-height:1.2; font-weight:800; letter-spacing:1px;
-      }
-      #apaa-a4-export .metadata {
-        display:flex; justify-content:space-between; gap:20px; padding:0 0 21px;
-        border-bottom:2px solid #dce4ec; color:#344256; font-size:18px;
-      }
-      #apaa-a4-export .metadata strong { color:#173f6b; }
-      #apaa-a4-export .details-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:35px; }
-      #apaa-a4-export .card {
-        min-width:0; border:2px solid #d7e0e9; border-radius:12px;
-        background:rgba(255,255,255,.84); overflow:hidden;
-      }
-      #apaa-a4-export .card h2 {
-        margin:0; padding:19px 24px; color:#173f6b; background:rgba(231,240,251,.92);
-        border-bottom:1px solid #d7e0e9; font-size:22px; line-height:1.25; font-weight:800; letter-spacing:.3px;
-      }
-      #apaa-a4-export .rows { padding:10px 24px 13px; }
-      #apaa-a4-export .detail-row {
-        display:grid; grid-template-columns:minmax(0,42%) 20px minmax(0,1fr); gap:10px;
-        align-items:center; min-height:77px; padding:15px 0; border-bottom:1px solid #d8e1eb;
-        font-size:18px; line-height:1.45;
-      }
-      #apaa-a4-export .detail-row:last-child { border-bottom:0; }
-      #apaa-a4-export .detail-label { color:#667488; }
-      #apaa-a4-export .detail-colon { color:#173f6b; text-align:center; font-weight:700; }
-      #apaa-a4-export .detail-value { color:#25364c; text-align:left; font-weight:600; overflow-wrap:anywhere; }
-      #apaa-a4-export .amount-row .detail-value { font-size:21px; font-weight:800; }
-      #apaa-a4-export .remarks {
-        margin-top:31px; padding:23px 27px; border:2px solid #d7e0e9; border-left:8px solid #d6aa27;
-        border-radius:10px; background:rgba(247,249,252,.9); min-height:100px;
-        display:flex; align-items:center; gap:28px; font-size:19px;
-      }
-      #apaa-a4-export .remarks strong { color:#173f6b; white-space:nowrap; }
-      #apaa-a4-export .remarks span { color:#25364c; overflow-wrap:anywhere; }
-      #apaa-a4-export .notice {
-        display:grid; grid-template-columns:34px minmax(0,1fr); gap:16px; align-items:start;
-        margin-top:27px; padding:22px 25px; border:2px dashed #d9b54d; border-radius:10px;
-        background:rgba(255,253,247,.94); color:#665d49; font-size:16px; line-height:1.65;
-      }
-      #apaa-a4-export .notice-icon {
-        display:flex; align-items:center; justify-content:center; width:30px; height:30px;
-        border-radius:50%; background:#d6aa27; color:#fff; font-size:19px; font-weight:800;
-      }
-      #apaa-a4-export .notice strong { color:#514a3d; }
-      #apaa-a4-export .footer-details {
-        display:grid; grid-template-columns:110px minmax(0,1fr) 300px; gap:25px; align-items:center;
-        margin-top:47px; padding:0 7px 36px; border-bottom:2px solid #dce4ec;
-      }
-      #apaa-a4-export .verified {
-        width:105px; height:112px; border:2px solid #d6e0eb; border-radius:10px;
-        background:rgba(247,249,252,.92); display:flex; flex-direction:column; align-items:center;
-        justify-content:center; gap:10px; color:#8995a4; font-size:13px; text-align:center;
-      }
-      #apaa-a4-export .verified-mark { width:35px; height:35px; display:grid; grid-template-columns:1fr 1fr; gap:5px; }
-      #apaa-a4-export .verified-mark span { border:3px solid #aab5c2; border-radius:2px; }
-      #apaa-a4-export .generated { color:#6c7888; font-size:17px; line-height:1.9; }
-      #apaa-a4-export .generated strong { color:#596779; }
-      #apaa-a4-export .signature { text-align:center; align-self:end; }
-      #apaa-a4-export .signature img { display:block; width:100%; height:85px; object-fit:contain; object-position:center bottom; margin-bottom:4px; }
-      #apaa-a4-export .signature-line { border-top:2px solid #26384f; }
-      #apaa-a4-export .signature-label { margin-top:10px; color:#173f6b; font-size:16px; font-weight:800; letter-spacing:.4px; }
-      #apaa-a4-export .thank-you { margin-top:auto; padding-top:25px; text-align:center; }
-      #apaa-a4-export .thank-you h3 { margin:0 0 11px; color:#c99e22; font-size:25px; font-weight:800; letter-spacing:.5px; }
-      #apaa-a4-export .thank-you p { margin:0 auto; max-width:990px; color:#788392; font-size:15px; line-height:1.6; }
-    </style>
-    <main id="apaa-a4-export">
-      <img class="watermark" src="${safe(logoSrc)}" alt="">
-      <div class="content">
-        <header class="header">
-          <div><img class="logo" src="${safe(logoSrc)}" alt="APAA Logo"></div>
-          <div class="academy">
-            <h1>ALAGAPPA</h1>
-            <div class="sub">PERFORMING ARTS ACADEMY</div>
-            <div class="courses">BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</div>
-          </div>
-          <div class="contact">
-            <div>49, Gangadeeshwar Koil St,</div>
-            <div>Purasaiwakkam, Chennai - 600084</div>
-            <div>+91 73558-596403</div>
-            <div>vaishnavi@alagappaarts.com</div>
-          </div>
-        </header>
-
-        <h2 class="title">FEE RECEIPT</h2>
-        <section class="metadata">
-          <div>Receipt No: <strong>${safe(itemData.receiptNo)}</strong></div>
-          <div>Receipt Date: <strong>${safe(itemData.paymentDate)}</strong></div>
-        </section>
-
-        <section class="details-grid">
-          <article class="card">
-            <h2>STUDENT &amp; COURSE DETAILS</h2>
-            <div class="rows">${renderRows(studentRows)}</div>
-          </article>
-          <article class="card">
-            <h2>PAYMENT INFORMATION</h2>
-            <div class="rows">${renderRows(paymentRows, true)}</div>
-          </article>
-        </section>
-
-        <section class="remarks">
-          <strong>Remarks &amp; Extra Declarations:</strong>
-          <span>${safe(itemData.remarks || 'No Remarks')}</span>
-        </section>
-
-        <section class="notice">
-          <span class="notice-icon">i</span>
-          <div><strong>Official Notice:</strong> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.</div>
-        </section>
-
-        <footer>
-          <div class="footer-details">
-            <div class="verified">
-              <div class="verified-mark"><span></span><span></span><span></span><span></span></div>
-              <span>Verified Slip</span>
-            </div>
-            <div class="generated">
-              <div><strong>Generated On:</strong> ${safe(itemData.savedAt || new Date().toLocaleString('en-IN'))}</div>
-              <div><strong>Secure Mode:</strong> Active System Gateway</div>
-            </div>
-            <div class="signature">
-              <img src="${safe(signatureSrc)}" alt="Authorised signature">
-              <div class="signature-line"></div>
-              <div class="signature-label">AUTHORIZED SIGNATURE</div>
-            </div>
-          </div>
-          <div class="thank-you">
-            <h3>THANK YOU!</h3>
-            <p>We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</p>
-          </div>
-        </footer>
-      </div>
-    </main>`;
-
-  document.body.appendChild(host);
-  const receiptNode = host.querySelector('#apaa-a4-export');
-
-  const images = Array.from(receiptNode.querySelectorAll('img'));
-  await Promise.all(images.map(img => {
-    if (img.complete && img.naturalWidth) return Promise.resolve();
-    return new Promise(resolve => {
-      img.onload = resolve;
-      img.onerror = resolve;
-    });
-  }));
-
-  try {
-    const canvas = await window.html2canvas(receiptNode, {
-      backgroundColor: '#ffffff',
-      scale: 2,
-      useCORS: true,
-      allowTaint: false,
-      logging: false,
-      width: 1240,
-      height: 1754,
-      windowWidth: 1400,
-      windowHeight: 1900
-    });
-
-    const blob = await new Promise((resolve, reject) => {
-      canvas.toBlob(result => result ? resolve(result) : reject(new Error('Could not create PNG image.')), 'image/png');
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${String(itemData.receiptNo || 'APAA-Receipt').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 30000);
-    return true;
-  } finally {
-    host.remove();
-  }
+  const canvas = await captureReceiptCanvas(itemData);
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob(result => result ? resolve(result) : reject(new Error('Could not create the PNG image.')), 'image/png');
+  });
+  const filename = buildReceiptExportFilename(itemData, 'png');
+  triggerBlobDownload(blob, filename);
+  return { blob, filename, canvas };
 }
 
-
-async function handlePrintReceiptWorkflow() {
-  if (!validateReceipt()) return;
-
+async function generateProfessionalPDF(itemData, options = {}) {
   if (!window.jspdf || !window.jspdf.jsPDF) {
-    alert('PDF library could not be loaded. Please check your internet connection and try again. Your entered details have been kept.');
-    return;
+    throw new Error('PDF library could not be loaded. Please refresh the page and try again.');
   }
 
-  const normalizedPhone = validateAndNormalizePhone();
-  if (!normalizedPhone) return;
+  const canvas = options.canvas || await captureReceiptCanvas(itemData);
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 5;
+  const ratio = Math.min((pageWidth - margin * 2) / canvas.width, (pageHeight - margin * 2) / canvas.height);
+  const imageWidth = canvas.width * ratio;
+  const imageHeight = canvas.height * ratio;
+  const x = (pageWidth - imageWidth) / 2;
+  const y = (pageHeight - imageHeight) / 2;
 
-  const data = receiptData(normalizedPhone);
+  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
+  const filename = buildReceiptExportFilename(itemData, 'pdf');
+  const blob = pdf.output('blob');
+  if (options.returnBlob) return { blob, filename, pdf };
+  pdf.save(filename);
+  return { blob, filename, pdf };
+}
+
+function triggerBlobDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+function getValidatedCurrentReceiptData() {
+  if (!validateReceipt()) return null;
+  const normalizedPhone = validateAndNormalizePhone();
+  if (!normalizedPhone) return null;
+  return receiptData(normalizedPhone);
+}
+
+function saveReceiptToLedger(data) {
   const saved = getSaved();
   const existingIndex = saved.findIndex(r => r.receiptNo === data.receiptNo);
+  if (existingIndex === -1) saved.push(data);
+  else saved[existingIndex] = data;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  updateSavedCount();
+  renderLedger();
+}
+
+async function handlePrintReceiptWorkflow() {
+  const data = getValidatedCurrentReceiptData();
+  if (!data) return;
 
   try {
-    if (existingIndex === -1) saved.push(data);
-    else saved[existingIndex] = data;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-    updateSavedCount();
-    renderLedger();
+    saveReceiptToLedger(data);
   } catch (storageError) {
     console.error('Receipt save error:', storageError);
-    alert('Could not save the receipt history. Please check browser storage and try again. Your entered details have been kept.');
+    alert('Could not save the receipt history. Please check browser storage. Your entered details have been kept.');
     return;
   }
 
   try {
-    const downloadStarted = await generateProfessionalPNG(data);
-    if (downloadStarted) {
-      resetFeeFormAfterSuccessfulReceipt();
-      alert('Receipt saved and PDF download started successfully. The form is ready for the next payment.');
-    } else {
-      throw new Error('PDF download was not initiated.');
-    }
-  } catch (pdfError) {
-    console.error('PDF Generation Error:', pdfError);
-    alert('The receipt was saved to Student Ledger, but PDF generation or download failed. Your entered details have been kept. You can download it from the Student Ledger.');
+    await generateProfessionalPNG(data);
+    resetFeeFormAfterSuccessfulReceipt();
+    alert('High-resolution PNG receipt downloaded and saved to Student Ledger. The form is ready for the next payment.');
+  } catch (pngError) {
+    console.error('PNG export failed:', pngError);
+    alert('The receipt was saved to Student Ledger, but PNG download failed. Your entered details have been kept. Please try again.');
   }
 }
 
 async function downloadCurrentPDF() {
-  if (!validateReceipt()) return;
-  const normalizedPhone = validateAndNormalizePhone();
-  if (!normalizedPhone) return;
+  const data = getValidatedCurrentReceiptData();
+  if (!data) return;
   try {
-    await generateProfessionalPDF(receiptData(normalizedPhone));
+    await generateProfessionalPDF(data);
   } catch (error) {
-    console.error('Current PDF download failed:', error);
-    alert('PDF download could not be completed. Your entered details have been kept.');
+    console.error('A4 PDF download failed:', error);
+    alert('A4 PDF download could not be completed. Your entered details have been kept.');
+  }
+}
+
+async function shareCurrentReceiptPDF() {
+  const data = getValidatedCurrentReceiptData();
+  if (!data) return;
+
+  const fallbackTab = window.open('about:blank', '_blank');
+  try {
+    const pdfResult = await generateProfessionalPDF(data, { returnBlob: true });
+    const file = new File([pdfResult.blob], pdfResult.filename, { type: 'application/pdf' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      if (fallbackTab && !fallbackTab.closed) fallbackTab.close();
+      await navigator.share({
+        files: [file],
+        title: 'APAA Fee Receipt',
+        text: `Fee receipt for ${data.studentName} | Receipt No: ${data.receiptNo}`
+      });
+      return;
+    }
+
+    triggerBlobDownload(pdfResult.blob, pdfResult.filename);
+    const message = `Dear ${data.studentName},\n\nPlease find your fee receipt details from Alagappa Performing Arts Academy.\nReceipt No: ${data.receiptNo}\nAmount: ₹${data.amount}\n\nThe PDF receipt has been downloaded. Please attach it to this WhatsApp message before sending.\n\nRegards,\nAlagappa Performing Arts Academy`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    if (fallbackTab && !fallbackTab.closed) fallbackTab.location.href = whatsappUrl;
+    else window.open(whatsappUrl, '_blank', 'noopener');
+    alert('The PDF has been downloaded. WhatsApp is open with the message ready; attach the downloaded PDF before sending.');
+  } catch (error) {
+    if (fallbackTab && !fallbackTab.closed) fallbackTab.close();
+    if (error && error.name === 'AbortError') return;
+    console.error('WhatsApp PDF share failed:', error);
+    alert('Could not share the PDF. Please use Download PDF (A4) and attach it manually in WhatsApp.');
   }
 }
 
@@ -3508,9 +3330,10 @@ function renderLedger() {
           <span class="dash">—</span>
           <span class="receipt-num">Receipt No. ${escapeHtml(item.receiptNo)}</span>
         </div>
-        <button class="btn btn-primary btn-small" type="button" onclick="downloadSpecificPDF(${originalIndex})">
-          Download Receipt
-        </button>
+        <div class="ledger-download-actions">
+          <button class="btn btn-primary btn-small" type="button" onclick="downloadSpecificPNG(${originalIndex})">PNG</button>
+          <button class="btn btn-secondary btn-small" type="button" onclick="downloadSpecificPDF(${originalIndex})">PDF</button>
+        </div>
       </div>
     `;
   }).join('');
@@ -3520,11 +3343,26 @@ function escapeHtml(str) {
   return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+async function downloadSpecificPNG(index) {
+  const saved = getSaved();
+  const item = saved[index];
+  if (!item) return;
+  try { await generateProfessionalPNG(item); }
+  catch (error) {
+    console.error('Ledger PNG download failed:', error);
+    alert('PNG download failed. Please try again.');
+  }
+}
+
 async function downloadSpecificPDF(index) {
   const saved = getSaved();
   const item = saved[index];
   if (!item) return;
-  await generateProfessionalPDF(item);
+  try { await generateProfessionalPDF(item); }
+  catch (error) {
+    console.error('Ledger PDF download failed:', error);
+    alert('PDF download failed. Please try again.');
+  }
 }
 
 function downloadExcel() {
