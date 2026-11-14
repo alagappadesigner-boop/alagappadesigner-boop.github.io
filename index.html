@@ -3268,6 +3268,168 @@ function resetFeeFormAfterSuccessfulReceipt() {
   initializeNewReceipt();
 }
 
+
+async function generateProfessionalPNG(itemData) {
+  if (typeof window.html2canvas !== 'function') {
+    throw new Error('Image export library is not available. Please refresh the page and try again.');
+  }
+
+  const safe = value => String(value == null || String(value).trim() === '' ? '—' : value)
+    .replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+  const logoSrc = el('logoLeftImg')?.currentSrc || el('logoLeftImg')?.src || 'Logo.png';
+  const signatureSrc = el('signatureImg')?.currentSrc || el('signatureImg')?.src || 'signature.png';
+
+  const amountNumber = Number(String(itemData.amount ?? '').replace(/[^\d.]/g, ''));
+  const amountText = Number.isFinite(amountNumber)
+    ? `₹ ${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amountNumber)}`
+    : `₹ ${safe(itemData.amount)}`;
+
+  const paymentMode = safe(itemData.paymentMode);
+  const txnText = itemData.transactionId ||
+    (String(itemData.paymentMode).toUpperCase() === 'CASH' ? 'Not required for Cash' : '—');
+
+  const rows = [
+    ['Amount Paid *', amountText, true],
+    ['Amount in Words', safe(itemData.amountInWords)],
+    ['Payment Date *', safe(itemData.paymentDate)],
+    ['Payment Mode *', paymentMode],
+    ['TXN / UPI ID', safe(txnText)],
+    ['Installment Stage *', safe(itemData.installmentStage)]
+  ];
+
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-20000px;top:0;z-index:-1;';
+  host.innerHTML = `
+    <div id="apaa-landscape-export" style="
+      width:1485px;height:1050px;box-sizing:border-box;position:relative;overflow:hidden;
+      padding:42px 50px 30px;background:#fff;color:#172b4d;
+      font-family:Lato,Arial,sans-serif;">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0;">
+        <img src="${safe(logoSrc)}" style="width:430px;max-height:360px;object-fit:contain;opacity:.055;">
+      </div>
+      <div style="position:relative;z-index:1;height:100%;display:flex;flex-direction:column;">
+        <header style="height:142px;display:grid;grid-template-columns:300px 1fr 330px;align-items:center;border-bottom:5px solid #d6a91c;padding-bottom:20px;">
+          <div style="display:flex;align-items:center;height:125px;">
+            <img src="${safe(logoSrc)}" style="max-width:260px;max-height:125px;object-fit:contain;">
+          </div>
+          <div style="text-align:center;padding:0 20px;">
+            <div style="font-family:Georgia,serif;font-size:48px;font-weight:700;letter-spacing:1px;color:#123b68;">ALAGAPPA</div>
+            <div style="font-size:29px;font-weight:700;letter-spacing:1px;color:#c99512;margin-top:4px;">PERFORMING ARTS ACADEMY</div>
+            <div style="font-size:20px;color:#596579;margin-top:9px;letter-spacing:.4px;">BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</div>
+          </div>
+          <div style="border-left:2px solid #d6dce5;padding-left:28px;text-align:left;font-size:19px;line-height:1.55;color:#44536a;">
+            <div>49, Gangadeeshwar Koil St,</div>
+            <div>Purasawalkam, Chennai - 600084</div>
+            <div>+91 73558-596403</div>
+            <div>vaishnavi@alagappaarts.com</div>
+          </div>
+        </header>
+
+        <div style="text-align:center;font-size:47px;line-height:1.15;font-weight:800;letter-spacing:1px;color:#123b68;margin:24px 0 10px;">FEE RECEIPT</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:23px;color:#334155;margin:0 8px 26px;padding-bottom:20px;border-bottom:2px solid #dce4ec;">
+          <div>Receipt No: <b style="color:#0d3472;">${safe(itemData.receiptNo)}</b></div>
+          <div>Receipt Date: <b style="color:#0d3472;">${safe(itemData.paymentDate)}</b></div>
+        </div>
+
+        <section style="display:grid;grid-template-columns:1fr 1fr;gap:42px;height:365px;">
+          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.86);">
+            <div style="height:66px;display:flex;align-items:center;padding:0 32px;background:#eaf2fc;color:#123b68;font-size:28px;font-weight:800;">STUDENT &amp; COURSE DETAILS</div>
+            <div style="padding:10px 30px;">
+              ${[
+                ['Student Name *',itemData.studentName],
+                ['Phone Number *',itemData.phone],
+                ['Course Registered *',itemData.course],
+                ['Academic Year *',itemData.academicYear]
+              ].map(([label,value])=>`<div style="height:68px;display:grid;grid-template-columns:37% 5% 58%;align-items:center;border-bottom:1px solid #d8e1ec;font-size:23px;"><span style="color:#526176;">${safe(label)}</span><b style="text-align:center;color:#172b4d;">:</b><span style="font-weight:600;color:#172b4d;padding-left:12px;">${safe(value)}</span></div>`).join('')}
+            </div>
+          </div>
+          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.86);">
+            <div style="height:66px;display:flex;align-items:center;padding:0 32px;background:#eaf2fc;color:#123b68;font-size:28px;font-weight:800;">PAYMENT INFORMATION</div>
+            <div style="padding:5px 28px;">
+              ${rows.map(([label,value,bold])=>`<div style="height:48px;display:grid;grid-template-columns:37% 5% 58%;align-items:center;border-bottom:1px solid #d8e1ec;font-size:21px;"><span style="color:#526176;">${safe(label)}</span><b style="text-align:center;color:#172b4d;">:</b><span style="font-weight:${bold?'800':'600'};font-size:${bold?'24px':'21px'};color:#172b4d;padding-left:12px;">${safe(value)}</span></div>`).join('')}
+            </div>
+          </div>
+        </section>
+
+        <section style="margin-top:26px;min-height:80px;display:flex;align-items:center;border:2px solid #d4dfec;border-left:12px solid #d6a91c;border-radius:12px;background:#f7f9fc;padding:0 28px;font-size:23px;">
+          <b style="color:#123b68;margin-right:28px;">Remarks &amp; Extra Declarations:</b>
+          <span style="color:#172b4d;">${safe(itemData.remarks || 'No Remarks')}</span>
+        </section>
+
+        <section style="margin-top:22px;min-height:86px;display:flex;align-items:center;border:2px dashed #e0b84d;border-radius:14px;background:#fffdf7;padding:10px 28px;font-size:19px;line-height:1.45;color:#5d594b;">
+          <span style="width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:#d6a91c;color:white;font-weight:800;font-size:28px;display:flex;align-items:center;justify-content:center;margin-right:20px;">i</span>
+          <span><b>Official Notice:</b> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.</span>
+        </section>
+
+        <section style="margin-top:26px;height:135px;display:grid;grid-template-columns:185px 1fr 420px;align-items:center;">
+          <div style="width:135px;height:120px;border:2px solid #cbd9ea;border-radius:12px;background:#f7f9fc;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#75849a;">
+            <div style="font-size:44px;letter-spacing:5px;line-height:1;">▦</div>
+            <div style="font-size:17px;margin-top:8px;">Verified Slip</div>
+          </div>
+          <div style="border-left:3px solid #d6a91c;padding-left:55px;font-size:21px;line-height:1.8;color:#596579;">
+            <div>Generated On: <b style="font-weight:500;color:#334155;">${safe(itemData.savedAt || new Date().toLocaleString('en-IN'))}</b></div>
+            <div>Secure Mode: <b style="font-weight:500;color:#334155;">Active System Gateway</b></div>
+          </div>
+          <div style="height:125px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;">
+            <img src="${safe(signatureSrc)}" style="max-width:340px;max-height:82px;object-fit:contain;">
+            <div style="width:100%;border-bottom:2px solid #334155;margin-top:3px;"></div>
+            <div style="font-size:21px;font-weight:800;color:#123b68;margin-top:8px;">AUTHORIZED SIGNATURE</div>
+          </div>
+        </section>
+
+        <footer style="margin-top:auto;border-top:2px solid #cbd5e1;text-align:center;padding-top:16px;">
+          <div style="font-size:27px;font-weight:800;color:#c99b19;letter-spacing:.5px;">THANK YOU!</div>
+          <div style="font-size:17px;color:#667386;margin-top:8px;">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
+        </footer>
+      </div>
+    </div>`;
+
+  document.body.appendChild(host);
+  const receiptNode = host.querySelector('#apaa-landscape-export');
+
+  // Wait for academy logo and signature assets before capturing.
+  const images = Array.from(receiptNode.querySelectorAll('img'));
+  await Promise.all(images.map(img => {
+    if (img.complete && img.naturalWidth) return Promise.resolve();
+    return new Promise(resolve => {
+      img.onload = resolve;
+      img.onerror = resolve;
+    });
+  }));
+
+  try {
+    const canvas = await window.html2canvas(receiptNode, {
+      backgroundColor: '#ffffff',
+      scale: 2.4,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      width: 1485,
+      height: 1050,
+      windowWidth: 1600,
+      windowHeight: 1200
+    });
+
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob(result => result ? resolve(result) : reject(new Error('Could not create PNG image.')), 'image/png');
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${String(itemData.receiptNo || 'APAA-Receipt').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    return true;
+  } finally {
+    host.remove();
+  }
+}
+
+
 async function handlePrintReceiptWorkflow() {
   if (!validateReceipt()) return;
 
@@ -3296,7 +3458,7 @@ async function handlePrintReceiptWorkflow() {
   }
 
   try {
-    const downloadStarted = await generateProfessionalPDF(data);
+    const downloadStarted = await generateProfessionalPNG(data);
     if (downloadStarted) {
       resetFeeFormAfterSuccessfulReceipt();
       alert('Receipt saved and PDF download started successfully. The form is ready for the next payment.');
