@@ -3289,201 +3289,106 @@ async function generateProfessionalPNG(itemData) {
   const txnText = itemData.transactionId ||
     (String(itemData.paymentMode).toUpperCase() === 'CASH' ? 'Not required for Cash' : '—');
 
-  const studentRows = [
-    ['Student Name *', itemData.studentName],
-    ['Phone Number *', itemData.phone],
-    ['Course Registered *', itemData.course],
-    ['Academic Year *', itemData.academicYear]
-  ];
-  const paymentRows = [
-    ['Amount Paid *', amountText],
-    ['Amount in Words', itemData.amountInWords],
-    ['Payment Date *', itemData.paymentDate],
+  const rows = [
+    ['Amount Paid *', amountText, true],
+    ['Amount in Words', safe(itemData.amountInWords)],
+    ['Payment Date *', safe(itemData.paymentDate)],
     ['Payment Mode *', paymentMode],
-    ['TXN / UPI ID', txnText],
-    ['Installment Stage *', itemData.installmentStage]
+    ['TXN / UPI ID', safe(txnText)],
+    ['Installment Stage *', safe(itemData.installmentStage)]
   ];
-
-  const renderRows = (rows, payment = false) => rows.map(([label, value], index) => `
-    <div class="detail-row ${payment && index === 0 ? 'amount-row' : ''}">
-      <span class="detail-label">${safe(label)}</span>
-      <span class="detail-colon">:</span>
-      <span class="detail-value">${safe(value)}</span>
-    </div>`).join('');
 
   const host = document.createElement('div');
-  host.style.cssText = 'position:fixed;left:-20000px;top:0;z-index:-1;width:1240px;height:1754px;overflow:hidden;';
+  host.style.cssText = 'position:fixed;left:-20000px;top:0;z-index:-1;';
   host.innerHTML = `
-    <style>
-      #apaa-a4-export, #apaa-a4-export * { box-sizing:border-box; }
-      #apaa-a4-export {
-        position:relative; width:1240px; height:1754px; overflow:hidden;
-        padding:58px 66px 46px; background:#fff; color:#27364a;
-        font-family:Arial,Helvetica,sans-serif; -webkit-font-smoothing:antialiased;
-      }
-      #apaa-a4-export .watermark {
-        position:absolute; z-index:0; pointer-events:none; width:520px; height:520px;
-        object-fit:contain; left:50%; top:51%; transform:translate(-50%,-50%); opacity:.04;
-      }
-      #apaa-a4-export .content { position:relative; z-index:1; height:100%; display:flex; flex-direction:column; }
-      #apaa-a4-export .header {
-        display:grid; grid-template-columns:190px minmax(0,1fr) 290px; align-items:center; gap:20px;
-        padding-bottom:25px; border-bottom:4px solid #d6aa27;
-      }
-      #apaa-a4-export .logo { display:block; width:180px; max-height:135px; object-fit:contain; object-position:left center; }
-      #apaa-a4-export .academy { text-align:center; min-width:0; }
-      #apaa-a4-export .academy h1 {
-        margin:0; color:#173f6b; font:700 43px/1.12 Georgia,'Times New Roman',serif; letter-spacing:.5px;
-      }
-      #apaa-a4-export .academy .sub {
-        margin-top:8px; color:#c59616; font-size:22px; line-height:1.25; font-weight:700; letter-spacing:1px;
-      }
-      #apaa-a4-export .academy .courses {
-        margin-top:10px; color:#697586; font-size:14px; line-height:1.45; letter-spacing:.3px; white-space:nowrap;
-      }
-      #apaa-a4-export .contact {
-        border-left:2px solid #d8e0e8; padding-left:22px; text-align:right; color:#657386;
-        font-size:15px; line-height:1.75; overflow-wrap:anywhere;
-      }
-      #apaa-a4-export .title {
-        margin:31px 0 23px; color:#173f6b; text-align:center; font-size:37px;
-        line-height:1.2; font-weight:800; letter-spacing:1px;
-      }
-      #apaa-a4-export .metadata {
-        display:flex; justify-content:space-between; gap:20px; padding:0 0 21px;
-        border-bottom:2px solid #dce4ec; color:#344256; font-size:18px;
-      }
-      #apaa-a4-export .metadata strong { color:#173f6b; }
-      #apaa-a4-export .details-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:35px; }
-      #apaa-a4-export .card {
-        min-width:0; border:2px solid #d7e0e9; border-radius:12px;
-        background:rgba(255,255,255,.84); overflow:hidden;
-      }
-      #apaa-a4-export .card h2 {
-        margin:0; padding:19px 24px; color:#173f6b; background:rgba(231,240,251,.92);
-        border-bottom:1px solid #d7e0e9; font-size:22px; line-height:1.25; font-weight:800; letter-spacing:.3px;
-      }
-      #apaa-a4-export .rows { padding:10px 24px 13px; }
-      #apaa-a4-export .detail-row {
-        display:grid; grid-template-columns:minmax(0,42%) 20px minmax(0,1fr); gap:10px;
-        align-items:center; min-height:77px; padding:15px 0; border-bottom:1px solid #d8e1eb;
-        font-size:18px; line-height:1.45;
-      }
-      #apaa-a4-export .detail-row:last-child { border-bottom:0; }
-      #apaa-a4-export .detail-label { color:#667488; }
-      #apaa-a4-export .detail-colon { color:#173f6b; text-align:center; font-weight:700; }
-      #apaa-a4-export .detail-value { color:#25364c; text-align:left; font-weight:600; overflow-wrap:anywhere; }
-      #apaa-a4-export .amount-row .detail-value { font-size:21px; font-weight:800; }
-      #apaa-a4-export .remarks {
-        margin-top:31px; padding:23px 27px; border:2px solid #d7e0e9; border-left:8px solid #d6aa27;
-        border-radius:10px; background:rgba(247,249,252,.9); min-height:100px;
-        display:flex; align-items:center; gap:28px; font-size:19px;
-      }
-      #apaa-a4-export .remarks strong { color:#173f6b; white-space:nowrap; }
-      #apaa-a4-export .remarks span { color:#25364c; overflow-wrap:anywhere; }
-      #apaa-a4-export .notice {
-        display:grid; grid-template-columns:34px minmax(0,1fr); gap:16px; align-items:start;
-        margin-top:27px; padding:22px 25px; border:2px dashed #d9b54d; border-radius:10px;
-        background:rgba(255,253,247,.94); color:#665d49; font-size:16px; line-height:1.65;
-      }
-      #apaa-a4-export .notice-icon {
-        display:flex; align-items:center; justify-content:center; width:30px; height:30px;
-        border-radius:50%; background:#d6aa27; color:#fff; font-size:19px; font-weight:800;
-      }
-      #apaa-a4-export .notice strong { color:#514a3d; }
-      #apaa-a4-export .footer-details {
-        display:grid; grid-template-columns:110px minmax(0,1fr) 300px; gap:25px; align-items:center;
-        margin-top:47px; padding:0 7px 36px; border-bottom:2px solid #dce4ec;
-      }
-      #apaa-a4-export .verified {
-        width:105px; height:112px; border:2px solid #d6e0eb; border-radius:10px;
-        background:rgba(247,249,252,.92); display:flex; flex-direction:column; align-items:center;
-        justify-content:center; gap:10px; color:#8995a4; font-size:13px; text-align:center;
-      }
-      #apaa-a4-export .verified-mark { width:35px; height:35px; display:grid; grid-template-columns:1fr 1fr; gap:5px; }
-      #apaa-a4-export .verified-mark span { border:3px solid #aab5c2; border-radius:2px; }
-      #apaa-a4-export .generated { color:#6c7888; font-size:17px; line-height:1.9; }
-      #apaa-a4-export .generated strong { color:#596779; }
-      #apaa-a4-export .signature { text-align:center; align-self:end; }
-      #apaa-a4-export .signature img { display:block; width:100%; height:85px; object-fit:contain; object-position:center bottom; margin-bottom:4px; }
-      #apaa-a4-export .signature-line { border-top:2px solid #26384f; }
-      #apaa-a4-export .signature-label { margin-top:10px; color:#173f6b; font-size:16px; font-weight:800; letter-spacing:.4px; }
-      #apaa-a4-export .thank-you { margin-top:auto; padding-top:25px; text-align:center; }
-      #apaa-a4-export .thank-you h3 { margin:0 0 11px; color:#c99e22; font-size:25px; font-weight:800; letter-spacing:.5px; }
-      #apaa-a4-export .thank-you p { margin:0 auto; max-width:990px; color:#788392; font-size:15px; line-height:1.6; }
-    </style>
-    <main id="apaa-a4-export">
-      <img class="watermark" src="${safe(logoSrc)}" alt="">
-      <div class="content">
-        <header class="header">
-          <div><img class="logo" src="${safe(logoSrc)}" alt="APAA Logo"></div>
-          <div class="academy">
-            <h1>ALAGAPPA</h1>
-            <div class="sub">PERFORMING ARTS ACADEMY</div>
-            <div class="courses">BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</div>
+    <div id="apaa-landscape-export" style="
+      width:1670px;height:1180px;box-sizing:border-box;position:relative;overflow:hidden;
+      padding:38px 52px 34px;background:#fff;color:#172b4d;
+      font-family:Lato,Arial,sans-serif;">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;">
+        <img src="${safe(logoSrc)}" style="width:540px;max-height:450px;object-fit:contain;opacity:.10;">
+      </div>
+      <div style="position:relative;z-index:3;height:100%;display:flex;flex-direction:column;">
+        <header style="height:150px;display:grid;grid-template-columns:300px 1fr 330px;align-items:center;border-bottom:5px solid #d6a91c;padding-bottom:20px;">
+          <div style="display:flex;align-items:center;height:125px;">
+            <img src="${safe(logoSrc)}" style="max-width:260px;max-height:125px;object-fit:contain;">
           </div>
-          <div class="contact">
+          <div style="text-align:center;padding:0 20px;">
+            <div style="font-family:Georgia,serif;font-size:48px;font-weight:700;letter-spacing:1px;color:#123b68;">ALAGAPPA</div>
+            <div style="font-size:29px;font-weight:700;letter-spacing:1px;color:#c99512;margin-top:4px;">PERFORMING ARTS ACADEMY</div>
+            <div style="font-size:20px;color:#596579;margin-top:9px;letter-spacing:.4px;">BHARATHANATYAM | CARNATIC VOCAL | NATTUVANGAM</div>
+          </div>
+          <div style="border-left:2px solid #d6dce5;padding-left:28px;text-align:left;font-size:19px;line-height:1.55;color:#44536a;">
             <div>49, Gangadeeshwar Koil St,</div>
-            <div>Purasaiwakkam, Chennai - 600084</div>
+            <div>Purasawalkam, Chennai - 600084</div>
             <div>+91 73558-596403</div>
             <div>vaishnavi@alagappaarts.com</div>
           </div>
         </header>
 
-        <h2 class="title">FEE RECEIPT</h2>
-        <section class="metadata">
-          <div>Receipt No: <strong>${safe(itemData.receiptNo)}</strong></div>
-          <div>Receipt Date: <strong>${safe(itemData.paymentDate)}</strong></div>
-        </section>
+        <div style="text-align:center;font-size:47px;line-height:1.15;font-weight:800;letter-spacing:1px;color:#123b68;margin:24px 0 10px;">FEE RECEIPT</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:23px;color:#334155;margin:0 8px 26px;padding-bottom:20px;border-bottom:2px solid #dce4ec;">
+          <div>Receipt No: <b style="color:#0d3472;">${safe(itemData.receiptNo)}</b></div>
+          <div>Receipt Date: <b style="color:#0d3472;">${safe(itemData.paymentDate)}</b></div>
+        </div>
 
-        <section class="details-grid">
-          <article class="card">
-            <h2>STUDENT &amp; COURSE DETAILS</h2>
-            <div class="rows">${renderRows(studentRows)}</div>
-          </article>
-          <article class="card">
-            <h2>PAYMENT INFORMATION</h2>
-            <div class="rows">${renderRows(paymentRows, true)}</div>
-          </article>
-        </section>
-
-        <section class="remarks">
-          <strong>Remarks &amp; Extra Declarations:</strong>
-          <span>${safe(itemData.remarks || 'No Remarks')}</span>
-        </section>
-
-        <section class="notice">
-          <span class="notice-icon">i</span>
-          <div><strong>Official Notice:</strong> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.</div>
-        </section>
-
-        <footer>
-          <div class="footer-details">
-            <div class="verified">
-              <div class="verified-mark"><span></span><span></span><span></span><span></span></div>
-              <span>Verified Slip</span>
-            </div>
-            <div class="generated">
-              <div><strong>Generated On:</strong> ${safe(itemData.savedAt || new Date().toLocaleString('en-IN'))}</div>
-              <div><strong>Secure Mode:</strong> Active System Gateway</div>
-            </div>
-            <div class="signature">
-              <img src="${safe(signatureSrc)}" alt="Authorised signature">
-              <div class="signature-line"></div>
-              <div class="signature-label">AUTHORIZED SIGNATURE</div>
+        <section style="display:grid;grid-template-columns:1fr 1fr;gap:42px;height:385px;">
+          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.34);">
+            <div style="height:66px;display:flex;align-items:center;padding:0 32px;background:#eaf2fc;color:#123b68;font-size:28px;font-weight:800;">STUDENT &amp; COURSE DETAILS</div>
+            <div style="padding:10px 30px;">
+              ${[
+                ['Student Name *',itemData.studentName],
+                ['Phone Number *',itemData.phone],
+                ['Course Registered *',itemData.course],
+                ['Academic Year *',itemData.academicYear]
+              ].map(([label,value])=>`<div style="height:68px;display:grid;grid-template-columns:37% 5% 58%;align-items:center;border-bottom:1px solid #d8e1ec;font-size:23px;"><span style="color:#526176;">${safe(label)}</span><b style="text-align:center;color:#172b4d;">:</b><span style="font-weight:600;color:#172b4d;padding-left:12px;">${safe(value)}</span></div>`).join('')}
             </div>
           </div>
-          <div class="thank-you">
-            <h3>THANK YOU!</h3>
-            <p>We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</p>
+          <div style="border:2px solid #cbd9ea;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.34);">
+            <div style="height:66px;display:flex;align-items:center;padding:0 32px;background:#eaf2fc;color:#123b68;font-size:28px;font-weight:800;">PAYMENT INFORMATION</div>
+            <div style="padding:5px 28px;">
+              ${rows.map(([label,value,bold])=>`<div style="height:48px;display:grid;grid-template-columns:37% 5% 58%;align-items:center;border-bottom:1px solid #d8e1ec;font-size:21px;"><span style="color:#526176;">${safe(label)}</span><b style="text-align:center;color:#172b4d;">:</b><span style="font-weight:${bold?'800':'600'};font-size:${bold?'24px':'21px'};color:#172b4d;padding-left:12px;">${safe(value)}</span></div>`).join('')}
+            </div>
           </div>
+        </section>
+
+        <section style="margin-top:26px;min-height:76px;display:flex;align-items:center;border:2px solid #d4dfec;border-left:12px solid #d6a91c;border-radius:12px;background:#f7f9fc;padding:0 28px;font-size:23px;">
+          <b style="color:#123b68;margin-right:28px;">Remarks &amp; Extra Declarations:</b>
+          <span style="color:#172b4d;">${safe(itemData.remarks || 'No Remarks')}</span>
+        </section>
+
+        <section style="margin-top:22px;min-height:82px;display:flex;align-items:center;border:2px dashed #e0b84d;border-radius:14px;background:#fffdf7;padding:10px 28px;font-size:19px;line-height:1.45;color:#5d594b;">
+          <span style="width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:#d6a91c;color:white;font-weight:800;font-size:28px;display:flex;align-items:center;justify-content:center;margin-right:20px;">i</span>
+          <span><b>Official Notice:</b> This is a computer-generated fee receipt issued by Alagappa Performing Arts Academy. The payment details recorded herein are considered valid and no physical signature or seal is required.</span>
+        </section>
+
+        <section style="margin-top:26px;height:128px;display:grid;grid-template-columns:185px 1fr 420px;align-items:center;">
+          <div style="width:135px;height:120px;border:2px solid #cbd9ea;border-radius:12px;background:#f7f9fc;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#75849a;">
+            <div style="font-size:44px;letter-spacing:5px;line-height:1;">▦</div>
+            <div style="font-size:17px;margin-top:8px;">Verified Slip</div>
+          </div>
+          <div style="border-left:3px solid #d6a91c;padding-left:55px;font-size:21px;line-height:1.8;color:#596579;">
+            <div>Generated On: <b style="font-weight:500;color:#334155;">${safe(itemData.savedAt || new Date().toLocaleString('en-IN'))}</b></div>
+            <div>Secure Mode: <b style="font-weight:500;color:#334155;">Active System Gateway</b></div>
+          </div>
+          <div style="height:125px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;">
+            <img src="${safe(signatureSrc)}" style="max-width:340px;max-height:82px;object-fit:contain;">
+            <div style="width:100%;border-bottom:2px solid #334155;margin-top:3px;"></div>
+            <div style="font-size:21px;font-weight:800;color:#123b68;margin-top:8px;">AUTHORIZED SIGNATURE</div>
+          </div>
+        </section>
+
+        <footer style="margin-top:auto;border-top:2px solid #cbd5e1;text-align:center;padding-top:16px;">
+          <div style="font-size:27px;font-weight:800;color:#c99b19;letter-spacing:.5px;">THANK YOU!</div>
+          <div style="font-size:17px;color:#667386;margin-top:8px;">We appreciate your trust in Alagappa Performing Arts Academy. This receipt is a computer-generated record statement and does not require a physical signature stamp.</div>
         </footer>
       </div>
-    </main>`;
+    </div>`;
 
   document.body.appendChild(host);
-  const receiptNode = host.querySelector('#apaa-a4-export');
+  const receiptNode = host.querySelector('#apaa-landscape-export');
 
+  // Wait for academy logo and signature assets before capturing.
   const images = Array.from(receiptNode.querySelectorAll('img'));
   await Promise.all(images.map(img => {
     if (img.complete && img.naturalWidth) return Promise.resolve();
@@ -3496,14 +3401,14 @@ async function generateProfessionalPNG(itemData) {
   try {
     const canvas = await window.html2canvas(receiptNode, {
       backgroundColor: '#ffffff',
-      scale: 2,
+      scale: 2.4,
       useCORS: true,
       allowTaint: false,
       logging: false,
-      width: 1240,
-      height: 1754,
-      windowWidth: 1400,
-      windowHeight: 1900
+      width: 1670,
+      height: 1180,
+      windowWidth: 1800,
+      windowHeight: 1350
     });
 
     const blob = await new Promise((resolve, reject) => {
