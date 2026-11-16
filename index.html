@@ -2990,12 +2990,12 @@ async function captureReceiptCanvas(itemData) {
   const exportWidth = 2047;
   const host = document.createElement('div');
   host.style.cssText = [
-    'position:fixed','left:-30000px','top:0','z-index:-1',
+    'position:fixed','left:-30000px','top:0','z-index:2147483647','opacity:1','visibility:visible','pointer-events:none','isolation:isolate',
     `width:${exportWidth}px`,'background:#ffffff','overflow:visible'
   ].join(';');
 
   const clone = original.cloneNode(true);
-  clone.style.cssText += `;width:${exportWidth}px;max-width:none;margin:0;box-shadow:none;box-sizing:border-box;`;
+  clone.style.cssText += `;width:${exportWidth}px;max-width:none;margin:0;box-shadow:none;box-sizing:border-box;opacity:1!important;visibility:visible!important;filter:none!important;background:#fff!important;`;
 
   const setText = (id, value) => {
     const node = clone.querySelector(`#${id}`);
@@ -3013,6 +3013,19 @@ async function captureReceiptCanvas(itemData) {
   setText('receiptNo', itemData.receiptNo || '');
   setText('displayDate', itemData.receiptDate || itemData.paymentDate || '');
   setText('remarksContent', itemData.remarks || 'No Remarks');
+  const amountWordsNode = clone.querySelector('#amountWords');
+  if (amountWordsNode) {
+    const rawAmount = String(itemData.amount ?? '').replace(/[₹,\s]/g, '');
+    const numericAmount = Number(rawAmount);
+    if (itemData.amountWords) {
+      amountWordsNode.textContent = itemData.amountWords;
+    } else if (Number.isFinite(numericAmount) && numericAmount > 0 && typeof numberWords === 'function') {
+      const rupees = Math.floor(numericAmount);
+      const paise = Math.round((numericAmount - rupees) * 100);
+      amountWordsNode.textContent = numberWords(rupees) + ' Rupees' +
+        (paise ? ' and ' + numberWords(paise) + ' Paise' : '') + ' Only';
+    }
+  }
   setText('genDateTime', itemData.savedAt || new Date().toLocaleString('en-IN'));
 
   // Convert every editable control into ordinary text before capture.
@@ -3070,6 +3083,19 @@ async function captureReceiptCanvas(itemData) {
   if (developerCredit) developerCredit.style.display = 'none';
 
   clone.querySelectorAll('button, .payment-calendar').forEach(node => node.remove());
+
+  const exportGrid = clone.querySelector('.form-grid');
+  const headerLogo = clone.querySelector('.academy-logo');
+  if (exportGrid && headerLogo) {
+    const watermark = document.createElement('div');
+    watermark.className = 'export-apaa-watermark';
+    const watermarkImg = document.createElement('img');
+    watermarkImg.src = headerLogo.currentSrc || headerLogo.src;
+    watermarkImg.alt = '';
+    watermarkImg.crossOrigin = 'anonymous';
+    watermark.appendChild(watermarkImg);
+    exportGrid.prepend(watermark);
+  }
 
   // Export-only layout refinements: preserve the reference's wide header,
   // two balanced information panels, readable values and complete footer.
@@ -3294,7 +3320,42 @@ async function captureReceiptCanvas(itemData) {
     .thank-you-footer strong { font-size: 28px !important; }
     .thank-you-footer p { font-size: 17px !important; line-height: 1.4 !important; }
   `;
-  clone.prepend(exportStyle);
+  document.head.appendChild(exportStyle);
+  const exportOverride = document.createElement('style');
+  exportOverride.textContent = `
+    html, body { opacity: 1 !important; filter: none !important; }
+    .sheet, .sheet * { opacity: 1 !important; visibility: visible !important; filter: none !important; }
+    .sheet { background: #fff !important; color: #172f50 !important; }
+    .sheet::before { content: none !important; display: none !important; background: none !important; }
+    .form-grid::before { content: none !important; display: none !important; }
+    .form-grid { position: relative !important; isolation: isolate !important; }
+    .export-apaa-watermark {
+      position: absolute !important; z-index: 0 !important;
+      left: 50% !important; top: 48% !important;
+      transform: translate(-50%,-50%) !important;
+      width: 560px !important; height: 330px !important;
+      display: flex !important; align-items: center !important; justify-content: center !important;
+      opacity: .085 !important; pointer-events: none !important;
+    }
+    .export-apaa-watermark img {
+      display: block !important; width: 100% !important; height: 100% !important;
+      object-fit: contain !important; opacity: 1 !important; filter: grayscale(1) !important;
+    }
+    .form-grid > .panel { position: relative !important; z-index: 2 !important; }
+    .panel { background: rgba(255,255,255,.96) !important; border: 2px solid #c9dbf0 !important; }
+    .panel-title { background: #e8f1fc !important; color: #123f70 !important; }
+    .panel .field { border-bottom: 1px solid #d8e2ef !important; }
+    .panel .field label { color: #526681 !important; }
+    .export-field-value, .words { color: #172f50 !important; opacity: 1 !important; }
+    .remarks-panel { display:flex !important; flex-direction:row !important; align-items:center !important; gap:28px !important; }
+    .remarks-title, .remarks-content { margin:0 !important; }
+    .notice-box { background:#fffdf8 !important; border-color:#e0ad13 !important; }
+    .notice-text, .notice-text strong { color:#5c584c !important; opacity:1 !important; }
+    .qr-box, .meta-info-text, .meta-info-text b, .meta-info-text span,
+    .signature-block, .sign-line, .thank-you-footer, .thank-you-footer p,
+    .thank-you-footer strong { opacity:1 !important; visibility:visible !important; }
+  `;
+  document.head.appendChild(exportOverride);
   host.appendChild(clone);
   document.body.appendChild(host);
 
@@ -3325,6 +3386,8 @@ async function captureReceiptCanvas(itemData) {
     });
   } finally {
     host.remove();
+    exportStyle.remove();
+    exportOverride.remove();
   }
 }
 
