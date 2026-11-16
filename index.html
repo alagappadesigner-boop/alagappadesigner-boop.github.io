@@ -2953,28 +2953,22 @@ async function getBase64ImageFromURL(url) {
 
 
 function buildReceiptExportFilename(itemData, extension) {
-  // Short recipient code: Alagappa -> ALG, Harish -> HRS.
-  // This keeps both PNG and PDF filenames compact and consistent.
-  const firstName = String(itemData.studentName || 'STU')
+  const student = String(itemData.studentName || 'student')
     .trim()
+    .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
-    .split(/\s+/)[0]
-    .toUpperCase()
-    .replace(/[^A-Z]/g, '');
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'student';
 
-  const consonants = firstName.slice(1).replace(/[AEIOU]/g, '');
-  const nameCode = (firstName.charAt(0) + consonants.slice(0, 2))
-    .padEnd(3, 'X');
-
-  const receiptText = String(itemData.receiptNo || '');
-  const receiptMatch = receiptText.match(/(20\d{2})\D*(\d+)$/);
-  const dateText = String(itemData.paymentDate || itemData.receiptDate || '');
+  const dateText = String(itemData.paymentDate || '');
   const dateMatch = dateText.match(/\b(20\d{2})\b/);
-  const year = receiptMatch?.[1] || dateMatch?.[1] || String(new Date().getFullYear());
-  const receiptNumber = receiptMatch?.[2] || receiptText.replace(/\D/g, '').slice(-4) || '0000';
+  const year = dateMatch ? dateMatch[1] : String(new Date().getFullYear());
+  const receipt = String(itemData.receiptNo || 'receipt')
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]+/g, '_');
 
-  return `${nameCode}_${year}-${receiptNumber}.${extension}`;
+  return `${student}_${year}_receipt_${receipt}.${extension}`;
 }
 
 async function captureReceiptCanvas(itemData) {
@@ -2990,12 +2984,12 @@ async function captureReceiptCanvas(itemData) {
   const exportWidth = 2047;
   const host = document.createElement('div');
   host.style.cssText = [
-    'position:fixed','left:-30000px','top:0','z-index:2147483647','opacity:1','visibility:visible','pointer-events:none','isolation:isolate',
+    'position:fixed','left:-30000px','top:0','z-index:-1',
     `width:${exportWidth}px`,'background:#ffffff','overflow:visible'
   ].join(';');
 
   const clone = original.cloneNode(true);
-  clone.style.cssText += `;width:${exportWidth}px;max-width:none;margin:0;box-shadow:none;box-sizing:border-box;opacity:1!important;visibility:visible!important;filter:none!important;background:#fff!important;`;
+  clone.style.cssText += `;width:${exportWidth}px;max-width:none;margin:0;box-shadow:none;box-sizing:border-box;`;
 
   const setText = (id, value) => {
     const node = clone.querySelector(`#${id}`);
@@ -3013,19 +3007,6 @@ async function captureReceiptCanvas(itemData) {
   setText('receiptNo', itemData.receiptNo || '');
   setText('displayDate', itemData.receiptDate || itemData.paymentDate || '');
   setText('remarksContent', itemData.remarks || 'No Remarks');
-  const amountWordsNode = clone.querySelector('#amountWords');
-  if (amountWordsNode) {
-    const rawAmount = String(itemData.amount ?? '').replace(/[₹,\s]/g, '');
-    const numericAmount = Number(rawAmount);
-    if (itemData.amountWords) {
-      amountWordsNode.textContent = itemData.amountWords;
-    } else if (Number.isFinite(numericAmount) && numericAmount > 0 && typeof numberWords === 'function') {
-      const rupees = Math.floor(numericAmount);
-      const paise = Math.round((numericAmount - rupees) * 100);
-      amountWordsNode.textContent = numberWords(rupees) + ' Rupees' +
-        (paise ? ' and ' + numberWords(paise) + ' Paise' : '') + ' Only';
-    }
-  }
   setText('genDateTime', itemData.savedAt || new Date().toLocaleString('en-IN'));
 
   // Convert every editable control into ordinary text before capture.
@@ -3084,19 +3065,6 @@ async function captureReceiptCanvas(itemData) {
 
   clone.querySelectorAll('button, .payment-calendar').forEach(node => node.remove());
 
-  const exportGrid = clone.querySelector('.form-grid');
-  const headerLogo = clone.querySelector('.academy-logo');
-  if (exportGrid && headerLogo) {
-    const watermark = document.createElement('div');
-    watermark.className = 'export-apaa-watermark';
-    const watermarkImg = document.createElement('img');
-    watermarkImg.src = headerLogo.currentSrc || headerLogo.src;
-    watermarkImg.alt = '';
-    watermarkImg.crossOrigin = 'anonymous';
-    watermark.appendChild(watermarkImg);
-    exportGrid.prepend(watermark);
-  }
-
   // Export-only layout refinements: preserve the reference's wide header,
   // two balanced information panels, readable values and complete footer.
   const exportStyle = document.createElement('style');
@@ -3115,37 +3083,45 @@ async function captureReceiptCanvas(itemData) {
     }
     .sheet {
       width: ${exportWidth}px !important;
-      min-height: 1447px !important;
-      height: 1447px !important;
       max-width: none !important;
       padding: 42px 48px 34px !important;
-      overflow: hidden !important;
+      overflow: visible !important;
+      animation: none !important;
+      opacity: 1 !important;
       background: #ffffff !important;
     }
-
-    /* Keep the APAA watermark behind the panels, never over the text. */
-    .sheet::before { content: none !important; display: none !important; }
+    /* Remove the duplicated university-seal background from the export.
+       The reference uses a subtle APAA wordmark behind the two data panels. */
+    .sheet::before {
+      content: none !important;
+      display: none !important;
+      background-image: none !important;
+    }
     .form-grid {
       display: grid !important;
       grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
       gap: 34px !important;
       align-items: stretch !important;
-      margin-bottom: 24px !important;
+      opacity: 1 !important;
       overflow: visible !important;
       isolation: isolate !important;
-      position: relative !important;
     }
-    .form-grid::after { content: none !important; display: none !important; }
+    .form-grid::after {
+      content: none !important;
+      display: none !important;
+      background: none !important;
+      background-image: none !important;
+    }
     .form-grid::before {
       content: "APAA" !important;
       display: block !important;
       position: absolute !important;
       left: 50% !important;
-      top: 56% !important;
+      top: 52% !important;
       transform: translate(-50%,-50%) !important;
       z-index: 0 !important;
       font-family: Georgia, 'Times New Roman', serif !important;
-      font-size: 270px !important;
+      font-size: 260px !important;
       font-weight: 800 !important;
       letter-spacing: 8px !important;
       line-height: 1 !important;
@@ -3154,208 +3130,60 @@ async function captureReceiptCanvas(itemData) {
       white-space: nowrap !important;
       pointer-events: none !important;
     }
-
-    .receipt-header {
-      grid-template-columns: 260px minmax(0,1fr) 420px !important;
-      gap: 24px !important;
-      align-items: center !important;
-    }
-    .academy-logo { width: 230px !important; height: 120px !important; object-fit: contain !important; }
-    .academy-details h2 { font-size: 42px !important; }
-    .academy-details .academy { font-size: 23px !important; }
-    .academy-details .courses {
-      font-size: 17px !important;
-      white-space: nowrap !important;
-      letter-spacing: .5px !important;
-    }
-    .header-right {
-      font-size: 18px !important;
-      line-height: 1.5 !important;
-      padding-left: 24px !important;
-      white-space: normal !important;
-      overflow-wrap: normal !important;
-      word-break: normal !important;
-      min-width: 0 !important;
-    }
-    .gold-divider { margin: 20px 0 22px !important; height: 3px !important; }
-    .receipt-title-block h3 { font-size: 42px !important; letter-spacing: 1px !important; }
-    .receipt-meta-row { font-size: 22px !important; padding-bottom: 14px !important; border-bottom: 1px solid #d6e0ec !important; }
-    .receipt-meta-row strong { font-size: 22px !important; }
-
-    /* Exact two-panel receipt treatment: pale-blue title bands, blue borders,
-       row separators, labels + colon + left-aligned values. */
     .form-grid .panel {
       display: block !important;
       position: relative !important;
       z-index: 1 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      background: rgba(255,255,255,.94) !important;
       min-width: 0 !important;
-      height: 440px !important;
-      padding: 0 !important;
-      border: 2px solid #c9dbf0 !important;
-      border-radius: 17px !important;
-      overflow: hidden !important;
-      background: rgba(255,255,255,.93) !important;
+      height: auto !important;
+    }
+    .panel:nth-child(2) {
+      animation: none !important;
       opacity: 1 !important;
       visibility: visible !important;
     }
-    .panel:nth-child(2) { animation: none !important; opacity: 1 !important; visibility: visible !important; }
-    .panel-title {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: flex-start !important;
-      height: 80px !important;
-      margin: 0 !important;
-      padding: 0 30px !important;
-      border: 0 !important;
-      background: #e8f1fc !important;
-      color: #123f70 !important;
-      font-size: 28px !important;
-      line-height: 1.2 !important;
-      letter-spacing: 0 !important;
-      font-weight: 800 !important;
-    }
-    .panel .field {
-      display: grid !important;
-      grid-template-columns: minmax(0,35%) minmax(0,65%) !important;
-      align-items: center !important;
-      gap: 0 !important;
-      min-height: 62px !important;
-      margin: 0 28px !important;
-      padding: 0 !important;
-      border-bottom: 1px solid #d8e2ef !important;
-    }
-    .panel .field:last-child { border-bottom: 1px solid #d8e2ef !important; }
-    .panel .field label {
-      position: relative !important;
-      display: block !important;
-      width: 100% !important;
-      padding-right: 22px !important;
-      color: #526681 !important;
-      font-family: Arial, sans-serif !important;
-      font-size: 21px !important;
-      line-height: 1.25 !important;
-      font-weight: 500 !important;
-      white-space: normal !important;
-    }
-    .panel .field label::after {
-      content: ":" !important;
-      position: absolute !important;
-      right: 0 !important;
-      top: 0 !important;
-      color: #142f52 !important;
-      font-weight: 600 !important;
-    }
-    .export-field-value {
-      display: block !important;
-      width: 100% !important;
-      min-width: 0 !important;
-      padding-left: 18px !important;
-      text-align: left !important;
-      font-family: Arial, sans-serif !important;
-      font-size: 21px !important;
-      line-height: 1.3 !important;
-      color: #172f50 !important;
-      font-weight: 600 !important;
-      white-space: normal !important;
-      overflow-wrap: anywhere !important;
-      letter-spacing: 0 !important;
-    }
-    .panel .words {
-      text-align: left !important;
-      font-size: 21px !important;
-      font-weight: 600 !important;
-      color: #172f50 !important;
-    }
-
-    .remarks-panel {
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      gap: 30px !important;
-      min-height: 90px !important;
-      padding: 18px 28px !important;
-      margin-bottom: 22px !important;
-      border: 2px solid #c9dbf0 !important;
-      border-left: 12px solid #e0ad13 !important;
-      border-radius: 14px !important;
-      background: #f5f8fc !important;
-    }
-    .remarks-title,.remarks-content { font-size: 21px !important; margin: 0 !important; }
-    .notice-box {
-      padding: 20px 28px !important;
-      margin-bottom: 24px !important;
-      min-height: 100px !important;
-      border: 2px dashed #e0ad13 !important;
-      border-radius: 16px !important;
-      background: #fffdf8 !important;
-    }
-    .notice-text { font-size: 19px !important; line-height: 1.45 !important; }
-
-    .receipt-footer-area {
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      gap: 36px !important;
-      padding: 16px 0 22px !important;
-      margin-bottom: 10px !important;
-    }
-    .qr-signature-group {
-      display: flex !important;
-      flex: 1 1 auto !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      gap: 24px !important;
-    }
-    .qr-box { width: 150px !important; height: 150px !important; flex: 0 0 150px !important; }
-    .qr-box svg { width: 58px !important; height: 58px !important; }
-    .qr-box span { font-size: 16px !important; }
-    .meta-info-text { font-size: 19px !important; line-height: 1.8 !important; }
-    .signature-block { flex: 0 0 520px !important; width: 520px !important; }
-    .signature-img-wrap { height: 120px !important; }
-    .signature-img { max-height: 115px !important; max-width: 100% !important; object-fit: contain !important; }
-    .sign-line { font-size: 21px !important; }
-    .bottom-divider { margin: 10px 0 16px !important; }
-    .thank-you-footer { display: block !important; text-align: center !important; }
-    .thank-you-footer strong { font-size: 28px !important; }
-    .thank-you-footer p { font-size: 17px !important; line-height: 1.4 !important; }
+    .receipt-header { grid-template-columns: 260px minmax(0,1fr) 420px !important; gap: 24px !important; align-items: center !important; }
+    .academy-logo { width: 230px !important; height: 120px !important; object-fit: contain !important; }
+    .academy-details h2 { font-size: 42px !important; }
+    .academy-details .academy { font-size: 23px !important; }
+    .academy-details .courses { font-size: 17px !important; white-space: nowrap !important; letter-spacing: .5px !important; }
+    .header-right { font-size: 17px !important; line-height: 1.55 !important; padding-left: 24px !important; white-space: nowrap !important; }
+    .gold-divider { margin: 20px 0 22px !important; height: 3px !important; }
+    .receipt-title-block h3 { font-size: 42px !important; letter-spacing: 1px !important; }
+    .receipt-meta-row { font-size: 22px !important; }
+    .receipt-meta-row strong { font-size: 22px !important; }
+    .form-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important; gap: 34px !important; margin-bottom: 24px !important; }
+    .panel { min-width: 0 !important; padding: 24px 28px !important; border-radius: 16px !important; }
+    .panel-title { font-size: 25px !important; padding-bottom: 16px !important; margin-bottom: 18px !important; }
+    .field { grid-template-columns: minmax(0,42%) minmax(0,58%) !important; gap: 12px !important; min-height: 44px !important; margin-bottom: 12px !important; }
+    .field label { font-size: 21px !important; }
+    .export-field-value { display:block !important; width:100% !important; min-width:0 !important; text-align:right !important; font-family:Arial,sans-serif !important; font-size:21px !important; line-height:1.35 !important; color:#172f50 !important; font-weight:600 !important; white-space:normal !important; overflow-wrap:anywhere !important; letter-spacing:0 !important; }
+    .amount-wrap + .export-field-value { font-weight:700 !important; }
+    .remarks-panel { padding:22px 28px !important; margin-bottom:22px !important; }
+    .remarks-title,.remarks-content { font-size:21px !important; }
+    .notice-box { padding:20px 28px !important; margin-bottom:24px !important; }
+    .notice-text { font-size:19px !important; line-height:1.45 !important; }
+    .receipt-footer-area { display:flex !important; flex-direction:row !important; align-items:center !important; justify-content:space-between !important; gap:36px !important; padding:16px 0 22px !important; margin-bottom:10px !important; }
+    .qr-signature-group { display:flex !important; flex:1 1 auto !important; flex-direction:row !important; align-items:center !important; gap:24px !important; }
+    .qr-box { width:150px !important; height:150px !important; flex:0 0 150px !important; }
+    .qr-box svg { width:58px !important; height:58px !important; }
+    .qr-box span { font-size:16px !important; }
+    .meta-info-text { font-size:19px !important; line-height:1.8 !important; }
+    .signature-block { flex:0 0 520px !important; width:520px !important; }
+    .signature-img-wrap { height:120px !important; }
+    .signature-img { max-height:115px !important; max-width:100% !important; object-fit:contain !important; }
+    .sign-line { font-size:21px !important; }
+    .bottom-divider { margin:10px 0 16px !important; }
+    .thank-you-footer { display:block !important; text-align:center !important; }
+    .thank-you-footer strong { font-size:28px !important; }
+    .thank-you-footer p { font-size:17px !important; line-height:1.4 !important; }
+    .form-grid::before { z-index:0 !important; opacity:.85 !important; }
+    .panel { z-index:1 !important; }
   `;
-  document.head.appendChild(exportStyle);
-  const exportOverride = document.createElement('style');
-  exportOverride.textContent = `
-    html, body { opacity: 1 !important; filter: none !important; }
-    .sheet, .sheet * { opacity: 1 !important; visibility: visible !important; filter: none !important; }
-    .sheet { background: #fff !important; color: #172f50 !important; }
-    .sheet::before { content: none !important; display: none !important; background: none !important; }
-    .form-grid::before { content: none !important; display: none !important; }
-    .form-grid { position: relative !important; isolation: isolate !important; }
-    .export-apaa-watermark {
-      position: absolute !important; z-index: 0 !important;
-      left: 50% !important; top: 48% !important;
-      transform: translate(-50%,-50%) !important;
-      width: 560px !important; height: 330px !important;
-      display: flex !important; align-items: center !important; justify-content: center !important;
-      opacity: .085 !important; pointer-events: none !important;
-    }
-    .export-apaa-watermark img {
-      display: block !important; width: 100% !important; height: 100% !important;
-      object-fit: contain !important; opacity: 1 !important; filter: grayscale(1) !important;
-    }
-    .form-grid > .panel { position: relative !important; z-index: 2 !important; }
-    .panel { background: rgba(255,255,255,.96) !important; border: 2px solid #c9dbf0 !important; }
-    .panel-title { background: #e8f1fc !important; color: #123f70 !important; }
-    .panel .field { border-bottom: 1px solid #d8e2ef !important; }
-    .panel .field label { color: #526681 !important; }
-    .export-field-value, .words { color: #172f50 !important; opacity: 1 !important; }
-    .remarks-panel { display:flex !important; flex-direction:row !important; align-items:center !important; gap:28px !important; }
-    .remarks-title, .remarks-content { margin:0 !important; }
-    .notice-box { background:#fffdf8 !important; border-color:#e0ad13 !important; }
-    .notice-text, .notice-text strong { color:#5c584c !important; opacity:1 !important; }
-    .qr-box, .meta-info-text, .meta-info-text b, .meta-info-text span,
-    .signature-block, .sign-line, .thank-you-footer, .thank-you-footer p,
-    .thank-you-footer strong { opacity:1 !important; visibility:visible !important; }
-  `;
-  document.head.appendChild(exportOverride);
+  clone.prepend(exportStyle);
   host.appendChild(clone);
   document.body.appendChild(host);
 
@@ -3386,8 +3214,6 @@ async function captureReceiptCanvas(itemData) {
     });
   } finally {
     host.remove();
-    exportStyle.remove();
-    exportOverride.remove();
   }
 }
 
@@ -3408,31 +3234,17 @@ async function generateProfessionalPDF(itemData, options = {}) {
 
   const canvas = options.canvas || await captureReceiptCanvas(itemData);
   const { jsPDF } = window.jspdf;
-
-  // One complete receipt on a single A4 landscape page, matching the supplied
-  // landscape receipt reference. Preserve aspect ratio; never stretch or crop.
-  const pdf = new jsPDF({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: 'a4',
-    compress: true,
-    putOnlyUsedFonts: true
-  });
-  const pageWidth = pdf.internal.pageSize.getWidth();   // 297 mm
-  const pageHeight = pdf.internal.pageSize.getHeight(); // 210 mm
-  const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 5;
+  const ratio = Math.min((pageWidth - margin * 2) / canvas.width, (pageHeight - margin * 2) / canvas.height);
   const imageWidth = canvas.width * ratio;
   const imageHeight = canvas.height * ratio;
   const x = (pageWidth - imageWidth) / 2;
   const y = (pageHeight - imageHeight) / 2;
 
-  pdf.setProperties({
-    title: `APAA Fee Receipt - ${itemData.receiptNo || ''}`,
-    subject: `Fee receipt for ${itemData.studentName || 'student'}`,
-    creator: 'Alagappa Performing Arts Academy'
-  });
-  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
-
+  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
   const filename = buildReceiptExportFilename(itemData, 'pdf');
   const blob = pdf.output('blob');
   if (options.returnBlob) return { blob, filename, pdf };
