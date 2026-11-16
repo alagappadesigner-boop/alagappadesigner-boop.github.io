@@ -2992,8 +2992,27 @@ async function captureReceiptCanvas(itemData) {
     throw new Error('Image export library is not available. Please refresh the page and try again.');
   }
 
-  const original = document.querySelector('.sheet');
-  if (!original) throw new Error('The receipt layout could not be found.');
+  // Resolve the one authoritative receipt currently being edited.
+  // The form lives inside the primary <main class="sheet"> receipt canvas.
+  // Do not use a generic .sheet query or fall back to any hidden/legacy preview.
+  const activeForm = document.getElementById('feeForm');
+  const original = activeForm ? activeForm.closest('main.sheet') : null;
+
+  if (!original || !original.isConnected) {
+    throw new Error('The active receipt layout could not be found. Please reopen the receipt form and try again.');
+  }
+
+  const activeStyle = window.getComputedStyle(original);
+  const activeRect = original.getBoundingClientRect();
+  if (
+    activeStyle.display === 'none' ||
+    activeStyle.visibility === 'hidden' ||
+    Number(activeStyle.opacity) === 0 ||
+    activeRect.width < 1 ||
+    activeRect.height < 1
+  ) {
+    throw new Error('The active receipt is not visible. Please make the receipt form visible and try again.');
+  }
 
   // Render at a wide desktop canvas so responsive/mobile rules cannot collapse
   // the two-column receipt or squeeze the header and footer.
@@ -3005,6 +3024,7 @@ async function captureReceiptCanvas(itemData) {
   ].join(';');
 
   const clone = original.cloneNode(true);
+  clone.dataset.exportSource = 'active-fee-receipt';
   clone.style.cssText += `;width:${exportWidth}px;max-width:none;margin:0;box-shadow:none;box-sizing:border-box;opacity:1!important;visibility:visible!important;filter:none!important;background:#fff!important;`;
 
   const setText = (id, value) => {
