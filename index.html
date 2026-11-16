@@ -9,6 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.11.20/bundle/libphonenumber-js.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.10.2/build/js/intlTelInput.min.js"></script>
 
@@ -2712,9 +2713,6 @@ select option { font-size: 14px; color: #243b53; }
         <svg viewBox="0 0 24 24"><path d="M4 3h16v18H4z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg>
         Print Receipt (PNG)
       </button>
-      <button class="btn btn-secondary" type="button" onclick="downloadCurrentPDF()">
-        Download PDF (A4)
-      </button>
       <button class="btn btn-danger" type="button" onclick="clearCurrentForm()">
         Clear Current Form
       </button>
@@ -3638,13 +3636,13 @@ async function downloadSpecificPDF(index) {
   }
 }
 
-function downloadExcel() {
+async function downloadExcel() {
   const rows = getSaved();
   if (!rows.length) {
     alert('No saved receipts found. Please generate a receipt first.');
     return;
   }
-  
+
   const columns = [
     ['Receipt Number', 'receiptNo'],
     ['Student Name', 'studentName'],
@@ -3660,10 +3658,186 @@ function downloadExcel() {
     ['Saved Timestamp', 'savedAt']
   ];
 
+  const cleanAmount = value => {
+    if (typeof value === 'number') return value;
+    const parsed = Number(String(value ?? '').replace(/[₹,\s]/g, ''));
+    return Number.isFinite(parsed) ? parsed : (value ?? '');
+  };
+
+  const parseDateValue = value => {
+    if (!value) return '';
+    if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+    const text = String(value).trim();
+    const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+    const dmy = text.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+    if (dmy) return new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
+    return value;
+  };
+
+  // ExcelJS supports real cell formatting in the downloaded .xlsx file.
+  if (window.ExcelJS) {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'Alagappa Performing Arts Academy';
+      workbook.subject = 'Official institutional paid receipts register';
+      workbook.title = 'APAA Paid Receipts';
+      workbook.company = 'Alagappa Performing Arts Academy';
+      workbook.created = new Date();
+      workbook.modified = new Date();
+
+      const sheet = workbook.addWorksheet('Paid Receipts', {
+        views: [{ state: 'frozen', ySplit: 1, showGridLines: true }],
+        pageSetup: {
+          paperSize: 9,
+          orientation: 'landscape',
+          fitToPage: true,
+          fitToWidth: 1,
+          fitToHeight: 0,
+          margins: { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 }
+        }
+      });
+
+      sheet.columns = columns.map(([header, key]) => ({
+        header,
+        key,
+        width: Math.min(36, Math.max(18, header.length + 4))
+      }));
+
+      // Build records in the same order as the receipt ledger.
+      rows.forEach(record => {
+        const rowData = {};
+        columns.forEach(([header, key]) => {
+          let value = record[key] ?? '';
+          if (key === 'amount') value = cleanAmount(value);
+          if (key === 'paymentDate' || key === 'savedAt') value = parseDateValue(value);
+          rowData[key] = value;
+        });
+        sheet.addRow(rowData);
+      });
+
+      const navy = '17365D';
+      const navyDark = '102A43';
+      const gold = 'D6A629';
+      const paleBlue = 'EAF1F8';
+      const paleGray = 'F5F7FA';
+      const borderGray = 'D7DFE8';
+      const textNavy = '20364F';
+
+      // Header hierarchy.
+      const header = sheet.getRow(1);
+      header.height = 32;
+      header.eachCell(cell => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: navy } };
+        cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        cell.border = {
+          top: { style: 'medium', color: { argb: navyDark } },
+          bottom: { style: 'medium', color: { argb: gold } },
+          left: { style: 'thin', color: { argb: '365777' } },
+          right: { style: 'thin', color: { argb: '365777' } }
+        };
+      });
+
+      const dateKeys = new Set(['paymentDate', 'savedAt']);
+      const centerKeys = new Set(['receiptNo', 'phone', 'academicYear', 'paymentDate', 'paymentMode', 'installmentStage', 'savedAt']);
+      const amountCol = columns.findIndex(c => c[1] === 'amount') + 1;
+
+      for (let r = 2; r <= sheet.rowCount; r++) {
+        const row = sheet.getRow(r);
+        row.height = 27;
+        row.eachCell((cell, colNumber) => {
+          const key = columns[colNumber - 1][1];
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: r % 2 === 0 ? 'FFFFFFFF' : paleGray } };
+          cell.font = { name: 'Calibri', size: 11, color: { argb: textNavy } };
+          cell.alignment = {
+            horizontal: key === 'amount' ? 'right' : (centerKeys.has(key) ? 'center' : 'left'),
+            vertical: 'middle',
+            wrapText: !centerKeys.has(key) && key !== 'amount'
+          };
+          cell.border = {
+            bottom: { style: 'thin', color: { argb: borderGray } },
+            left: { style: 'hair', color: { argb: borderGray } },
+            right: { style: 'hair', color: { argb: borderGray } }
+          };
+          if (key === 'amount' && typeof cell.value === 'number') {
+            cell.numFmt = '₹#,##0.00;[Red](₹#,##0.00);-';
+          }
+          if (dateKeys.has(key) && cell.value instanceof Date) {
+            cell.numFmt = key === 'paymentDate' ? 'dd/mm/yyyy' : 'dd/mm/yyyy hh:mm AM/PM';
+          }
+          if (key === 'phone' || key === 'receiptNo' || key === 'transactionId') {
+            cell.numFmt = '@';
+          }
+        });
+      }
+
+      const dataEnd = sheet.rowCount;
+      const summary = sheet.addRow([]);
+      summary.height = 30;
+      summary.getCell(1).value = 'TOTAL RECEIPTS';
+      summary.getCell(2).value = { formula: `COUNTA(A2:A${dataEnd})` };
+      summary.getCell(2).numFmt = '0';
+      summary.getCell(amountCol).value = { formula: `SUM(${sheet.getColumn(amountCol).letter}2:${sheet.getColumn(amountCol).letter}${dataEnd})` };
+      summary.getCell(amountCol).numFmt = '₹#,##0.00;[Red](₹#,##0.00);-';
+
+      summary.eachCell({ includeEmpty: true }, cell => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E9EFF6' } };
+        cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: navy } };
+        cell.alignment = { vertical: 'middle', horizontal: cell.col === amountCol ? 'right' : 'left' };
+        cell.border = {
+          top: { style: 'thin', color: { argb: navy } },
+          bottom: { style: 'double', color: { argb: navy } }
+        };
+      });
+      summary.getCell(2).alignment = { horizontal: 'center', vertical: 'middle' };
+
+      sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: Math.max(1, dataEnd), column: columns.length } };
+      sheet.pageSetup.printArea = `A1:${sheet.getColumn(columns.length).letter}${summary.number}`;
+      sheet.pageSetup.printTitlesRow = '1:1';
+
+      // Content-aware widths with practical limits.
+      columns.forEach(([headerText, key], index) => {
+        const col = sheet.getColumn(index + 1);
+        let longest = headerText.length;
+        col.eachCell({ includeEmpty: false }, cell => {
+          const value = cell.value instanceof Date ? '00/00/0000 00:00 PM' : String(cell.value ?? '');
+          longest = Math.max(longest, value.length);
+        });
+        const specialMinimum = key === 'amountInWords' ? 30 :
+          key === 'savedAt' ? 24 : key === 'phone' ? 19 :
+          key === 'receiptNo' ? 22 : 14;
+        col.width = Math.min(38, Math.max(specialMinimum, longest + 3));
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'APAA_Paid_Receipts.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      return;
+    } catch (error) {
+      console.error('Styled Excel export failed; trying standard XLSX export.', error);
+    }
+  }
+
+  // Compatibility fallback if ExcelJS is blocked or unavailable.
   if (window.XLSX) {
-    const data = [columns.map(c => c[0]), ...rows.map(r => columns.map(c => r[c[1]] ?? ''))];
+    const data = [columns.map(c => c[0]), ...rows.map(r => columns.map(c => {
+      const value = r[c[1]] ?? '';
+      return c[1] === 'amount' ? cleanAmount(value) : value;
+    }))];
     const ws = XLSX.utils.aoa_to_sheet(data);
-    ws['!cols'] = columns.map(c => ({ wch: Math.max(c[0].length + 2, 18) }));
+    ws['!cols'] = columns.map(c => ({ wch: Math.max(c[0].length + 3, 18) }));
+    ws['!autofilter'] = { ref: `A1:${XLSX.utils.encode_col(columns.length - 1)}${rows.length + 1}` };
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Paid Receipts');
     XLSX.writeFile(wb, 'APAA_Paid_Receipts.xlsx');
@@ -3678,7 +3852,7 @@ function downloadExcel() {
     a.href = url;
     a.download = 'APAA_Paid_Receipts.csv';
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
   }
 }
 
