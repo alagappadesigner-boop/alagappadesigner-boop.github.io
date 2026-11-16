@@ -3543,6 +3543,26 @@ async function shareCurrentReceiptPDF() {
   }
 }
 
+// Automatically clear the entry fields after a receipt PNG has been generated.
+ // Saved receipt history is retained. This is intentionally the same reset
+ // sequence as Clear Current Form, without showing a confirmation prompt.
+function resetFeeFormAfterSuccessfulReceipt() {
+  const form = el('feeForm');
+  if (form) form.reset();
+  if (el('remarksInput')) el('remarksInput').value = '';
+  if (el('remarksContent')) el('remarksContent').textContent = 'No Remarks';
+  if (el('countryCode')) el('countryCode').value = '+91';
+  if (el('date')) el('date').value = formatTodayForReceipt();
+  if (el('dateDisplay')) el('dateDisplay').value = formatDateForDisplay(el('date').value);
+  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(el('date').value);
+  if (el('amountWords')) el('amountWords').textContent = 'Amount in words will appear here';
+  if (el('paymentCalendar')) el('paymentCalendar').hidden = true;
+  document.querySelectorAll('.field-error').forEach(node => node.classList.remove('field-error'));
+  handlePaymentModeChange();
+  try { localStorage.removeItem(CURRENT_RECEIPT_META_KEY); } catch (error) {}
+  initializeNewReceipt();
+}
+
 function clearCurrentForm() {
   if (!confirm('Clear the current receipt form? Saved receipt history will not be affected.')) return;
   const form = el('feeForm');
