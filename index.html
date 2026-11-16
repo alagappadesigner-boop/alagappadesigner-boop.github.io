@@ -3022,7 +3022,7 @@ async function captureReceiptCanvas(itemData) {
 
   setText('receiptNo', itemData.receiptNo || '');
   setText('displayDate', itemData.receiptDate || itemData.paymentDate || '');
-  setText('remarksContent', itemData.remarks || 'No Remarks');
+  setText('remarksContent', String(itemData.remarks ?? '').trim() || 'No Remarks');
   const amountWordsNode = clone.querySelector('#amountWords');
   if (amountWordsNode) {
     const rawAmount = String(itemData.amount ?? '').replace(/[₹,\s]/g, '');
@@ -3402,9 +3402,12 @@ async function captureReceiptCanvas(itemData) {
 }
 
 async function generateProfessionalPNG(itemData) {
-  // Download the original uploaded PNG byte-for-byte. Do not capture the DOM,
-  // receipt preview, or html2canvas output for this action.
-  const blob = getOriginalReceiptPNGBlob();
+  // Export the same populated receipt DOM used by the on-screen preview.
+  // captureReceiptCanvas applies itemData (including remarks) to the export clone.
+  const canvas = await captureReceiptCanvas(itemData);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  if (!blob) throw new Error('The receipt PNG could not be generated.');
+
   const filename = buildReceiptExportFilename(itemData, 'png');
   triggerBlobDownload(blob, filename);
   return { blob, filename };
@@ -3415,8 +3418,11 @@ async function generateProfessionalPDF(itemData, options = {}) {
     throw new Error('PDF library could not be loaded. Please refresh the page and try again.');
   }
 
-  // Place the original PNG directly onto one A4 landscape page. This preserves
-  // the source image rather than exporting a faded DOM/canvas preview.
+  // Use the exact same populated receipt DOM capture as the PNG export.
+  // This keeps remarks and all other receipt fields identical in both formats.
+  const canvas = await captureReceiptCanvas(itemData);
+  const imageData = canvas.toDataURL('image/png');
+
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({
     orientation: 'landscape',
@@ -3427,11 +3433,9 @@ async function generateProfessionalPDF(itemData, options = {}) {
   });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const sourceWidth = 2047;
-  const sourceHeight = 1447;
-  const ratio = Math.min(pageWidth / sourceWidth, pageHeight / sourceHeight);
-  const imageWidth = sourceWidth * ratio;
-  const imageHeight = sourceHeight * ratio;
+  const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+  const imageWidth = canvas.width * ratio;
+  const imageHeight = canvas.height * ratio;
   const x = (pageWidth - imageWidth) / 2;
   const y = (pageHeight - imageHeight) / 2;
 
@@ -3440,7 +3444,7 @@ async function generateProfessionalPDF(itemData, options = {}) {
     subject: `Fee receipt for ${itemData.studentName || 'student'}`,
     creator: 'Alagappa Performing Arts Academy'
   });
-  pdf.addImage(ORIGINAL_RECEIPT_IMAGE_DATA_URL, 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
+  pdf.addImage(imageData, 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
 
   const filename = buildReceiptExportFilename(itemData, 'pdf');
   const blob = pdf.output('blob');
@@ -4295,9 +4299,13 @@ renderLedger();
 
 // Keep the receipt preview synchronized with the editable remarks field.
 if (el('remarksInput')) {
-  el('remarksInput').addEventListener('input', () => {
-    if (el('remarksContent')) el('remarksContent').textContent = el('remarksInput').value.trim() || 'No Remarks';
-  });
+  const syncRemarksPreview = () => {
+    if (el('remarksContent')) {
+      el('remarksContent').textContent = String(el('remarksInput').value || '').trim() || 'No Remarks';
+    }
+  };
+  el('remarksInput').addEventListener('input', syncRemarksPreview);
+  syncRemarksPreview();
 }
 </script>
 
