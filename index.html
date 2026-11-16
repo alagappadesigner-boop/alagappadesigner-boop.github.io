@@ -2953,22 +2953,28 @@ async function getBase64ImageFromURL(url) {
 
 
 function buildReceiptExportFilename(itemData, extension) {
-  const student = String(itemData.studentName || 'student')
+  // Short recipient code: Alagappa -> ALG, Harish -> HRS.
+  // This keeps both PNG and PDF filenames compact and consistent.
+  const firstName = String(itemData.studentName || 'STU')
     .trim()
-    .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '') || 'student';
+    .split(/\s+/)[0]
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '');
 
-  const dateText = String(itemData.paymentDate || '');
+  const consonants = firstName.slice(1).replace(/[AEIOU]/g, '');
+  const nameCode = (firstName.charAt(0) + consonants.slice(0, 2))
+    .padEnd(3, 'X');
+
+  const receiptText = String(itemData.receiptNo || '');
+  const receiptMatch = receiptText.match(/(20\d{2})\D*(\d+)$/);
+  const dateText = String(itemData.paymentDate || itemData.receiptDate || '');
   const dateMatch = dateText.match(/\b(20\d{2})\b/);
-  const year = dateMatch ? dateMatch[1] : String(new Date().getFullYear());
-  const receipt = String(itemData.receiptNo || 'receipt')
-    .trim()
-    .replace(/[^a-zA-Z0-9_-]+/g, '_');
+  const year = receiptMatch?.[1] || dateMatch?.[1] || String(new Date().getFullYear());
+  const receiptNumber = receiptMatch?.[2] || receiptText.replace(/\D/g, '').slice(-4) || '0000';
 
-  return `${student}_${year}_receipt_${receipt}.${extension}`;
+  return `${nameCode}_${year}-${receiptNumber}.${extension}`;
 }
 
 async function captureReceiptCanvas(itemData) {
@@ -3150,7 +3156,7 @@ async function captureReceiptCanvas(itemData) {
     .academy-details h2 { font-size: 42px !important; }
     .academy-details .academy { font-size: 23px !important; }
     .academy-details .courses { font-size: 17px !important; white-space: nowrap !important; letter-spacing: .5px !important; }
-    .header-right { font-size: 17px !important; line-height: 1.55 !important; padding-left: 24px !important; white-space: nowrap !important; }
+    .header-right { font-size: 16px !important; line-height: 1.5 !important; padding-left: 24px !important; white-space: normal !important; overflow-wrap: anywhere !important; word-break: normal !important; min-width: 0 !important; }
     .gold-divider { margin: 20px 0 22px !important; height: 3px !important; }
     .receipt-title-block h3 { font-size: 42px !important; letter-spacing: 1px !important; }
     .receipt-meta-row { font-size: 22px !important; }
@@ -3234,17 +3240,31 @@ async function generateProfessionalPDF(itemData, options = {}) {
 
   const canvas = options.canvas || await captureReceiptCanvas(itemData);
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 5;
-  const ratio = Math.min((pageWidth - margin * 2) / canvas.width, (pageHeight - margin * 2) / canvas.height);
+
+  // One complete receipt on a single A4 landscape page, matching the supplied
+  // landscape receipt reference. Preserve aspect ratio; never stretch or crop.
+  const pdf = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
+    compress: true,
+    putOnlyUsedFonts: true
+  });
+  const pageWidth = pdf.internal.pageSize.getWidth();   // 297 mm
+  const pageHeight = pdf.internal.pageSize.getHeight(); // 210 mm
+  const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
   const imageWidth = canvas.width * ratio;
   const imageHeight = canvas.height * ratio;
   const x = (pageWidth - imageWidth) / 2;
   const y = (pageHeight - imageHeight) / 2;
 
-  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
+  pdf.setProperties({
+    title: `APAA Fee Receipt - ${itemData.receiptNo || ''}`,
+    subject: `Fee receipt for ${itemData.studentName || 'student'}`,
+    creator: 'Alagappa Performing Arts Academy'
+  });
+  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
+
   const filename = buildReceiptExportFilename(itemData, 'pdf');
   const blob = pdf.output('blob');
   if (options.returnBlob) return { blob, filename, pdf };
