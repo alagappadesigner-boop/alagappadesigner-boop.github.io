@@ -3022,7 +3022,11 @@ async function captureReceiptCanvas(itemData) {
 
   setText('receiptNo', itemData.receiptNo || '');
   setText('displayDate', itemData.receiptDate || itemData.paymentDate || '');
-  setText('remarksContent', itemData.remarks || 'No Remarks');
+  const remarksNode = clone.querySelector('#remarksContent');
+  if (remarksNode) {
+    remarksNode.textContent = String(itemData.remarks || 'No Remarks');
+    remarksNode.style.cssText += ';display:block!important;white-space:pre-wrap!important;overflow:visible!important;height:auto!important;max-height:none!important;min-width:0!important;overflow-wrap:anywhere!important;line-height:1.45!important;';
+  }
   const amountWordsNode = clone.querySelector('#amountWords');
   if (amountWordsNode) {
     const rawAmount = String(itemData.amount ?? '').replace(/[₹,\s]/g, '');
@@ -3126,10 +3130,11 @@ async function captureReceiptCanvas(itemData) {
     .sheet {
       width: ${exportWidth}px !important;
       min-height: 1447px !important;
-      height: 1447px !important;
+      height: auto !important;
+      max-height: none !important;
       max-width: none !important;
       padding: 42px 48px 34px !important;
-      overflow: hidden !important;
+      overflow: visible !important;
       background: #ffffff !important;
     }
 
@@ -3280,17 +3285,45 @@ async function captureReceiptCanvas(itemData) {
     .remarks-panel {
       display: flex !important;
       flex-direction: row !important;
-      align-items: center !important;
+      align-items: flex-start !important;
       gap: 30px !important;
       min-height: 90px !important;
+      height: auto !important;
+      max-height: none !important;
       padding: 18px 28px !important;
       margin-bottom: 22px !important;
       border: 2px solid #c9dbf0 !important;
       border-left: 12px solid #e0ad13 !important;
       border-radius: 14px !important;
       background: #f5f8fc !important;
+      overflow: visible !important;
+      box-sizing: border-box !important;
     }
-    .remarks-title,.remarks-content { font-size: 21px !important; margin: 0 !important; }
+    .remarks-title {
+      flex: 0 0 auto !important;
+      font-size: 21px !important;
+      line-height: 1.45 !important;
+      margin: 0 !important;
+      white-space: nowrap !important;
+    }
+    .remarks-content {
+      display: block !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      width: auto !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      white-space: pre-wrap !important;
+      overflow-wrap: anywhere !important;
+      word-break: normal !important;
+      font-size: 21px !important;
+      line-height: 1.45 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      color: #172f50 !important;
+      opacity: 1 !important;
+    }
     .notice-box {
       padding: 20px 28px !important;
       margin-bottom: 24px !important;
@@ -3357,8 +3390,19 @@ async function captureReceiptCanvas(itemData) {
     .panel .field { border-bottom: 1px solid #d8e2ef !important; }
     .panel .field label { color: #526681 !important; }
     .export-field-value, .words { color: #172f50 !important; opacity: 1 !important; }
-    .remarks-panel { display:flex !important; flex-direction:row !important; align-items:center !important; gap:28px !important; }
-    .remarks-title, .remarks-content { margin:0 !important; }
+    .remarks-panel {
+      display:flex !important; flex-direction:row !important; align-items:flex-start !important;
+      height:auto !important; max-height:none !important; min-height:90px !important;
+      overflow:visible !important; box-sizing:border-box !important;
+    }
+    .remarks-title { flex:0 0 auto !important; margin:0 !important; white-space:nowrap !important; }
+    .remarks-content {
+      display:block !important; flex:1 1 auto !important; min-width:0 !important;
+      width:auto !important; height:auto !important; max-height:none !important;
+      margin:0 !important; white-space:pre-wrap !important; overflow:visible !important;
+      overflow-wrap:anywhere !important; word-break:normal !important; line-height:1.45 !important;
+      color:#172f50 !important; opacity:1 !important;
+    }
     .notice-box { background:#fffdf8 !important; border-color:#e0ad13 !important; }
     .notice-text, .notice-text strong { color:#5c584c !important; opacity:1 !important; }
     .qr-box, .meta-info-text, .meta-info-text b, .meta-info-text span,
@@ -3402,9 +3446,12 @@ async function captureReceiptCanvas(itemData) {
 }
 
 async function generateProfessionalPNG(itemData) {
-  // Download the original uploaded PNG byte-for-byte. Do not capture the DOM,
-  // receipt preview, or html2canvas output for this action.
-  const blob = getOriginalReceiptPNGBlob();
+  // Capture the receipt clone so all current form values, including remarks,
+  // are rendered into the exported image without changing the live preview.
+  const canvas = await captureReceiptCanvas(itemData);
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob(result => result ? resolve(result) : reject(new Error('Could not encode receipt image.')), 'image/png');
+  });
   const filename = buildReceiptExportFilename(itemData, 'png');
   triggerBlobDownload(blob, filename);
   return { blob, filename };
@@ -3415,8 +3462,8 @@ async function generateProfessionalPDF(itemData, options = {}) {
     throw new Error('PDF library could not be loaded. Please refresh the page and try again.');
   }
 
-  // Place the original PNG directly onto one A4 landscape page. This preserves
-  // the source image rather than exporting a faded DOM/canvas preview.
+  const canvas = await captureReceiptCanvas(itemData);
+  const imageData = canvas.toDataURL('image/png');
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({
     orientation: 'landscape',
@@ -3427,11 +3474,9 @@ async function generateProfessionalPDF(itemData, options = {}) {
   });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const sourceWidth = 2047;
-  const sourceHeight = 1447;
-  const ratio = Math.min(pageWidth / sourceWidth, pageHeight / sourceHeight);
-  const imageWidth = sourceWidth * ratio;
-  const imageHeight = sourceHeight * ratio;
+  const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+  const imageWidth = canvas.width * ratio;
+  const imageHeight = canvas.height * ratio;
   const x = (pageWidth - imageWidth) / 2;
   const y = (pageHeight - imageHeight) / 2;
 
@@ -3440,7 +3485,7 @@ async function generateProfessionalPDF(itemData, options = {}) {
     subject: `Fee receipt for ${itemData.studentName || 'student'}`,
     creator: 'Alagappa Performing Arts Academy'
   });
-  pdf.addImage(ORIGINAL_RECEIPT_IMAGE_DATA_URL, 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
+  pdf.addImage(imageData, 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
 
   const filename = buildReceiptExportFilename(itemData, 'pdf');
   const blob = pdf.output('blob');
@@ -3504,6 +3549,7 @@ async function downloadCurrentPDF() {
   if (!data) return;
   try {
     await generateProfessionalPDF(data);
+    resetFeeFormAfterSuccessfulReceipt();
   } catch (error) {
     console.error('A4 PDF download failed:', error);
     alert('A4 PDF download could not be completed. Your entered details have been kept.');
@@ -3526,6 +3572,7 @@ async function shareCurrentReceiptPDF() {
         title: 'APAA Fee Receipt',
         text: `Fee receipt for ${data.studentName} | Receipt No: ${data.receiptNo}`
       });
+      resetFeeFormAfterSuccessfulReceipt();
       return;
     }
 
@@ -3534,6 +3581,7 @@ async function shareCurrentReceiptPDF() {
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     if (fallbackTab && !fallbackTab.closed) fallbackTab.location.href = whatsappUrl;
     else window.open(whatsappUrl, '_blank', 'noopener');
+    resetFeeFormAfterSuccessfulReceipt();
     alert('The PDF has been downloaded. WhatsApp is open with the message ready; attach the downloaded PDF before sending.');
   } catch (error) {
     if (fallbackTab && !fallbackTab.closed) fallbackTab.close();
@@ -3541,6 +3589,46 @@ async function shareCurrentReceiptPDF() {
     console.error('WhatsApp PDF share failed:', error);
     alert('Could not share the PDF. Please use Download PDF (A4) and attach it manually in WhatsApp.');
   }
+}
+
+function resetFeeFormAfterSuccessfulReceipt() {
+  const form = el('feeForm');
+  if (form) form.reset();
+
+  // Clear all user-entered/uploaded form controls, while retaining the
+  // academy logo and authorized signature assets used by the receipt layout.
+  document.querySelectorAll('#feeForm input[type="file"]').forEach(input => {
+    input.value = '';
+  });
+
+  if (el('student')) el('student').value = '';
+  if (el('phone')) el('phone').value = '';
+  if (el('countryCode')) el('countryCode').value = '+91';
+  if (el('course')) el('course').selectedIndex = 0;
+  if (el('year')) el('year').selectedIndex = 0;
+  if (el('amount')) el('amount').value = '';
+  if (el('txn')) el('txn').value = '';
+  if (el('modeInput')) el('modeInput').selectedIndex = 0;
+  if (el('installment')) el('installment').selectedIndex = 0;
+
+  if (el('remarksInput')) el('remarksInput').value = '';
+  if (el('remarksContent')) {
+    el('remarksContent').textContent = 'No Remarks';
+    el('remarksContent').style.whiteSpace = '';
+  }
+  if (el('amountWords')) el('amountWords').textContent = 'Amount in words will appear here';
+
+  const today = formatTodayForReceipt();
+  if (el('date')) el('date').value = today;
+  if (el('dateDisplay')) el('dateDisplay').value = formatDateForDisplay(today);
+  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(today);
+  if (el('paymentCalendar')) el('paymentCalendar').hidden = true;
+
+  document.querySelectorAll('.field-error').forEach(node => node.classList.remove('field-error'));
+  try { localStorage.removeItem(CURRENT_RECEIPT_META_KEY); } catch (error) {}
+  handlePaymentModeChange();
+  initializeNewReceipt();
+  updateLiveGeneratedTime();
 }
 
 function clearCurrentForm() {
