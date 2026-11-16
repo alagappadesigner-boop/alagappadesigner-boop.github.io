@@ -2953,28 +2953,22 @@ async function getBase64ImageFromURL(url) {
 
 
 function buildReceiptExportFilename(itemData, extension) {
-  // Short recipient code: Alagappa -> ALG, Harish -> HRS.
-  // This keeps both PNG and PDF filenames compact and consistent.
-  const firstName = String(itemData.studentName || 'STU')
+  const student = String(itemData.studentName || 'student')
     .trim()
+    .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
-    .split(/\s+/)[0]
-    .toUpperCase()
-    .replace(/[^A-Z]/g, '');
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'student';
 
-  const consonants = firstName.slice(1).replace(/[AEIOU]/g, '');
-  const nameCode = (firstName.charAt(0) + consonants.slice(0, 2))
-    .padEnd(3, 'X');
-
-  const receiptText = String(itemData.receiptNo || '');
-  const receiptMatch = receiptText.match(/(20\d{2})\D*(\d+)$/);
-  const dateText = String(itemData.paymentDate || itemData.receiptDate || '');
+  const dateText = String(itemData.paymentDate || '');
   const dateMatch = dateText.match(/\b(20\d{2})\b/);
-  const year = receiptMatch?.[1] || dateMatch?.[1] || String(new Date().getFullYear());
-  const receiptNumber = receiptMatch?.[2] || receiptText.replace(/\D/g, '').slice(-4) || '0000';
+  const year = dateMatch ? dateMatch[1] : String(new Date().getFullYear());
+  const receipt = String(itemData.receiptNo || 'receipt')
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]+/g, '_');
 
-  return `${nameCode}_${year}-${receiptNumber}.${extension}`;
+  return `${student}_${year}_receipt_${receipt}.${extension}`;
 }
 
 async function captureReceiptCanvas(itemData) {
@@ -3075,88 +3069,14 @@ async function captureReceiptCanvas(itemData) {
   // two balanced information panels, readable values and complete footer.
   const exportStyle = document.createElement('style');
   exportStyle.textContent = `
-    * {
-      box-sizing: border-box !important;
-      animation: none !important;
-      transition: none !important;
-      caret-color: transparent !important;
-    }
-    html, body, .sheet, .sheet * {
-      opacity: 1 !important;
-      visibility: visible !important;
-      filter: none !important;
-      text-shadow: none !important;
-    }
-    .sheet {
-      width: ${exportWidth}px !important;
-      max-width: none !important;
-      padding: 42px 48px 34px !important;
-      overflow: visible !important;
-      animation: none !important;
-      opacity: 1 !important;
-      background: #ffffff !important;
-    }
-    /* Remove the duplicated university-seal background from the export.
-       The reference uses a subtle APAA wordmark behind the two data panels. */
-    .sheet::before {
-      content: none !important;
-      display: none !important;
-      background-image: none !important;
-    }
-    .form-grid {
-      display: grid !important;
-      grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
-      gap: 34px !important;
-      align-items: stretch !important;
-      opacity: 1 !important;
-      overflow: visible !important;
-      isolation: isolate !important;
-    }
-    .form-grid::after {
-      content: none !important;
-      display: none !important;
-      background: none !important;
-      background-image: none !important;
-    }
-    .form-grid::before {
-      content: "APAA" !important;
-      display: block !important;
-      position: absolute !important;
-      left: 50% !important;
-      top: 52% !important;
-      transform: translate(-50%,-50%) !important;
-      z-index: 0 !important;
-      font-family: Georgia, 'Times New Roman', serif !important;
-      font-size: 260px !important;
-      font-weight: 800 !important;
-      letter-spacing: 8px !important;
-      line-height: 1 !important;
-      color: rgba(18,59,104,.075) !important;
-      opacity: 1 !important;
-      white-space: nowrap !important;
-      pointer-events: none !important;
-    }
-    .form-grid .panel {
-      display: block !important;
-      position: relative !important;
-      z-index: 1 !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      background: rgba(255,255,255,.94) !important;
-      min-width: 0 !important;
-      height: auto !important;
-    }
-    .panel:nth-child(2) {
-      animation: none !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
+    * { box-sizing: border-box !important; }
+    .sheet { width: ${exportWidth}px !important; max-width: none !important; padding: 42px 48px 34px !important; overflow: visible !important; }
     .receipt-header { grid-template-columns: 260px minmax(0,1fr) 420px !important; gap: 24px !important; align-items: center !important; }
     .academy-logo { width: 230px !important; height: 120px !important; object-fit: contain !important; }
     .academy-details h2 { font-size: 42px !important; }
     .academy-details .academy { font-size: 23px !important; }
     .academy-details .courses { font-size: 17px !important; white-space: nowrap !important; letter-spacing: .5px !important; }
-    .header-right { font-size: 16px !important; line-height: 1.5 !important; padding-left: 24px !important; white-space: normal !important; overflow-wrap: anywhere !important; word-break: normal !important; min-width: 0 !important; }
+    .header-right { font-size: 17px !important; line-height: 1.55 !important; padding-left: 24px !important; white-space: nowrap !important; }
     .gold-divider { margin: 20px 0 22px !important; height: 3px !important; }
     .receipt-title-block h3 { font-size: 42px !important; letter-spacing: 1px !important; }
     .receipt-meta-row { font-size: 22px !important; }
@@ -3240,31 +3160,17 @@ async function generateProfessionalPDF(itemData, options = {}) {
 
   const canvas = options.canvas || await captureReceiptCanvas(itemData);
   const { jsPDF } = window.jspdf;
-
-  // One complete receipt on a single A4 landscape page, matching the supplied
-  // landscape receipt reference. Preserve aspect ratio; never stretch or crop.
-  const pdf = new jsPDF({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: 'a4',
-    compress: true,
-    putOnlyUsedFonts: true
-  });
-  const pageWidth = pdf.internal.pageSize.getWidth();   // 297 mm
-  const pageHeight = pdf.internal.pageSize.getHeight(); // 210 mm
-  const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 5;
+  const ratio = Math.min((pageWidth - margin * 2) / canvas.width, (pageHeight - margin * 2) / canvas.height);
   const imageWidth = canvas.width * ratio;
   const imageHeight = canvas.height * ratio;
   const x = (pageWidth - imageWidth) / 2;
   const y = (pageHeight - imageHeight) / 2;
 
-  pdf.setProperties({
-    title: `APAA Fee Receipt - ${itemData.receiptNo || ''}`,
-    subject: `Fee receipt for ${itemData.studentName || 'student'}`,
-    creator: 'Alagappa Performing Arts Academy'
-  });
-  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
-
+  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
   const filename = buildReceiptExportFilename(itemData, 'pdf');
   const blob = pdf.output('blob');
   if (options.returnBlob) return { blob, filename, pdf };
