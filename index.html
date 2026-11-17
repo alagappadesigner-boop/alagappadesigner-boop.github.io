@@ -2310,6 +2310,32 @@ select option { font-size: 14px; color: #243b53; }
 }
 </style>
 
+
+<style id="apaa-elegant-feedback-styles">
+/* Elegant feedback dialog and refined interaction transitions */
+.apaa-feedback-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(13,31,52,.42);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:opacity .24s ease,visibility .24s ease}
+.apaa-feedback-overlay.is-visible{opacity:1;visibility:visible}
+.apaa-feedback-card{width:min(100%,430px);background:#fff;border:1px solid rgba(208,165,47,.25);border-radius:18px;padding:28px 28px 24px;box-shadow:0 24px 70px rgba(10,32,56,.24);text-align:center;transform:translateY(18px) scale(.97);transition:transform .28s cubic-bezier(.2,.8,.2,1);font-family:'Lato',Arial,sans-serif}
+.apaa-feedback-overlay.is-visible .apaa-feedback-card{transform:translateY(0) scale(1)}
+.apaa-feedback-icon{width:58px;height:58px;border-radius:50%;margin:0 auto 15px;display:grid;place-items:center;background:#eaf7ef;color:#16834a;font-size:27px;font-weight:800;box-shadow:0 0 0 7px #f4fbf6;animation:apaaFeedbackPop .42s ease both}
+.apaa-feedback-overlay[data-kind="error"] .apaa-feedback-icon{background:#fff0ef;color:#b42318;box-shadow:0 0 0 7px #fff7f6}
+.apaa-feedback-overlay[data-kind="info"] .apaa-feedback-icon{background:#edf4ff;color:#1d5d9b;box-shadow:0 0 0 7px #f6f9ff}
+.apaa-feedback-title{margin:0 0 8px;color:#123b68;font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700}
+.apaa-feedback-message{margin:0 auto 22px;max-width:340px;color:#657487;font-size:14px;line-height:1.65;white-space:pre-line}
+.apaa-button-spinner{display:inline-block;width:13px;height:13px;margin-right:7px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;vertical-align:-2px;animation:apaaSpin .7s linear infinite}@keyframes apaaSpin{to{transform:rotate(360deg)}}
+.apaa-feedback-button{min-width:120px;border:0;border-radius:9px;padding:11px 24px;background:#123b68;color:#fff;font-size:13px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 5px 12px rgba(18,59,104,.18);transition:transform .18s ease,background .18s ease,box-shadow .18s ease}
+.apaa-feedback-button:hover{background:#0d2b4e;transform:translateY(-2px);box-shadow:0 8px 18px rgba(18,59,104,.23)}
+.apaa-feedback-button:active{transform:translateY(0) scale(.98)}
+@keyframes apaaFeedbackPop{0%{opacity:0;transform:scale(.65)}75%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+.ledger-actions-bar .btn,.ledger-download-actions .btn,.btn{transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease}
+.ledger-actions-bar .btn:hover,.ledger-download-actions .btn:hover{transform:translateY(-2px);box-shadow:0 7px 16px rgba(18,59,104,.14)}
+.ledger-actions-bar .btn:active,.ledger-download-actions .btn:active{transform:translateY(0) scale(.985)}
+#txn{transition:border-color .2s ease,box-shadow .2s ease,background-color .2s ease}
+#txn:focus{border-color:#d0a52f!important;box-shadow:0 0 0 3px rgba(208,165,47,.13);background:#fffdf7}
+#txn[required]{border-bottom-color:rgba(208,165,47,.65)}
+@media(prefers-reduced-motion:reduce){.apaa-feedback-overlay,.apaa-feedback-card,.apaa-feedback-icon,.apaa-feedback-button,.ledger-actions-bar .btn,.ledger-download-actions .btn,.btn,#txn{animation:none!important;transition:none!important}}
+</style>
+
 </head>
 <body>
 
@@ -2740,6 +2766,17 @@ select option { font-size: 14px; color: #243b53; }
   </section>
 </div>
 
+
+<!-- Elegant feedback dialog: used for receipt success and export errors -->
+<div id="apaaFeedbackOverlay" class="apaa-feedback-overlay" data-kind="success" aria-hidden="true">
+  <section class="apaa-feedback-card" role="dialog" aria-modal="true" aria-labelledby="apaaFeedbackTitle" aria-describedby="apaaFeedbackMessage">
+    <div id="apaaFeedbackIcon" class="apaa-feedback-icon" aria-hidden="true">✓</div>
+    <h2 id="apaaFeedbackTitle" class="apaa-feedback-title">Receipt downloaded</h2>
+    <p id="apaaFeedbackMessage" class="apaa-feedback-message">Your receipt has been saved successfully.</p>
+    <button id="apaaFeedbackClose" class="apaa-feedback-button" type="button">Continue</button>
+  </section>
+</div>
+
 <script>
 const el = id => document.getElementById(id);
 const STORAGE_KEY = 'apaa_paid_receipts_v1';
@@ -2886,7 +2923,7 @@ function validateReceipt() {
   handlePaymentModeChange();
   const selectedMode = (el('modeInput').value || '').toUpperCase();
   if (['UPI', 'CARD', 'BANK'].includes(selectedMode) && !el('txn').value.trim()) {
-    alert(`Transaction ID is required when the payment mode is ${selectedMode}. Please enter the transaction ID.`);
+    showApaFeedback('info', 'Transaction ID Required', `Please enter the transaction ID for ${selectedMode} payment before printing the receipt.`, 'Enter Details');
     el('txn').focus();
     return false;
   }
@@ -3473,28 +3510,94 @@ function saveReceiptToLedger(data) {
   else saved[existingIndex] = data;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
   updateSavedCount();
-  renderLedger();
+  
+renderLedger();
+}
+
+function showApaFeedback(kind, title, message, buttonLabel = 'Continue') {
+  const overlay = el('apaaFeedbackOverlay');
+  if (!overlay) { window.alert(message); return; }
+  overlay.dataset.kind = kind || 'success';
+  el('apaaFeedbackTitle').textContent = title || 'Notice';
+  el('apaaFeedbackMessage').textContent = message || '';
+  el('apaaFeedbackIcon').textContent = kind === 'error' ? '!' : (kind === 'info' ? 'i' : '✓');
+  el('apaaFeedbackClose').textContent = buttonLabel;
+  overlay.classList.add('is-visible');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => el('apaaFeedbackClose')?.focus(), 80);
+}
+
+function closeApaFeedback() {
+  const overlay = el('apaaFeedbackOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('is-visible');
+  overlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+// Reset only the active entry form after a successful PNG download.
+// Saved ledger records and all existing application settings remain untouched.
+function resetFeeFormAfterSuccessfulReceipt() {
+  const form = el('feeForm');
+  if (form) form.reset();
+  if (el('remarksInput')) el('remarksInput').value = '';
+  if (el('remarksContent')) el('remarksContent').textContent = 'No Remarks';
+  if (el('countryCode')) el('countryCode').value = '+91';
+  if (el('date')) el('date').value = formatTodayForReceipt();
+  if (el('dateDisplay')) el('dateDisplay').value = formatDateForDisplay(el('date').value);
+  if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(el('date').value);
+  if (el('amountWords')) el('amountWords').textContent = 'Amount in words will appear here';
+  if (el('paymentCalendar')) el('paymentCalendar').hidden = true;
+  document.querySelectorAll('.field-error').forEach(node => node.classList.remove('field-error'));
+  handlePaymentModeChange();
+  try { localStorage.removeItem(CURRENT_RECEIPT_META_KEY); } catch (error) {}
+  initializeNewReceipt();
+  const firstField = el('student');
+  if (firstField) firstField.focus({ preventScroll: true });
 }
 
 async function handlePrintReceiptWorkflow() {
   const data = getValidatedCurrentReceiptData();
   if (!data) return;
 
-  try {
-    saveReceiptToLedger(data);
-  } catch (storageError) {
-    console.error('Receipt save error:', storageError);
-    alert('Could not save the receipt history. Please check browser storage. Your entered details have been kept.');
-    return;
+  const printButton = document.querySelector('.ledger-actions-bar .btn-primary');
+  if (printButton?.dataset.processing === 'true') return;
+  if (printButton) {
+    printButton.dataset.processing = 'true';
+    printButton.disabled = true;
+    printButton.dataset.originalHtml = printButton.innerHTML;
+    printButton.innerHTML = '<span class="apaa-button-spinner" aria-hidden="true"></span> Preparing Receipt…';
   }
 
   try {
+    // Persist the complete transaction first, so a download issue never loses history.
+    saveReceiptToLedger(data);
     await generateProfessionalPNG(data);
+
+    // The old code called this function but did not define it. That caused a
+    // successful download to fall into the PNG-failed catch block.
     resetFeeFormAfterSuccessfulReceipt();
-    alert('High-resolution PNG receipt downloaded and saved to Student Ledger. The form is ready for the next payment.');
-  } catch (pngError) {
-    console.error('PNG export failed:', pngError);
-    alert('The receipt was saved to Student Ledger, but PNG download failed. Your entered details have been kept. Please try again.');
+    showApaFeedback(
+      'success',
+      'Receipt Downloaded Successfully',
+      `The receipt for ${data.studentName} has been downloaded and saved to the Student Ledger.\n\nReceipt No: ${data.receiptNo}\nPayment: ₹${data.amount}\nTransaction ID: ${data.transactionId}\n\nThe form has been cleared and is ready for the next payment.`,
+      'Continue'
+    );
+  } catch (error) {
+    console.error('Receipt generation workflow failed:', error);
+    showApaFeedback(
+      'error',
+      'Receipt Download Unsuccessful',
+      'Your entered details have been kept. The receipt may already be present in the Student Ledger. Please try downloading again.',
+      'Try Again'
+    );
+  } finally {
+    if (printButton) {
+      printButton.disabled = false;
+      printButton.dataset.processing = 'false';
+      if (printButton.dataset.originalHtml) printButton.innerHTML = printButton.dataset.originalHtml;
+    }
   }
 }
 
@@ -4094,6 +4197,20 @@ handlePaymentModeChange();
 updateLiveGeneratedTime();
 setInterval(updateLiveGeneratedTime, 1000);
 updateSavedCount();
+// Elegant feedback dialog controls.
+(function initializeApaFeedbackDialog(){
+  const closeButton = el('apaaFeedbackClose');
+  const overlay = el('apaaFeedbackOverlay');
+  if (closeButton) closeButton.addEventListener('click', closeApaFeedback);
+  if (overlay) overlay.addEventListener('click', event => {
+    if (event.target === overlay) closeApaFeedback();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && overlay?.classList.contains('is-visible')) closeApaFeedback();
+  });
+})();
+
+
 renderLedger();
 
 // Keep the receipt preview synchronized with the editable remarks field.
@@ -4152,4 +4269,3 @@ if (el('remarksInput')) {
 </body>
 
 </html>
-
