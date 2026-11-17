@@ -2710,10 +2710,7 @@ select option { font-size: 14px; color: #243b53; }
     <div class="ledger-actions-bar">
       <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
         <svg viewBox="0 0 24 24"><path d="M4 3h16v18H4z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg>
-        Print Receipt (PNG)
-      </button>
-      <button class="btn btn-secondary" type="button" onclick="downloadCurrentPDF()">
-        Download PDF (A4)
+        Print Receipt
       </button>
       <button class="btn btn-danger" type="button" onclick="clearCurrentForm()">
         Clear Current Form
@@ -3541,7 +3538,7 @@ async function shareCurrentReceiptPDF() {
     if (fallbackTab && !fallbackTab.closed) fallbackTab.close();
     if (error && error.name === 'AbortError') return;
     console.error('WhatsApp PDF share failed:', error);
-    alert('Could not share the PDF. Please use Download PDF (A4) and attach it manually in WhatsApp.');
+    alert('Could not share the PDF. Please try sharing again or attach the downloaded PDF manually in WhatsApp.');
   }
 }
 
@@ -4155,3 +4152,4 @@ if (el('remarksInput')) {
 </body>
 
 </html>
+
