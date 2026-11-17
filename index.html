@@ -2061,14 +2061,6 @@ async function getBase64ImageFromURL(url) {
   });
 }
 
-function getOriginalReceiptPNGBlob() {
-  const base64 = ORIGINAL_RECEIPT_IMAGE_DATA_URL.split(',')[1];
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new Blob([bytes], { type: 'image/png' });
-}
-
 function buildReceiptExportFilename(itemData, extension) {
   const firstName = String(itemData.studentName || 'STU')
     .trim()
@@ -2124,7 +2116,7 @@ async function captureReceiptCanvas(itemData) {
   };
 
   setText('receiptNo', itemData.receiptNo || '');
-  setText('displayDate', itemData.receiptDate || itemData.paymentDate || '');
+  setText('displayDate', itemData.paymentDate || '');
   setText('remarksContent', itemData.remarks || 'No Remarks');
   const amountWordsNode = clone.querySelector('#amountWords');
   if (amountWordsNode) {
@@ -2437,13 +2429,8 @@ async function captureReceiptCanvas(itemData) {
 
 async function generateProfessionalPNG(itemData) {
   try {
-    let blob;
-    if (typeof ORIGINAL_RECEIPT_IMAGE_DATA_URL !== 'undefined' && ORIGINAL_RECEIPT_IMAGE_DATA_URL) {
-      blob = getOriginalReceiptPNGBlob();
-    } else {
-      const canvas = await captureReceiptCanvas(itemData);
-      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    }
+    const canvas = await captureReceiptCanvas(itemData);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     const filename = buildReceiptExportFilename(itemData, 'png');
     triggerBlobDownload(blob, filename);
     return { blob, filename };
@@ -2458,6 +2445,9 @@ async function generateProfessionalPDF(itemData, options = {}) {
     throw new Error('PDF library could not be loaded. Please refresh the page and try again.');
   }
 
+  const canvas = await captureReceiptCanvas(itemData);
+  const canvasImgData = canvas.toDataURL('image/png');
+
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({
     orientation: 'landscape',
@@ -2468,8 +2458,8 @@ async function generateProfessionalPDF(itemData, options = {}) {
   });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const sourceWidth = 2047;
-  const sourceHeight = 1447;
+  const sourceWidth = canvas.width;
+  const sourceHeight = canvas.height;
   const ratio = Math.min(pageWidth / sourceWidth, pageHeight / sourceHeight);
   const imageWidth = sourceWidth * ratio;
   const imageHeight = sourceHeight * ratio;
@@ -2482,13 +2472,7 @@ async function generateProfessionalPDF(itemData, options = {}) {
     creator: 'Alagappa Performing Arts Academy'
   });
   
-  if (typeof ORIGINAL_RECEIPT_IMAGE_DATA_URL !== 'undefined' && ORIGINAL_RECEIPT_IMAGE_DATA_URL) {
-    pdf.addImage(ORIGINAL_RECEIPT_IMAGE_DATA_URL, 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
-  } else {
-    const canvas = await captureReceiptCanvas(itemData);
-    const canvasImgData = canvas.toDataURL('image/png');
-    pdf.addImage(canvasImgData, 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
-  }
+  pdf.addImage(canvasImgData, 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
 
   const filename = buildReceiptExportFilename(itemData, 'pdf');
   const blob = pdf.output('blob');
