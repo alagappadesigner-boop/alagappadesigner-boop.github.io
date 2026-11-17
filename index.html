@@ -1947,7 +1947,6 @@ function validateAndNormalizePhone() {
     phoneInput.classList.add('field-error'); phoneInput.focus(); return null;
   }
   const fullNumber = countryCode + nationalNumber;
-  // Use Google's libphonenumber metadata when the CDN is available.
   try {
     const parser = window.libphonenumber?.parsePhoneNumberFromString;
     if (parser) {
@@ -1959,7 +1958,6 @@ function validateAndNormalizePhone() {
     alert('Invalid mobile number for the selected country code. Please check the number and try again.');
     phoneInput.classList.add('field-error'); phoneInput.focus(); return null;
   }
-  // Offline fallback: enforce known national lengths for common calling codes.
   const exactLengths = {'+91':[10],'+1':[10],'+44':[10],'+61':[9],'+64':[8,9,10],'+65':[8],'+60':[9,10],'+62':[9,10,11,12],'+63':[10],'+81':[10],'+82':[9,10],'+86':[11],'+90':[10],'+92':[10],'+94':[9],'+880':[10],'+971':[9],'+966':[9],'+974':[8],'+973':[8],'+965':[8],'+852':[8],'+886':[9,10]};
   const allowed = exactLengths[countryCode] || (nationalNumber.length >= 7 && nationalNumber.length <= 12 ? [nationalNumber.length] : []);
   if (!allowed.includes(nationalNumber.length) || /^0+$/.test(nationalNumber)) {
@@ -2438,10 +2436,21 @@ async function captureReceiptCanvas(itemData) {
 }
 
 async function generateProfessionalPNG(itemData) {
-  const blob = getOriginalReceiptPNGBlob();
-  const filename = buildReceiptExportFilename(itemData, 'png');
-  triggerBlobDownload(blob, filename);
-  return { blob, filename };
+  try {
+    let blob;
+    if (typeof ORIGINAL_RECEIPT_IMAGE_DATA_URL !== 'undefined' && ORIGINAL_RECEIPT_IMAGE_DATA_URL) {
+      blob = getOriginalReceiptPNGBlob();
+    } else {
+      const canvas = await captureReceiptCanvas(itemData);
+      blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    }
+    const filename = buildReceiptExportFilename(itemData, 'png');
+    triggerBlobDownload(blob, filename);
+    return { blob, filename };
+  } catch (err) {
+    console.error('PNG generation error details:', err);
+    throw err;
+  }
 }
 
 async function generateProfessionalPDF(itemData, options = {}) {
@@ -2472,7 +2481,14 @@ async function generateProfessionalPDF(itemData, options = {}) {
     subject: `Fee receipt for ${itemData.studentName || 'student'}`,
     creator: 'Alagappa Performing Arts Academy'
   });
-  pdf.addImage(ORIGINAL_RECEIPT_IMAGE_DATA_URL, 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
+  
+  if (typeof ORIGINAL_RECEIPT_IMAGE_DATA_URL !== 'undefined' && ORIGINAL_RECEIPT_IMAGE_DATA_URL) {
+    pdf.addImage(ORIGINAL_RECEIPT_IMAGE_DATA_URL, 'PNG', x, y, imageWidth, imageHeight, undefined, 'NONE');
+  } else {
+    const canvas = await captureReceiptCanvas(itemData);
+    const canvasImgData = canvas.toDataURL('image/png');
+    pdf.addImage(canvasImgData, 'PNG', x, y, imageWidth, imageHeight, undefined, 'FAST');
+  }
 
   const filename = buildReceiptExportFilename(itemData, 'pdf');
   const blob = pdf.output('blob');
