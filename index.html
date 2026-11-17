@@ -3123,7 +3123,7 @@ async function captureReceiptCanvas(itemData) {
     watermark.className = 'export-apaa-watermark';
     watermark.setAttribute('aria-hidden', 'true');
     const watermarkLogo = document.createElement('img');
-    watermarkLogo.src = headerLogo.currentSrc || headerLogo.src;
+    watermarkLogo.src = headerLogo.getAttribute('src') || headerLogo.src;
     watermarkLogo.alt = '';
     watermarkLogo.crossOrigin = 'anonymous';
     watermark.appendChild(watermarkLogo);
@@ -3656,8 +3656,11 @@ async function captureReceiptCanvas(itemData) {
     .form-grid > .panel { z-index:1 !important; }
     #apaaReceiptExportHost .export-apaa-watermark {
       z-index:0 !important;
+      position:absolute !important;
       inset:0 !important;
-      opacity:.055 !important;
+      width:100% !important;
+      height:100% !important;
+      opacity:.10 !important;
       transform:none !important;
       display:flex !important;
       align-items:center !important;
@@ -3665,10 +3668,12 @@ async function captureReceiptCanvas(itemData) {
       background:transparent !important;
     }
     #apaaReceiptExportHost .export-apaa-watermark img {
+      display:block !important;
       width:560px !important;
       height:280px !important;
       max-width:72% !important;
       object-fit:contain !important;
+      object-position:center center !important;
       filter:grayscale(1) !important;
       opacity:1 !important;
     }
