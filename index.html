@@ -3114,19 +3114,19 @@ async function captureReceiptCanvas(itemData) {
   });
 
   const exportGrid = clone.querySelector('.form-grid');
-  const sourceGrid = original.querySelector('.form-grid');
-  if (exportGrid && sourceGrid) {
-    // Reuse the actual APAA watermark artwork already used by the live receipt.
-    // The previous export incorrectly substituted the small header logo, which
-    // has a different aspect ratio and transparent padding.
-    const sourceWatermark = window.getComputedStyle(sourceGrid, '::after');
+  const headerLogo = clone.querySelector('.academy-logo');
+  if (exportGrid && headerLogo) {
+    // Use the academy's actual APAA logotype as the large receipt watermark.
+    // The decorative ::after on the live form is the university crest, not the
+    // APAA watermark shown in the approved reference receipt.
     const watermark = document.createElement('div');
     watermark.className = 'export-apaa-watermark';
     watermark.setAttribute('aria-hidden', 'true');
-    watermark.style.backgroundImage = sourceWatermark.backgroundImage;
-    watermark.style.backgroundRepeat = sourceWatermark.backgroundRepeat || 'no-repeat';
-    watermark.style.backgroundPosition = sourceWatermark.backgroundPosition || 'center center';
-    watermark.style.backgroundSize = sourceWatermark.backgroundSize || 'min(38%, 360px) auto';
+    const watermarkLogo = document.createElement('img');
+    watermarkLogo.src = headerLogo.currentSrc || headerLogo.src;
+    watermarkLogo.alt = '';
+    watermarkLogo.crossOrigin = 'anonymous';
+    watermark.appendChild(watermarkLogo);
     exportGrid.prepend(watermark);
   }
 
@@ -3277,14 +3277,14 @@ async function captureReceiptCanvas(itemData) {
     .gold-divider {
       display: block !important;
       height: 2px !important;
-      margin: 10px 0 12px !important;
+      margin: 10px 0 16px !important;
       padding: 0 !important;
       background: #d9a400 !important;
     }
     .receipt-title-block {
       display: block !important;
       width: 100% !important;
-      margin: 0 0 12px !important;
+      margin: 0 0 18px !important;
       padding: 0 !important;
       text-align: center !important;
     }
@@ -3328,7 +3328,7 @@ async function captureReceiptCanvas(itemData) {
       display: grid !important;
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       align-items: stretch !important;
-      gap: 18px !important;
+      gap: 28px !important;
       width: 100% !important;
       margin: 0 0 16px !important;
       padding: 0 !important;
@@ -3338,18 +3338,27 @@ async function captureReceiptCanvas(itemData) {
       position: absolute !important;
       z-index: 0 !important;
       inset: 0 !important;
-      display: block !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       width: 100% !important;
       height: 100% !important;
       margin: 0 !important;
       padding: 0 !important;
-      opacity: .10 !important;
+      opacity: .055 !important;
       pointer-events: none !important;
       transform: none !important;
-      background-repeat: no-repeat !important;
-      background-position: center center !important;
-      background-size: min(38%, 360px) auto !important;
-      mix-blend-mode: multiply !important;
+      background: transparent !important;
+    }
+    .export-apaa-watermark img {
+      display: block !important;
+      width: 560px !important;
+      height: 280px !important;
+      max-width: 72% !important;
+      object-fit: contain !important;
+      object-position: center !important;
+      filter: grayscale(1) !important;
+      opacity: 1 !important;
     }
     .form-grid > .panel {
       position: relative !important;
@@ -3648,10 +3657,20 @@ async function captureReceiptCanvas(itemData) {
     #apaaReceiptExportHost .export-apaa-watermark {
       z-index:0 !important;
       inset:0 !important;
-      opacity:.10 !important;
+      opacity:.055 !important;
       transform:none !important;
-      background-position:center center !important;
-      background-size:min(38%, 360px) auto !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+      background:transparent !important;
+    }
+    #apaaReceiptExportHost .export-apaa-watermark img {
+      width:560px !important;
+      height:280px !important;
+      max-width:72% !important;
+      object-fit:contain !important;
+      filter:grayscale(1) !important;
+      opacity:1 !important;
     }
     #apaaReceiptExportHost .panel .field > label::after { content:none !important; display:none !important; }
     #apaaReceiptExportHost .panel .field > .export-field-label { white-space:nowrap !important; }
