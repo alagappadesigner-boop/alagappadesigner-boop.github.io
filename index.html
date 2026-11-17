@@ -305,14 +305,20 @@ body {
 .field,
 .panel .field {
   display: grid;
-  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  grid-template-columns: minmax(0, 40%) 14px minmax(0, 56%);
   align-items: center;
-  gap: 10px;
+  gap: 0;
   margin: 0 0 15px;
   min-height: 34px;
 }
 
 .field:last-child { margin-bottom: 0; }
+
+.field-colons {
+  text-align: center;
+  color: #718096;
+  font-weight: 700;
+}
 
 label {
   font-size: 13.5px;
@@ -335,7 +341,7 @@ input, select {
   font-weight: 700;
   font-size: 14px;
   outline: none;
-  text-align: right;
+  text-align: left;
   transition: border-color 0.2s;
   border-radius: 0;
 }
@@ -354,7 +360,7 @@ input[type=date] { color-scheme: light; }
 
 select {
   cursor: pointer;
-  text-align: right;
+  text-align: left;
 }
 
 select option {
@@ -367,11 +373,11 @@ select option {
   width: 100%;
   min-width: 0;
   min-height: 36px;
-  padding: 5px 24px 5px 8px;
+  padding: 5px 8px;
   font-size: 14px !important;
   line-height: 1.35;
-  text-align: right;
-  text-align-last: right;
+  text-align: left;
+  text-align-last: left;
   border-bottom: 1px solid #dbe4ef;
   border-radius: 4px;
   background-color: rgba(255,255,255,.82);
@@ -403,8 +409,8 @@ select option {
   width: 100%;
 }
 .phone-input-group select {
-  flex: 0 0 112px;
-  width: 112px;
+  flex: 0 0 100px;
+  width: 100px;
   min-width: 0;
   text-align: left;
   text-align-last: left;
@@ -432,7 +438,7 @@ select option {
 .amount-wrap {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 3px;
   min-width: 0;
   max-width: 100%;
@@ -449,7 +455,7 @@ select option {
   min-width: 0;
   max-width: 100%;
   border: 0;
-  text-align: right;
+  text-align: left;
   color: #2d3748;
   font-size: 14px;
   font-weight: 700;
@@ -457,7 +463,7 @@ select option {
 
 .words {
   color: #2d3748;
-  text-align: right;
+  text-align: left;
   font-size: 13px;
   font-weight: 700;
   line-height: 1.4;
@@ -1671,11 +1677,13 @@ select option {
 
           <div class="field">
             <label for="student">Student Name *</label>
+            <div class="field-colons">:</div>
             <input id="student" type="text" placeholder="Enter student name" required autocomplete="name">
           </div>
 
           <div class="field">
             <label for="phone">Phone Number *</label>
+            <div class="field-colons">:</div>
             <div class="phone-input-group">
               <select id="countryCode" aria-label="Country calling code" required>
                 <option value="+91" selected>🇮🇳 +91</option>
@@ -1690,6 +1698,7 @@ select option {
 
           <div class="field">
             <label for="course">Course Registered *</label>
+            <div class="field-colons">:</div>
             <select id="course" required>
               <option value="" selected disabled hidden>Select Course</option>
               <option value="Diploma in Bharatanatyam">Diploma in Bharatanatyam</option>
@@ -1703,6 +1712,7 @@ select option {
 
           <div class="field">
             <label for="year">Academic Year *</label>
+            <div class="field-colons">:</div>
             <select id="year" required>
               <option value="" selected disabled hidden>Select Year</option>
               <option value="1 Year">1 Year</option>
@@ -1720,6 +1730,7 @@ select option {
 
           <div class="field">
             <label for="amount">Amount Paid *</label>
+            <div class="field-colons">:</div>
             <div class="amount-wrap">
               <b>₹</b>
               <input id="amount" type="text" placeholder="Enter amount" required inputmode="decimal" oninput="updateWords()">
@@ -1728,11 +1739,13 @@ select option {
 
           <div class="field">
             <label>Amount in Words</label>
+            <div class="field-colons">:</div>
             <div class="words" id="amountWords">Amount in words will appear here</div>
           </div>
 
           <div class="field">
             <label for="date">Payment Date *</label>
+            <div class="field-colons">:</div>
             <div class="date-picker-wrap">
               <input id="date" type="hidden" required>
               <input id="dateDisplay" type="text" class="date-display-input" placeholder="Select payment date" readonly aria-label="Payment date">
@@ -1745,6 +1758,7 @@ select option {
 
           <div class="field">
             <label for="modeInput">Payment Mode *</label>
+            <div class="field-colons">:</div>
             <select id="modeInput" required onchange="handlePaymentModeChange()">
               <option value="" selected disabled hidden>Select Payment Mode</option>
               <option value="CASH">CASH</option>
@@ -1756,10 +1770,12 @@ select option {
 
           <div class="field">
             <label for="txn">TXN / UPI ID <span id="txnRequiredMark" hidden>*</span></label>
+            <div class="field-colons">:</div>
             <input id="txn" type="text" placeholder="Not required for Cash" autocomplete="off">
           </div>
           <div class="field">
             <label for="installment">Installment Stage *</label>
+            <div class="field-colons">:</div>
             <select id="installment" required>
               <option value="" selected disabled hidden>Select Installment</option>
               <option value="First Installment">First Installment</option>
@@ -2286,9 +2302,9 @@ async function captureReceiptCanvas(itemData) {
     }
     .panel .field {
       display: grid !important;
-      grid-template-columns: minmax(0, 42%) minmax(0, 58%) !important;
+      grid-template-columns: minmax(0, 40%) 14px minmax(0, 56%) !important;
       align-items: center !important;
-      gap: 10px !important;
+      gap: 0 !important;
       min-height: 34px !important;
       margin: 0 0 15px 0 !important;
       padding: 0 !important;
@@ -2299,20 +2315,23 @@ async function captureReceiptCanvas(itemData) {
       position: relative !important;
       display: block !important;
       width: 100% !important;
-      padding-right: 0 !important;
       color: #718096 !important;
       font-family: 'Lato', Arial, sans-serif !important;
       font-size: 13.5px !important;
       line-height: 1.4 !important;
       font-weight: 600 !important;
     }
-    .panel .field label::after { content: none !important; }
+    .field-colons {
+      text-align: center !important;
+      color: #718096 !important;
+      font-weight: 700 !important;
+    }
     .export-field-value {
       display: block !important;
       width: 100% !important;
       min-width: 0 !important;
       padding-left: 0 !important;
-      text-align: right !important;
+      text-align: left !important;
       font-family: 'Lato', Arial, sans-serif !important;
       font-size: 14px !important;
       line-height: 1.4 !important;
@@ -2321,7 +2340,7 @@ async function captureReceiptCanvas(itemData) {
       overflow-wrap: anywhere !important;
     }
     .panel .words {
-      text-align: right !important;
+      text-align: left !important;
       font-size: 13px !important;
       font-weight: 700 !important;
       color: #2d3748 !important;
