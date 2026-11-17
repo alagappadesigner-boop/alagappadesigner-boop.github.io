@@ -2669,11 +2669,11 @@ select option { font-size: 14px; color: #243b53; }
             <input id="txn" type="text" placeholder="Not required for Cash" autocomplete="off">
           </div>
           <div class="field">
-            <label for="installment">Installment Stage *</label>
+            <label for="installment">Installment *</label>
             <select id="installment" required>
               <option value="" selected disabled hidden>Select Installment</option>
               <option value="First Installment">First Installment</option>
-              <option value="Second Installment Stage">Second Installment Stage</option>
+              <option value="Second Installment">Second Installment</option>
               <option value="Third Installment">Third Installment</option>
               <option value="Fourth Installment">Fourth Installment</option>
             </select>
@@ -4237,6 +4237,67 @@ if (el('remarksInput')) {
   user-drag: none;
   pointer-events: none;
 }
+
+/* ===== Refined form dropdowns: clean sizing, spacing and alignment ===== */
+.field select,
+.phone-input-group select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 34px 8px 12px;
+  border: 1px solid #d8e1eb;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #183653;
+  font-family: 'Lato', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23123b68' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  background-size: 16px;
+}
+.field select:hover,
+.phone-input-group select:hover {
+  border-color: #b7c8d9;
+  background-color: #fcfdff;
+}
+.field select:focus,
+.phone-input-group select:focus {
+  border-color: #123b68;
+  box-shadow: 0 0 0 3px rgba(18, 59, 104, .10);
+  background-color: #fff;
+}
+.field select option,
+.phone-input-group select option {
+  padding: 10px 12px;
+  background: #fff;
+  color: #263b53;
+  font-size: 14px;
+  font-weight: 500;
+}
+.field select option:checked {
+  background: #eaf1f8;
+  color: #123b68;
+  font-weight: 700;
+}
+@media (max-width: 680px) {
+  .field select,
+  .phone-input-group select {
+    min-height: 42px;
+    font-size: 14px;
+  }
+}
+
 </style>
 <script>
 (function protectVisibleReceiptFromCasualCopying() {
