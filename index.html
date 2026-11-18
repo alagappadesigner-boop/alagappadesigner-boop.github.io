@@ -2380,6 +2380,61 @@ select option { font-size: 14px; color: #243b53; }
 @media(prefers-reduced-motion:reduce){.apaa-feedback-overlay,.apaa-feedback-card,.apaa-feedback-icon,.apaa-feedback-button,.ledger-actions-bar .btn,.ledger-download-actions .btn,.btn,#txn{animation:none!important;transition:none!important}}
 </style>
 
+
+<style id="apaa-analytics-statement-styles">
+.apaa-analytics{margin:0 0 24px;padding:24px;border:1px solid #dfe7f0;border-radius:16px;background:linear-gradient(145deg,#fff 0%,#f8fafc 100%);box-shadow:0 12px 32px rgba(18,59,104,.07)}
+.apaa-analytics-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}
+.apaa-section-kicker{display:block;color:#b18a2c;font-size:10px;font-weight:800;letter-spacing:1.8px;margin-bottom:5px}
+.apaa-analytics-heading h2,.apaa-statement-head h2{margin:0;color:#123b68;font:700 23px/1.2 'Playfair Display',Georgia,serif}
+.apaa-analytics-heading p{margin:5px 0 0;color:#78889a;font-size:12px}
+.apaa-dashboard-filter{display:flex;flex-direction:column;gap:5px;min-width:170px}
+.apaa-dashboard-filter label{font-size:11px;color:#718096;font-weight:700}
+.apaa-dashboard-filter select{min-height:38px;padding:7px 32px 7px 10px;border:1px solid #d8e1eb;border-radius:8px;background:#fff;color:#183653;font:600 13px 'Lato',Arial,sans-serif;text-align:left}
+.apaa-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.apaa-stat-card{min-width:0;padding:17px 18px;border:1px solid #e5ebf2;border-radius:12px;background:#fff;box-shadow:0 4px 12px rgba(18,59,104,.035)}
+.apaa-stat-card span{display:block;color:#75869a;font-size:11px;font-weight:700}
+.apaa-stat-card strong{display:block;margin:9px 0 5px;color:#123b68;font:700 clamp(19px,2.2vw,27px)/1.1 'Lato',Arial,sans-serif;overflow-wrap:anywhere}
+.apaa-stat-card small{color:#9aa6b4;font-size:10px}
+.apaa-chart-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+.apaa-chart-card{min-width:0;padding:18px;border:1px solid #e5ebf2;border-radius:12px;background:#fff}
+.apaa-chart-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.apaa-chart-title h3{margin:0;color:#173b60;font-size:14px;font-weight:800}
+.apaa-chart-title p{margin:4px 0 0;color:#91a0af;font-size:10px}
+.apaa-chart-mark{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#fff7e5;color:#a47b1f;font-weight:800}
+.apaa-monthly-chart{height:175px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:end;gap:12px;padding:8px 4px 0}
+.apaa-month-column{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:7px;min-width:0}
+.apaa-month-value{font-size:9px;color:#718096;font-weight:700;white-space:nowrap}
+.apaa-month-bar-wrap{height:112px;width:min(100%,34px);display:flex;align-items:flex-end;overflow:hidden;border-radius:7px 7px 3px 3px;background:#f0f4f8}
+.apaa-month-bar{width:100%;min-height:3px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,#d9b34f,#123b68);transition:height .35s ease}
+.apaa-month-label{font-size:10px;color:#8291a2;font-weight:700}
+.apaa-mode-chart{display:flex;flex-direction:column;gap:15px;padding:3px 0}
+.apaa-mode-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:9px}
+.apaa-mode-name{font-size:11px;color:#526579;font-weight:800}
+.apaa-mode-track{height:9px;overflow:hidden;border-radius:20px;background:#edf1f5}
+.apaa-mode-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#123b68,#d0a52f)}
+.apaa-mode-amount{font-size:10px;color:#687b8f;font-weight:700;white-space:nowrap}
+.apaa-chart-empty{height:145px;display:grid;place-items:center;color:#99a6b4;font-size:12px;text-align:center}
+.apaa-dashboard-footnote{margin-top:13px;color:#9aa6b4;font-size:10px}
+.apaa-statement-modal{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;padding:18px;background:rgba(8,27,48,.56);backdrop-filter:blur(6px)}
+.apaa-statement-modal[hidden]{display:none!important}
+.apaa-statement-panel{width:min(100%,820px);max-height:min(88vh,900px);overflow:auto;padding:24px;border:1px solid #dfe7f0;border-radius:16px;background:#fff;box-shadow:0 25px 80px rgba(8,27,48,.28)}
+.apaa-statement-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;padding-bottom:16px;border-bottom:1px solid #e8edf3;margin-bottom:16px}
+.apaa-statement-close{width:34px;height:34px;border:0;border-radius:9px;background:#f0f4f8;color:#123b68;font-size:24px;line-height:1;cursor:pointer}
+.apaa-statement-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.apaa-statement-summary div{padding:13px;border:1px solid #e7edf3;border-radius:10px;background:#f9fbfd}
+.apaa-statement-summary span{display:block;color:#8291a2;font-size:10px;font-weight:700}
+.apaa-statement-summary strong{display:block;margin-top:6px;color:#123b68;font-size:17px}
+.apaa-statement-table-wrap{overflow-x:auto}
+.apaa-statement-table{width:100%;border-collapse:collapse;font-size:12px}
+.apaa-statement-table th{padding:11px 9px;background:#123b68;color:#fff;text-align:left;white-space:nowrap}
+.apaa-statement-table td{padding:10px 9px;border-bottom:1px solid #e8edf3;color:#43566a}
+.apaa-statement-table td:last-child,.apaa-statement-table th:last-child{text-align:right}
+.apaa-statement-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:18px}
+@media(max-width:760px){.apaa-analytics{padding:16px}.apaa-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.apaa-chart-grid{grid-template-columns:1fr}.apaa-analytics-heading{align-items:stretch;flex-direction:column}.apaa-dashboard-filter{max-width:220px}.apaa-statement-panel{padding:16px}.apaa-statement-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.apaa-stat-card{padding:13px}.apaa-stat-card strong{font-size:19px}.apaa-statement-summary{grid-template-columns:1fr}.apaa-statement-actions .btn{flex:1 1 100%;justify-content:center}}
+@media print{body.apaa-print-statement *{visibility:hidden!important}body.apaa-print-statement #apaaStudentStatementModal,body.apaa-print-statement #apaaStudentStatementModal *{visibility:visible!important}body.apaa-print-statement #apaaStudentStatementModal{position:absolute;inset:0;padding:0;background:#fff;display:block!important}body.apaa-print-statement .apaa-statement-panel{width:100%;max-height:none;overflow:visible;border:0;box-shadow:none}body.apaa-print-statement .apaa-statement-actions,body.apaa-print-statement .apaa-statement-close{display:none!important}}
+</style>
+
 </head>
 <body>
 
@@ -2793,6 +2848,58 @@ select option { font-size: 14px; color: #243b53; }
         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
         WhatsApp Share (PDF)
       </button>
+    </div>
+
+    <!-- APAA Collection Dashboard: reads the existing saved receipt ledger -->
+    <section class="apaa-analytics" id="apaaAnalyticsDashboard" aria-label="Fee collection dashboard">
+      <div class="apaa-analytics-heading">
+        <div>
+          <span class="apaa-section-kicker">APAA FINANCE OVERVIEW</span>
+          <h2>Collection Dashboard</h2>
+          <p>Live summary from the saved receipt records on this device</p>
+        </div>
+        <div class="apaa-dashboard-filter">
+          <label for="apaaAnalyticsPeriod">Report period</label>
+          <select id="apaaAnalyticsPeriod" onchange="renderApaAnalyticsDashboard()">
+            <option value="all">All time</option>
+            <option value="month" selected>This month</option>
+            <option value="year">This calendar year</option>
+          </select>
+        </div>
+      </div>
+      <div class="apaa-stat-grid">
+        <article class="apaa-stat-card"><span>Total Collection</span><strong id="apaaStatCollection">₹0</strong><small id="apaaStatCollectionNote">Selected period</small></article>
+        <article class="apaa-stat-card"><span>Receipts Generated</span><strong id="apaaStatReceipts">0</strong><small>Saved receipt records</small></article>
+        <article class="apaa-stat-card"><span>Students</span><strong id="apaaStatStudents">0</strong><small>Unique student accounts</small></article>
+        <article class="apaa-stat-card"><span>Average Payment</span><strong id="apaaStatAverage">₹0</strong><small>Per receipt</small></article>
+      </div>
+      <div class="apaa-chart-grid">
+        <article class="apaa-chart-card">
+          <div class="apaa-chart-title"><div><h3>Collection Trend</h3><p>Monthly collection for the last 6 months</p></div><span class="apaa-chart-mark">₹</span></div>
+          <div id="apaaMonthlyChart" class="apaa-monthly-chart"></div>
+        </article>
+        <article class="apaa-chart-card">
+          <div class="apaa-chart-title"><div><h3>Payment Mode Analytics</h3><p>Collection split by payment method</p></div><span class="apaa-chart-mark">%</span></div>
+          <div id="apaaPaymentModeChart" class="apaa-mode-chart"></div>
+        </article>
+      </div>
+      <div class="apaa-dashboard-footnote" id="apaaDashboardFootnote">Analytics update automatically when a receipt is saved.</div>
+    </section>
+
+    <!-- Individual Student Statement -->
+    <div id="apaaStudentStatementModal" class="apaa-statement-modal" hidden role="dialog" aria-modal="true" aria-labelledby="apaaStatementTitle">
+      <div class="apaa-statement-panel">
+        <div class="apaa-statement-head">
+          <div><span class="apaa-section-kicker">STUDENT ACCOUNT</span><h2 id="apaaStatementTitle">Individual Student Statement</h2></div>
+          <button type="button" class="apaa-statement-close" onclick="closeApaStudentStatement()" aria-label="Close statement">×</button>
+        </div>
+        <div id="apaaStudentStatementContent"></div>
+        <div class="apaa-statement-actions">
+          <button type="button" class="btn btn-secondary" onclick="downloadApaStudentStatementCSV()">Download Statement</button>
+          <button type="button" class="btn btn-primary" onclick="printApaStudentStatement()">Print Statement</button>
+          <button type="button" class="btn btn-danger" onclick="closeApaStudentStatement()">Close</button>
+        </div>
+      </div>
     </div>
 
     <div class="ledger-header">
@@ -3569,6 +3676,158 @@ function getValidatedCurrentReceiptData() {
   return receiptData(normalizedPhone);
 }
 
+
+function apaDigits(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+function apaAmount(value) {
+  const parsed = Number(String(value || '').replace(/,/g, '').replace(/[^\d.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+function findApaPotentialDuplicate(data) {
+  const phone = apaDigits(data.phone).slice(-10);
+  const txn = String(data.transactionId || '').trim().toLowerCase();
+  const mode = String(data.paymentMode || '').trim().toUpperCase();
+  return getSaved().find(item => {
+    const samePhone = phone && apaDigits(item.phone).slice(-10) === phone;
+    const sameMode = String(item.paymentMode || '').toUpperCase() === mode;
+    const oldTxn = String(item.transactionId || '').trim().toLowerCase();
+    const transactionMatch = txn && txn !== 'n/a' && oldTxn && oldTxn !== 'n/a' && txn === oldTxn && sameMode;
+    const samePaymentDetails = samePhone &&
+      apaAmount(item.amount) === apaAmount(data.amount) &&
+      String(item.installmentStage || '').toLowerCase() === String(data.installmentStage || '').toLowerCase() &&
+      String(item.paymentDate || '') === String(data.paymentDate || '');
+    return transactionMatch || samePaymentDetails;
+  });
+}
+function apaParseReceiptDate(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (!Number.isNaN(parsed.getTime())) return parsed;
+  const match = String(value).match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if (match) {
+    const d = new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]));
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  return null;
+}
+function apaCurrency(value) {
+  return new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(value || 0);
+}
+function apaStudentKey(item) {
+  const phone = apaDigits(item.phone).slice(-10);
+  return phone || String(item.studentName || '').trim().toLowerCase();
+}
+function renderApaAnalyticsDashboard() {
+  const root = el('apaaAnalyticsDashboard');
+  if (!root) return;
+  const all = getSaved();
+  const period = el('apaaAnalyticsPeriod')?.value || 'month';
+  const now = new Date();
+  const filtered = all.filter(item => {
+    const date = apaParseReceiptDate(item.paymentDate) || apaParseReceiptDate(item.savedAt);
+    if (!date) return period === 'all';
+    if (period === 'month') return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+    if (period === 'year') return date.getFullYear() === now.getFullYear();
+    return true;
+  });
+  const total = filtered.reduce((sum, item) => sum + apaAmount(item.amount), 0);
+  const uniqueStudents = new Set(filtered.map(apaStudentKey).filter(Boolean)).size;
+  const average = filtered.length ? total / filtered.length : 0;
+  el('apaaStatCollection').textContent = apaCurrency(total);
+  el('apaaStatReceipts').textContent = String(filtered.length);
+  el('apaaStatStudents').textContent = String(uniqueStudents);
+  el('apaaStatAverage').textContent = apaCurrency(average);
+  const periodLabel = period === 'month' ? now.toLocaleString('en-IN',{month:'long',year:'numeric'}) :
+    period === 'year' ? String(now.getFullYear()) : 'All saved records';
+  el('apaaStatCollectionNote').textContent = periodLabel;
+
+  const monthly = [];
+  for (let offset = 5; offset >= 0; offset--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    const amount = all.reduce((sum, item) => {
+      const itemDate = apaParseReceiptDate(item.paymentDate) || apaParseReceiptDate(item.savedAt);
+      return itemDate && itemDate.getFullYear() === date.getFullYear() && itemDate.getMonth() === date.getMonth()
+        ? sum + apaAmount(item.amount) : sum;
+    }, 0);
+    monthly.push({ label:date.toLocaleString('en-IN',{month:'short'}), amount });
+  }
+  const maxMonthly = Math.max(1, ...monthly.map(x => x.amount));
+  const monthlyHost = el('apaaMonthlyChart');
+  if (monthlyHost) {
+    monthlyHost.innerHTML = monthly.every(x => !x.amount)
+      ? '<div class="apaa-chart-empty">No collection data available for the last six months.</div>'
+      : monthly.map(x => `<div class="apaa-month-column"><span class="apaa-month-value">${x.amount ? apaCurrency(x.amount) : '—'}</span><div class="apaa-month-bar-wrap"><div class="apaa-month-bar" style="height:${Math.max(3, x.amount / maxMonthly * 100)}%"></div></div><span class="apaa-month-label">${x.label}</span></div>`).join('');
+  }
+
+  const modes = ['CASH','UPI','CARD','BANK'];
+  const modeTotals = modes.map(mode => ({ mode, amount:filtered.reduce((sum,item) => sum + (String(item.paymentMode || '').toUpperCase() === mode ? apaAmount(item.amount) : 0),0) }));
+  const modeMax = Math.max(1, ...modeTotals.map(x=>x.amount));
+  const modeHost = el('apaaPaymentModeChart');
+  if (modeHost) {
+    modeHost.innerHTML = filtered.length
+      ? modeTotals.map(x => `<div class="apaa-mode-row"><span class="apaa-mode-name">${x.mode}</span><div class="apaa-mode-track"><div class="apaa-mode-fill" style="width:${x.amount / modeMax * 100}%"></div></div><span class="apaa-mode-amount">${apaCurrency(x.amount)}</span></div>`).join('')
+      : '<div class="apaa-chart-empty">No payment records for this period.</div>';
+  }
+  const foot = el('apaaDashboardFootnote');
+  if (foot) foot.textContent = `${filtered.length} receipt record(s) included • Data is calculated from this browser's saved ledger.`;
+}
+let apaCurrentStatement = null;
+function viewApaStudentStatement(index) {
+  const saved = getSaved();
+  const selected = saved[index];
+  if (!selected) return;
+  const key = apaStudentKey(selected);
+  const studentRows = saved.filter(item => apaStudentKey(item) === key)
+    .sort((a,b) => (apaParseReceiptDate(a.paymentDate)?.getTime() || 0) - (apaParseReceiptDate(b.paymentDate)?.getTime() || 0));
+  apaCurrentStatement = { studentName:selected.studentName || 'Student', phone:selected.phone || '', rows:studentRows };
+  const total = studentRows.reduce((sum,item)=>sum+apaAmount(item.amount),0);
+  const content = el('apaaStudentStatementContent');
+  content.innerHTML = `
+    <div class="apaa-statement-summary">
+      <div><span>Student Name</span><strong>${escapeHtml(apaCurrentStatement.studentName)}</strong></div>
+      <div><span>Phone Number</span><strong>${escapeHtml(apaCurrentStatement.phone || 'N/A')}</strong></div>
+      <div><span>Total Paid</span><strong>${apaCurrency(total)}</strong></div>
+      <div><span>Total Receipts</span><strong>${studentRows.length}</strong></div>
+      <div><span>First Payment</span><strong>${escapeHtml(studentRows[0]?.paymentDate || 'N/A')}</strong></div>
+      <div><span>Latest Payment</span><strong>${escapeHtml(studentRows[studentRows.length-1]?.paymentDate || 'N/A')}</strong></div>
+    </div>
+    <div class="apaa-statement-table-wrap"><table class="apaa-statement-table">
+      <thead><tr><th>Date</th><th>Receipt No.</th><th>Course / Year</th><th>Installment</th><th>Mode</th><th>Amount</th></tr></thead>
+      <tbody>${studentRows.map(item=>`<tr><td>${escapeHtml(item.paymentDate || '')}</td><td>${escapeHtml(item.receiptNo || '')}</td><td>${escapeHtml(item.course || '')} / ${escapeHtml(item.academicYear || '')}</td><td>${escapeHtml(item.installmentStage || '')}</td><td>${escapeHtml(item.paymentMode || '')}</td><td>${apaCurrency(apaAmount(item.amount))}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="5"><strong>Total Amount Paid</strong></td><td><strong>${apaCurrency(total)}</strong></td></tr></tfoot>
+    </table></div>`;
+  el('apaaStudentStatementModal').hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeApaStudentStatement() {
+  const modal = el('apaaStudentStatementModal');
+  if (modal) modal.hidden = true;
+  document.body.style.overflow = '';
+}
+function apaStatementCSVCell(value) {
+  return '"' + String(value ?? '').replace(/"/g,'""') + '"';
+}
+function downloadApaStudentStatementCSV() {
+  if (!apaCurrentStatement) return;
+  const rows = [['Student Name',apaCurrentStatement.studentName],['Phone',apaCurrentStatement.phone],[],['Payment Date','Receipt Number','Course','Academic Year','Installment','Payment Mode','Amount']];
+  apaCurrentStatement.rows.forEach(item => rows.push([item.paymentDate,item.receiptNo,item.course,item.academicYear,item.installmentStage,item.paymentMode,apaAmount(item.amount)]));
+  const csv = rows.map(row=>row.map(apaStatementCSVCell).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `APAA_Student_Statement_${(apaCurrentStatement.studentName || 'Student').replace(/[^a-z0-9_-]/gi,'_')}.csv`;
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),20000);
+}
+function printApaStudentStatement() {
+  if (!apaCurrentStatement) return;
+  document.body.classList.add('apaa-print-statement');
+  window.print();
+  setTimeout(()=>document.body.classList.remove('apaa-print-statement'),500);
+}
+
 function saveReceiptToLedger(data) {
   const saved = getSaved();
   const existingIndex = saved.findIndex(r => r.receiptNo === data.receiptNo);
@@ -3660,6 +3919,22 @@ function hideApaTransactionProgress() {
 async function handlePrintReceiptWorkflow() {
   const data = getValidatedCurrentReceiptData();
   if (!data) return;
+
+  const duplicate = findApaPotentialDuplicate(data);
+  if (duplicate) {
+    const duplicateDetails = [
+      `Existing receipt: ${duplicate.receiptNo || 'N/A'}`,
+      `Student: ${duplicate.studentName || 'N/A'}`,
+      `Installment: ${duplicate.installmentStage || 'N/A'}`,
+      `Amount: ₹${duplicate.amount || '0'}`,
+      `Payment date: ${duplicate.paymentDate || 'N/A'}`
+    ].join('\\n');
+    const proceed = window.confirm(
+      'POSSIBLE DUPLICATE PAYMENT\\n\\n' + duplicateDetails +
+      '\\n\\nA similar payment record already exists. Do you want to continue and create a separate receipt anyway?'
+    );
+    if (!proceed) return;
+  }
 
   const printButton = document.querySelector('.ledger-actions-bar .btn-primary');
   if (printButton?.dataset.processing === 'true') return;
@@ -3784,6 +4059,7 @@ function clearAllRecords() {
 }
 
 function renderLedger() {
+  renderApaAnalyticsDashboard();
   const container = el('ledgerList');
   const query = (el('ledgerSearchInput')?.value || '').toLowerCase().trim();
   const saved = getSaved();
@@ -3810,6 +4086,7 @@ function renderLedger() {
           <span class="receipt-num">Receipt No. ${escapeHtml(item.receiptNo)}</span>
         </div>
         <div class="ledger-download-actions">
+          <button class="btn btn-primary btn-small" type="button" onclick="viewApaStudentStatement(${originalIndex})">Statement</button>
           <button class="btn btn-primary btn-small" type="button" onclick="downloadSpecificPNG(${originalIndex})">PNG</button>
           <button class="btn btn-secondary btn-small" type="button" onclick="downloadSpecificPDF(${originalIndex})">PDF</button>
         </div>
