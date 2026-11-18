@@ -2850,8 +2850,6 @@ body.apaa-view-ledger .ledger-header{margin-top:0}
     <div class="developer-credit">Designed &amp; Developed by <strong>Easwaran Prasanth</strong></div>
   </main>
 
-  <!-- Student Ledger Section -->
-  <section class="ledger-section">
     <div class="ledger-actions-bar">
       <button class="btn btn-primary" type="button" onclick="handlePrintReceiptWorkflow()">
         <svg viewBox="0 0 24 24"><path d="M4 3h16v18H4z"></path><path d="M8 7h8M8 11h8M8 15h5"></path></svg>
@@ -2859,6 +2857,10 @@ body.apaa-view-ledger .ledger-header{margin-top:0}
       </button>
       <button class="btn btn-danger" type="button" onclick="clearCurrentForm()">
         Clear Current Form
+      </button>
+      <button class="btn btn-secondary" type="button" onclick="downloadCurrentReceiptPDF()">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z"></path><path d="M15 2v5h5M9 13h8M9 17h6"></path></svg>
+        Download PDF
       </button>
       <button class="btn btn-secondary" type="button" onclick="downloadExcel()">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -2869,6 +2871,10 @@ body.apaa-view-ledger .ledger-header{margin-top:0}
         WhatsApp Share (PDF)
       </button>
     </div>
+
+  <!-- Student Ledger Section -->
+  <section class="ledger-section">
+
 
     <!-- APAA Collection Dashboard: reads the existing saved receipt ledger -->
     <section class="apaa-analytics" id="apaaAnalyticsDashboard" aria-label="Fee collection dashboard">
@@ -2928,6 +2934,10 @@ body.apaa-view-ledger .ledger-header{margin-top:0}
         <div class="ledger-search">
           <input type="text" id="ledgerSearchInput" placeholder="Search student name or phone..." oninput="renderLedger()">
         </div>
+        <button class="btn btn-secondary btn-small" type="button" onclick="downloadExcel()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          Export All to Excel
+        </button>
         <button class="btn btn-danger btn-small" type="button" onclick="clearAllRecords()">
           Clear All Records
         </button>
@@ -3705,7 +3715,7 @@ function switchApaWorkspaceView(view) {
 
   const sheet = document.querySelector('main.sheet');
   const dashboard = el('apaaAnalyticsDashboard');
-  const actions = document.querySelector('.ledger-section .ledger-actions-bar');
+  const actions = document.querySelector('.ledger-actions-bar');
   const ledgerHeader = document.querySelector('.ledger-section .ledger-header');
   const ledgerList = el('ledgerList');
   const ledgerSection = document.querySelector('.ledger-section');
@@ -4157,6 +4167,18 @@ async function downloadSpecificPNG(index) {
   catch (error) {
     console.error('Ledger PNG download failed:', error);
     alert('PNG download failed. Please try again.');
+  }
+}
+
+async function downloadCurrentReceiptPDF() {
+  const data = getValidatedCurrentReceiptData();
+  if (!data) return;
+  try {
+    await generateProfessionalPDF(data);
+    showApaFeedback('success', 'PDF Downloaded', `PDF receipt ${data.receiptNo} has been downloaded.`, 'Continue');
+  } catch (error) {
+    console.error('Current receipt PDF download failed:', error);
+    showApaFeedback('error', 'PDF Download Failed', 'Please refresh the page and try again.', 'Continue');
   }
 }
 
@@ -4759,40 +4781,4 @@ if (el('remarksInput')) {
 @media (max-width: 680px) {
   .field select,
   .phone-input-group select {
-    min-height: 42px;
-    font-size: 14px;
-  }
-}
-
-</style>
-<script>
-(function protectVisibleReceiptFromCasualCopying() {
-  const appRoot = document.querySelector('.wrap');
-  if (!appRoot) return;
-
-  const isFormControl = node => node && node.closest &&
-    node.closest('input, textarea, select, [contenteditable="true"]');
-
-  appRoot.addEventListener('contextmenu', event => {
-    if (event.target.closest('#signatureImg, .signature-block, .sheet')) {
-      event.preventDefault();
-    }
-  });
-  appRoot.addEventListener('dragstart', event => {
-    if (event.target.closest('#signatureImg, .signature-block, .sheet')) event.preventDefault();
-  });
-  appRoot.addEventListener('copy', event => {
-    const selection = window.getSelection();
-    if (!isFormControl(event.target) && selection && appRoot.contains(selection.anchorNode)) {
-      event.preventDefault();
-    }
-  });
-  appRoot.addEventListener('selectstart', event => {
-    if (!isFormControl(event.target)) event.preventDefault();
-  });
-})();
-</script>
-
-</body>
-
-</html>
+    min-height: 4
