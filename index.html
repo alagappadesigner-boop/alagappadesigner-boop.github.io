@@ -2311,6 +2311,50 @@ select option { font-size: 14px; color: #243b53; }
 </style>
 
 
+
+<style id="apaa-login-transaction-motion">
+/* Login entrance and successful sign-in motion */
+#apaaLoginGate .apaa-login-layout { animation: apaaLoginEntrance .72s cubic-bezier(.2,.8,.2,1) both; }
+#apaaLoginGate .apaa-login-visual { animation: apaaLoginVisualIn .85s .08s ease both; }
+#apaaLoginGate .apaa-login-card { animation: apaaLoginFormIn .72s .18s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes apaaLoginEntrance { from { opacity:0; transform:translateY(22px) scale(.975); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes apaaLoginVisualIn { from { opacity:.65; } to { opacity:1; } }
+@keyframes apaaLoginFormIn { from { opacity:0; transform:translateX(25px); } to { opacity:1; transform:translateX(0); } }
+.apaa-login-submit.is-loading { pointer-events:none; opacity:.92; }
+.apaa-login-submit .apaa-login-spinner { display:inline-block; width:15px; height:15px; margin-right:9px; vertical-align:-3px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:apaaSpin .65s linear infinite; }
+#apaaLoginGate.is-leaving .apaa-login-layout { animation:apaaLoginExit .42s ease forwards; }
+@keyframes apaaLoginExit { to { opacity:0; transform:translateY(-12px) scale(.985); } }
+
+/* Receipt transaction progress */
+.apaa-transaction-overlay { position:fixed; inset:0; z-index:100001; display:grid; place-items:center; padding:18px; background:rgba(10,29,50,.48); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px); }
+.apaa-transaction-overlay[hidden] { display:none !important; }
+.apaa-transaction-card { width:min(100%,440px); padding:32px 30px 26px; border:1px solid rgba(208,165,47,.3); border-radius:22px; background:linear-gradient(145deg,#fff 0%,#fbfcff 100%); box-shadow:0 28px 85px rgba(8,28,51,.28); text-align:center; font-family:'Lato',Arial,sans-serif; animation:apaaTransactionCardIn .38s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes apaaTransactionCardIn { from { opacity:0; transform:translateY(16px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+.apaa-transaction-orbit { position:relative; width:94px; height:94px; margin:0 auto 18px; display:grid; place-items:center; }
+.apaa-transaction-orbit-ring { position:absolute; inset:0; border:3px solid #e9eef5; border-top-color:#d0a52f; border-right-color:#123b68; border-radius:50%; animation:apaaSpin 1.15s linear infinite; }
+.apaa-transaction-document { width:62px; height:62px; display:grid; place-items:center; border-radius:18px; color:#123b68; background:linear-gradient(145deg,#f2f6fb,#fff8e8); box-shadow:0 7px 20px rgba(18,59,104,.10); }
+.apaa-transaction-document svg { width:34px; height:34px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.apaa-transaction-eyebrow { margin:0 0 7px; color:#b58b32; font-size:10px; font-weight:800; letter-spacing:2px; }
+.apaa-transaction-card h2 { margin:0 0 8px; color:#123b68; font:700 23px/1.2 'Playfair Display',Georgia,serif; }
+.apaa-transaction-card p:not(.apaa-transaction-eyebrow) { min-height:22px; margin:0 auto 20px; color:#6b7b8d; font-size:13px; line-height:1.5; }
+.apaa-transaction-progress { height:7px; overflow:hidden; border-radius:20px; background:#e9eef4; }
+.apaa-transaction-progress span { display:block; width:12%; height:100%; border-radius:20px; background:linear-gradient(90deg,#123b68,#d0a52f); transition:width .45s ease; }
+.apaa-transaction-steps { display:flex; justify-content:space-between; gap:7px; margin:17px 0 19px; }
+.apaa-transaction-steps span { display:flex; align-items:center; gap:5px; color:#9aa6b4; font-size:10px; font-weight:700; white-space:nowrap; }
+.apaa-transaction-steps i { width:20px; height:20px; display:grid; place-items:center; border:1px solid #dce4ed; border-radius:50%; background:#fff; color:#8795a5; font-size:10px; font-style:normal; }
+.apaa-transaction-steps .is-active { color:#123b68; }
+.apaa-transaction-steps .is-active i { border-color:#123b68; color:#fff; background:#123b68; }
+.apaa-transaction-steps .is-done { color:#16834a; }
+.apaa-transaction-steps .is-done i { border-color:#16834a; color:#fff; background:#16834a; }
+.apaa-transaction-card small { color:#9aa6b4; font-size:10px; }
+@media(max-width:420px) { .apaa-transaction-card { padding:27px 18px 22px; } .apaa-transaction-steps span { font-size:9px; gap:3px; } }
+@media(prefers-reduced-motion:reduce) {
+  #apaaLoginGate .apaa-login-layout,#apaaLoginGate .apaa-login-visual,#apaaLoginGate .apaa-login-card,
+  .apaa-login-submit .apaa-login-spinner,.apaa-transaction-orbit-ring,.apaa-transaction-card { animation:none!important; }
+  .apaa-transaction-progress span { transition:none!important; }
+}
+</style>
+
 <style id="apaa-elegant-feedback-styles">
 /* Elegant feedback dialog and refined interaction transitions */
 .apaa-feedback-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(13,31,52,.42);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:opacity .24s ease,visibility .24s ease}
@@ -2766,6 +2810,28 @@ select option { font-size: 14px; color: #243b53; }
   </section>
 </div>
 
+
+<!-- APAA receipt transaction progress: visual feedback only; no payment gateway is contacted -->
+<div id="apaaTransactionOverlay" class="apaa-transaction-overlay" hidden aria-live="polite" aria-busy="true">
+  <section class="apaa-transaction-card" role="status" aria-label="Preparing fee receipt">
+    <div class="apaa-transaction-orbit">
+      <div class="apaa-transaction-orbit-ring"></div>
+      <div class="apaa-transaction-document">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 5h15l8 8v29H13z"/><path d="M28 5v9h8M19 23h11M19 29h11M19 35h7"/></svg>
+      </div>
+    </div>
+    <p class="apaa-transaction-eyebrow">APAA • FEE RECEIPT</p>
+    <h2 id="apaaTransactionTitle">Securing your receipt</h2>
+    <p id="apaaTransactionMessage">Saving transaction details to the student ledger…</p>
+    <div class="apaa-transaction-progress"><span id="apaaTransactionProgressBar"></span></div>
+    <div class="apaa-transaction-steps">
+      <span id="apaaTransactionStep1" class="is-active"><i>1</i> Save details</span>
+      <span id="apaaTransactionStep2"><i>2</i> Generate receipt</span>
+      <span id="apaaTransactionStep3"><i>3</i> Complete</span>
+    </div>
+    <small>Please wait. Do not close this page.</small>
+  </section>
+</div>
 
 <!-- Elegant feedback dialog: used for receipt success and export errors -->
 <div id="apaaFeedbackOverlay" class="apaa-feedback-overlay" data-kind="success" aria-hidden="true">
@@ -3557,6 +3623,40 @@ function resetFeeFormAfterSuccessfulReceipt() {
   if (firstField) firstField.focus({ preventScroll: true });
 }
 
+
+function showApaTransactionProgress() {
+  const overlay = el('apaaTransactionOverlay');
+  if (!overlay) return;
+  overlay.hidden = false;
+  document.body.style.overflow = 'hidden';
+  updateApaTransactionProgress(1);
+}
+function updateApaTransactionProgress(step) {
+  const title = el('apaaTransactionTitle');
+  const message = el('apaaTransactionMessage');
+  const bar = el('apaaTransactionProgressBar');
+  const labels = [el('apaaTransactionStep1'), el('apaaTransactionStep2'), el('apaaTransactionStep3')];
+  const states = [
+    ['Saving transaction details', 'Saving transaction details to the student ledger…', 28],
+    ['Generating your receipt', 'Preparing your APAA fee receipt for download…', 68],
+    ['Finalising receipt', 'Your receipt is ready. Finishing up…', 100]
+  ];
+  const current = Math.max(1, Math.min(3, step)) - 1;
+  if (title) title.textContent = states[current][0];
+  if (message) message.textContent = states[current][1];
+  if (bar) bar.style.width = states[current][2] + '%';
+  labels.forEach((node, index) => {
+    if (!node) return;
+    node.classList.toggle('is-active', index === current);
+    node.classList.toggle('is-done', index < current);
+  });
+}
+function hideApaTransactionProgress() {
+  const overlay = el('apaaTransactionOverlay');
+  if (overlay) overlay.hidden = true;
+  document.body.style.overflow = '';
+}
+
 async function handlePrintReceiptWorkflow() {
   const data = getValidatedCurrentReceiptData();
   if (!data) return;
@@ -3571,13 +3671,18 @@ async function handlePrintReceiptWorkflow() {
   }
 
   try {
+    showApaTransactionProgress();
+
     // Persist the complete transaction first, so a download issue never loses history.
     saveReceiptToLedger(data);
+    updateApaTransactionProgress(2);
     await generateProfessionalPNG(data);
 
+    updateApaTransactionProgress(3);
     // The old code called this function but did not define it. That caused a
     // successful download to fall into the PNG-failed catch block.
     resetFeeFormAfterSuccessfulReceipt();
+    hideApaTransactionProgress();
     showApaFeedback(
       'success',
       'Receipt Downloaded Successfully',
@@ -3585,6 +3690,7 @@ async function handlePrintReceiptWorkflow() {
       'Continue'
     );
   } catch (error) {
+    hideApaTransactionProgress();
     console.error('Receipt generation workflow failed:', error);
     showApaFeedback(
       'error',
@@ -4037,18 +4143,50 @@ function apaaLogout() {
   const error = document.getElementById('apaaLoginError');
   if (error) error.textContent = '';
 }
-document.getElementById('apaaLoginForm').addEventListener('submit', function(event) {
+document.getElementById('apaaLoginForm').addEventListener('submit', async function(event) {
   event.preventDefault();
-  const username = document.getElementById('apaaLoginUsername').value.trim();
-  const password = document.getElementById('apaaLoginPassword').value.trim();
+  const usernameField = document.getElementById('apaaLoginUsername');
+  const passwordField = document.getElementById('apaaLoginPassword');
+  const submitButton = this.querySelector('.apaa-login-submit');
+  const errorMessage = document.getElementById('apaaLoginError');
+  const username = usernameField.value.trim();
+  const password = passwordField.value.trim();
+
+  if (submitButton?.dataset.busy === 'true') return;
+  if (submitButton) {
+    submitButton.dataset.busy = 'true';
+    submitButton.disabled = true;
+    submitButton.classList.add('is-loading');
+    submitButton.innerHTML = '<span class="apaa-login-spinner" aria-hidden="true"></span>VERIFYING ACCESS…';
+  }
+
+  // Brief, intentional transition so the sign-in feedback is visible.
+  await new Promise(resolve => setTimeout(resolve, 520));
+
   if (username.toLowerCase() === APAA_LOGIN_USERNAME.toLowerCase() && password === APAA_LOGIN_PASSWORD) {
     sessionStorage.setItem(APAA_LOGIN_SESSION_KEY, 'yes');
-    document.getElementById('apaaLoginError').textContent = '';
+    errorMessage.textContent = '';
+    const gate = document.getElementById('apaaLoginGate');
+    if (gate) gate.classList.add('is-leaving');
+    await new Promise(resolve => setTimeout(resolve, 380));
+    if (gate) gate.classList.remove('is-leaving');
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.dataset.busy = 'false';
+      submitButton.classList.remove('is-loading');
+      submitButton.textContent = 'SIGN IN';
+    }
     apaaShowApplication();
   } else {
-    document.getElementById('apaaLoginError').textContent = 'Incorrect username or password. Please try again.';
-    document.getElementById('apaaLoginPassword').value = '';
-    document.getElementById('apaaLoginPassword').focus();
+    errorMessage.textContent = 'Incorrect username or password. Please try again.';
+    passwordField.value = '';
+    passwordField.focus();
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.dataset.busy = 'false';
+      submitButton.classList.remove('is-loading');
+      submitButton.textContent = 'SIGN IN';
+    }
   }
 });
 document.getElementById('apaaTogglePassword').addEventListener('click', function() {
