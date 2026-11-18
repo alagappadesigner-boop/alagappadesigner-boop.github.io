@@ -2435,6 +2435,21 @@ select option { font-size: 14px; color: #243b53; }
 @media print{body.apaa-print-statement *{visibility:hidden!important}body.apaa-print-statement #apaaStudentStatementModal,body.apaa-print-statement #apaaStudentStatementModal *{visibility:visible!important}body.apaa-print-statement #apaaStudentStatementModal{position:absolute;inset:0;padding:0;background:#fff;display:block!important}body.apaa-print-statement .apaa-statement-panel{width:100%;max-height:none;overflow:visible;border:0;box-shadow:none}body.apaa-print-statement .apaa-statement-actions,body.apaa-print-statement .apaa-statement-close{display:none!important}}
 </style>
 
+
+<style id="apaa-workspace-navigation-styles">
+.apaa-workspace-nav{display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px;border:1px solid #e1e8f0;border-radius:13px;background:#fff;box-shadow:0 6px 20px rgba(18,59,104,.055);position:sticky;top:8px;z-index:1000}
+.apaa-nav-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;min-height:43px;padding:9px 13px;border:1px solid transparent;border-radius:9px;background:transparent;color:#63768b;font:700 13px 'Lato',Arial,sans-serif;cursor:pointer;transition:all .2s ease}
+.apaa-nav-tab span{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#edf2f7;color:#718096;font-size:10px}
+.apaa-nav-tab:hover{background:#f6f8fb;color:#123b68}
+.apaa-nav-tab.is-active{background:linear-gradient(135deg,#123b68,#1c527f);color:#fff;box-shadow:0 4px 12px rgba(18,59,104,.18)}
+.apaa-nav-tab.is-active span{background:rgba(255,255,255,.16);color:#fff}
+.apaa-workspace-hidden{display:none!important}
+body.apaa-view-dashboard .apaa-analytics,body.apaa-view-ledger .ledger-header,body.apaa-view-ledger #ledgerList{display:block}
+body.apaa-view-dashboard .apaa-analytics{margin-bottom:24px}
+body.apaa-view-ledger .ledger-header{margin-top:0}
+@media(max-width:560px){.apaa-workspace-nav{gap:4px;padding:5px}.apaa-nav-tab{gap:5px;padding:8px 5px;font-size:11px;min-height:42px}.apaa-nav-tab span{width:19px;height:19px;font-size:9px}}
+</style>
+
 </head>
 <body>
 
@@ -2635,6 +2650,11 @@ select option { font-size: 14px; color: #243b53; }
     <button type="button" class="apaa-logout" onclick="apaaLogout()">Logout</button>
   </div>
 
+  <nav class="apaa-workspace-nav" aria-label="Fee management sections">
+    <button type="button" class="apaa-nav-tab is-active" data-view="receipt" onclick="switchApaWorkspaceView('receipt')"><span>01</span> New Receipt</button>
+    <button type="button" class="apaa-nav-tab" data-view="dashboard" onclick="switchApaWorkspaceView('dashboard')"><span>02</span> Dashboard</button>
+    <button type="button" class="apaa-nav-tab" data-view="ledger" onclick="switchApaWorkspaceView('ledger')"><span>03</span> Student Ledger</button>
+  </nav>
   <!-- Exact Image Replica Sheet Container -->
   <main class="sheet">
     <!-- Header -->
@@ -2863,7 +2883,7 @@ select option { font-size: 14px; color: #243b53; }
           <select id="apaaAnalyticsPeriod" onchange="renderApaAnalyticsDashboard()">
             <option value="all">All time</option>
             <option value="month" selected>This month</option>
-            <option value="year">This calendar year</option>
+            <option value="year">This academic calendar year</option>
           </select>
         </div>
       </div>
@@ -3677,6 +3697,36 @@ function getValidatedCurrentReceiptData() {
 }
 
 
+
+function switchApaWorkspaceView(view) {
+  const valid = ['receipt','dashboard','ledger'].includes(view) ? view : 'receipt';
+  document.body.classList.remove('apaa-view-dashboard','apaa-view-ledger');
+  if (valid !== 'receipt') document.body.classList.add('apaa-view-' + valid);
+
+  const sheet = document.querySelector('main.sheet');
+  const dashboard = el('apaaAnalyticsDashboard');
+  const actions = document.querySelector('.ledger-section .ledger-actions-bar');
+  const ledgerHeader = document.querySelector('.ledger-section .ledger-header');
+  const ledgerList = el('ledgerList');
+  const ledgerSection = document.querySelector('.ledger-section');
+
+  if (sheet) sheet.classList.toggle('apaa-workspace-hidden', valid !== 'receipt');
+  if (dashboard) dashboard.classList.toggle('apaa-workspace-hidden', valid !== 'dashboard');
+  if (actions) actions.classList.toggle('apaa-workspace-hidden', valid !== 'receipt');
+  if (ledgerHeader) ledgerHeader.classList.toggle('apaa-workspace-hidden', valid !== 'ledger');
+  if (ledgerList) ledgerList.classList.toggle('apaa-workspace-hidden', valid !== 'ledger');
+  if (ledgerSection) ledgerSection.classList.toggle('apaa-workspace-hidden', valid === 'receipt');
+
+  document.querySelectorAll('.apaa-nav-tab').forEach(button => {
+    const active = button.dataset.view === valid;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-current', active ? 'page' : 'false');
+  });
+  if (valid === 'dashboard') renderApaAnalyticsDashboard();
+  if (valid === 'ledger') renderLedger();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function apaDigits(value) {
   return String(value || '').replace(/\D/g, '');
 }
@@ -4395,6 +4445,7 @@ const APAA_LOGIN_PASSWORD = 'APAA@123';
 const APAA_LOGIN_SESSION_KEY = 'apaa_fee_portal_logged_in_v1';
 
 function apaaShowApplication() {
+  switchApaWorkspaceView('receipt');
   const gate = document.getElementById('apaaLoginGate');
   if (gate) gate.hidden = true;
   const app = document.querySelector('.wrap');
