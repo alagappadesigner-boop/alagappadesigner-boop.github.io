@@ -2454,6 +2454,31 @@ select option { font-size: 14px; color: #243b53; }
 </style>
 
 
+<style id="apaa-statement-layering-fix">
+/* Statement dialog layering fix: fixed overlay must live at body level. */
+body > #apaaStudentStatementModal:not([hidden]) {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 3vw, 28px);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+body > #apaaStudentStatementModal .apaa-statement-panel {
+  position: relative;
+  flex: 0 1 820px;
+  max-width: 100%;
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+@media (max-width: 600px) {
+  body > #apaaStudentStatementModal .apaa-statement-panel { padding: 16px; }
+}
+</style>
 <style id="apaa-workspace-navigation-styles">
 .apaa-workspace-nav{display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px;border:1px solid #e1e8f0;border-radius:13px;background:#fff;box-shadow:0 6px 20px rgba(18,59,104,.055);position:sticky;top:8px;z-index:1000}
 .apaa-nav-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;min-height:43px;padding:9px 13px;border:1px solid transparent;border-radius:9px;background:transparent;color:#63768b;font:700 13px 'Lato',Arial,sans-serif;cursor:pointer;transition:all .2s ease}
@@ -3875,7 +3900,11 @@ function viewApaStudentStatement(index) {
       <tbody>${studentRows.map(item=>`<tr><td>${escapeHtml(item.paymentDate || '')}</td><td>${escapeHtml(item.receiptNo || '')}</td><td>${escapeHtml(item.course || '')} / ${escapeHtml(item.academicYear || '')}</td><td>${escapeHtml(item.installmentStage || '')}</td><td>${escapeHtml(item.paymentMode || '')}</td><td>${apaCurrency(apaAmount(item.amount))}</td></tr>`).join('')}</tbody>
       <tfoot><tr><td colspan="5"><strong>Total Amount Paid</strong></td><td><strong>${apaCurrency(total)}</strong></td></tr></tfoot>
     </table></div>`;
-  el('apaaStudentStatementModal').hidden = false;
+  // Keep the statement outside the animated ledger's stacking context.
+  // Otherwise the sticky workspace navigation can cover the dialog.
+  const statementModal = el('apaaStudentStatementModal');
+  if (statementModal.parentElement !== document.body) document.body.appendChild(statementModal);
+  statementModal.hidden = false;
   document.body.style.overflow = 'hidden';
 }
 function closeApaStudentStatement() {
