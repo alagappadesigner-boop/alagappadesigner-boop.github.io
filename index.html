@@ -2454,30 +2454,11 @@ select option { font-size: 14px; color: #243b53; }
 </style>
 
 
-<style id="apaa-statement-layering-fix">
-/* Statement dialog layering fix: fixed overlay must live at body level. */
-body > #apaaStudentStatementModal:not([hidden]) {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(12px, 3vw, 28px);
-  box-sizing: border-box;
-  overflow-y: auto;
-}
-body > #apaaStudentStatementModal .apaa-statement-panel {
-  position: relative;
-  flex: 0 1 820px;
-  max-width: 100%;
-  max-height: calc(100dvh - 40px);
-  overflow: auto;
-  overscroll-behavior: contain;
-}
-@media (max-width: 600px) {
-  body > #apaaStudentStatementModal .apaa-statement-panel { padding: 16px; }
-}
+<style id="apaa-statement-overlay-fix">
+.apaa-statement-modal{position:fixed!important;inset:0!important;z-index:2147483000!important;overflow-y:auto;overscroll-behavior:contain}
+.apaa-statement-panel{position:relative;margin:auto;max-height:calc(100dvh - 36px);overscroll-behavior:contain}
+@media(max-width:600px){.apaa-statement-modal{padding:10px}.apaa-statement-panel{max-height:calc(100dvh - 20px)}}
+@media print{body.apaa-print-statement .apaa-statement-modal{position:absolute!important;z-index:1!important;overflow:visible!important}body.apaa-print-statement .apaa-statement-panel{max-height:none!important}}
 </style>
 <style id="apaa-workspace-navigation-styles">
 .apaa-workspace-nav{display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px;border:1px solid #e1e8f0;border-radius:13px;background:#fff;box-shadow:0 6px 20px rgba(18,59,104,.055);position:sticky;top:8px;z-index:1000}
@@ -3900,9 +3881,8 @@ function viewApaStudentStatement(index) {
       <tbody>${studentRows.map(item=>`<tr><td>${escapeHtml(item.paymentDate || '')}</td><td>${escapeHtml(item.receiptNo || '')}</td><td>${escapeHtml(item.course || '')} / ${escapeHtml(item.academicYear || '')}</td><td>${escapeHtml(item.installmentStage || '')}</td><td>${escapeHtml(item.paymentMode || '')}</td><td>${apaCurrency(apaAmount(item.amount))}</td></tr>`).join('')}</tbody>
       <tfoot><tr><td colspan="5"><strong>Total Amount Paid</strong></td><td><strong>${apaCurrency(total)}</strong></td></tr></tfoot>
     </table></div>`;
-  // Keep the statement outside the animated ledger's stacking context.
-  // Otherwise the sticky workspace navigation can cover the dialog.
   const statementModal = el('apaaStudentStatementModal');
+  // Move the modal outside the ledger's stacking context.
   if (statementModal.parentElement !== document.body) document.body.appendChild(statementModal);
   statementModal.hidden = false;
   document.body.style.overflow = 'hidden';
