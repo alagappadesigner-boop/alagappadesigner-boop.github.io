@@ -4161,17 +4161,19 @@ function clearCurrentForm() {
 }
 
 function clearAllRecords() {
-  const confirmed = confirm("Are you sure you want to delete all saved student receipt records? This action cannot be undone.");
-  if (confirmed) {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      updateSavedCount();
-      renderLedger();
-      alert("All student receipt records have been cleared successfully.");
-    } catch (e) {
-      alert("Failed to clear receipt records.");
-    }
+  const modal = document.getElementById('apaaClearRecordsPasswordModal');
+  const input = document.getElementById('apaaClearRecordsPassword');
+  const error = document.getElementById('apaaClearRecordsPasswordError');
+  if (!modal || !input || !error) {
+    alert('Password confirmation is unavailable. Please refresh the page and try again.');
+    return;
   }
+  input.value = '';
+  error.textContent = '';
+  error.hidden = true;
+  modal.hidden = false;
+  modal.setAttribute('aria-hidden', 'false');
+  window.setTimeout(() => input.focus(), 60);
 }
 
 function renderLedger() {
@@ -4614,129 +4616,7 @@ apaaShowLogin();
 
 
 
-// APAA live mouse-following eyes — coordinates are calculated in each eye group's
-// own SVG coordinate system, including character animations and responsive scaling.
-(() => {
-  const svg = document.getElementById('character-svg');
-  if (!svg) return;
-
-  const pupilIds = [
-    'purple-pupil-1', 'purple-pupil-2',
-    'black-pupil-1', 'black-pupil-2',
-    'yellow-pupil-1', 'yellow-pupil-2',
-    'orange-pupil-1', 'orange-pupil-2'
-  ];
-
-  const eyes = pupilIds.map(id => {
-    const pupil = document.getElementById(id);
-    if (!pupil) return null;
-
-    const white = pupil.previousElementSibling;
-    const eyeGroup = pupil.parentElement;
-    if (!white || white.tagName.toLowerCase() !== 'circle' || !eyeGroup) return null;
-
-    const baseX = Number(pupil.getAttribute('cx'));
-    const baseY = Number(pupil.getAttribute('cy'));
-    const pupilRadius = Number(pupil.getAttribute('r')) || 2;
-    const eyeRadius = Number(white.getAttribute('r')) || 8;
-
-    return {
-      pupil,
-      eyeGroup,
-      baseX,
-      baseY,
-      maxTravel: Math.max(1.5, eyeRadius - pupilRadius - 1),
-      x: 0, y: 0,
-      targetX: 0, targetY: 0
-    };
-  }).filter(Boolean);
-
-  if (!eyes.length) {
-    console.warn('APAA eye tracking: no pupil elements were found.');
-    return;
-  }
-
-  let pointerX = window.innerWidth / 2;
-  let pointerY = window.innerHeight / 2;
-  let frame = 0;
-
-  function setPointer(event) {
-    if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
-    pointerX = event.clientX;
-    pointerY = event.clientY;
-    if (!frame) frame = requestAnimationFrame(updateGaze);
-  }
-
-  function updateGaze() {
-    frame = 0;
-
-    eyes.forEach(eye => {
-      // Use the eye group's own matrix so the gaze remains accurate when the
-      // character floats, rotates, or scales on different screen sizes.
-      const matrix = eye.eyeGroup.getScreenCTM();
-      if (!matrix) return;
-
-      let localPointer;
-      try {
-        const point = svg.createSVGPoint();
-        point.x = pointerX;
-        point.y = pointerY;
-        localPointer = point.matrixTransform(matrix.inverse());
-      } catch (_) {
-        return;
-      }
-
-      const dx = localPointer.x - eye.baseX;
-      const dy = localPointer.y - eye.baseY;
-      const distance = Math.hypot(dx, dy) || 1;
-      const travel = Math.min(eye.maxTravel, distance);
-      eye.targetX = (dx / distance) * travel;
-      eye.targetY = (dy / distance) * travel;
-    });
-
-    // Smoothly ease every pupil toward its target on each animation frame.
-    let stillMoving = false;
-    eyes.forEach(eye => {
-      eye.x += (eye.targetX - eye.x) * 0.32;
-      eye.y += (eye.targetY - eye.y) * 0.32;
-
-      if (Math.abs(eye.targetX - eye.x) > 0.08 ||
-          Math.abs(eye.targetY - eye.y) > 0.08) {
-        stillMoving = true;
-      }
-
-      eye.pupil.setAttribute(
-        'transform',
-        `translate(${eye.x.toFixed(2)} ${eye.y.toFixed(2)})`
-      );
-    });
-
-    if (stillMoving) frame = requestAnimationFrame(updateGaze);
-  }
-
-  // Capture at document level so tracking continues over form controls,
-  // buttons, and both panels of the login page.
-  document.addEventListener('pointermove', setPointer, { passive: true, capture: true });
-  document.addEventListener('mousemove', setPointer, { passive: true, capture: true });
-  document.addEventListener('touchmove', event => {
-    if (event.touches && event.touches.length) setPointer(event.touches[0]);
-  }, { passive: true, capture: true });
-
-  window.addEventListener('resize', () => {
-    if (!frame) frame = requestAnimationFrame(updateGaze);
-  }, { passive: true });
-
-  // Recalculate after the login gate is shown or hidden.
-  const gate = document.getElementById('apaaLoginGate');
-  if (gate && window.MutationObserver) {
-    new MutationObserver(() => {
-      if (!frame) frame = requestAnimationFrame(updateGaze);
-    }).observe(gate, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
-  }
-
-  // Start with a visible gaze and continuously refresh while the pointer moves.
-  updateGaze();
-})();
+/* Mouse tracking is initialized by the single consolidated handler near </body>. */
 
 initializeNewReceipt();
 handlePaymentModeChange();
@@ -5335,188 +5215,166 @@ if (el('remarksInput')) {
 
 
 
-<script id="apaa-mouse-following-eyes-fix">
-/* Additive fix: robust global cursor tracking in each animated SVG eye's local coordinates. */
+
+
+
+
+
+
+
+<style id="apaa-single-mouse-gaze-style">
+#character-svg .eye-pupil {
+  transition: cx .08s linear, cy .08s linear !important;
+}
+</style>
+<script id="apaa-single-mouse-gaze">
 (function () {
-  function initApaAMouseEyes() {
+  function init() {
     const svg = document.getElementById('character-svg');
-    if (!svg || svg.dataset.mouseEyesReady === '1') return;
-    svg.dataset.mouseEyesReady = '1';
+    if (!svg || svg.dataset.singleGazeReady === '1') return;
+    svg.dataset.singleGazeReady = '1';
 
-    const ids = [
-      'purple-pupil-1','purple-pupil-2',
-      'black-pupil-1','black-pupil-2',
-      'yellow-pupil-1','yellow-pupil-2',
-      'orange-pupil-1','orange-pupil-2'
-    ];
-    const eyes = ids.map(id => {
-      const pupil = document.getElementById(id);
-      if (!pupil) return null;
-      const group = pupil.parentElement;
-      const baseX = Number(pupil.getAttribute('cx'));
-      const baseY = Number(pupil.getAttribute('cy'));
-      const sclera = pupil.previousElementSibling;
-      const pr = Number(pupil.getAttribute('r')) || 2;
-      const er = sclera && Number(sclera.getAttribute('r')) || 9;
-      return {
-        pupil, group, baseX, baseY,
-        max: Math.max(1.4, er - pr - 1.2),
-        x: 0, y: 0, tx: 0, ty: 0
-      };
-    }).filter(Boolean);
-    if (!eyes.length) return;
+    const pupils = [
+      {id:'purple-pupil-1',x:185,y:170,r:5,limit:4.4},
+      {id:'purple-pupil-2',x:215,y:170,r:5,limit:4.4},
+      {id:'black-pupil-1',x:252,y:215,r:5,limit:4.8},
+      {id:'black-pupil-2',x:282,y:215,r:5,limit:4.8},
+      {id:'yellow-pupil-1',x:326,y:254,r:3.5,limit:2.2},
+      {id:'yellow-pupil-2',x:351,y:254,r:3.5,limit:2.2},
+      {id:'orange-pupil-1',x:126,y:329,r:3.5,limit:2.4},
+      {id:'orange-pupil-2',x:166,y:329,r:3.5,limit:2.4}
+    ].map(item => ({...item,el:document.getElementById(item.id),cx:item.x,cy:item.y}))
+     .filter(item => item.el);
 
-    let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    if (!pupils.length) return;
+
+    let pointerX = window.innerWidth / 2;
+    let pointerY = window.innerHeight / 2;
     let raf = 0;
-    let active = true;
 
-    function onPointerMove(event) {
-      if (typeof event.clientX !== 'number' || typeof event.clientY !== 'number') return;
-      pointer.x = event.clientX;
-      pointer.y = event.clientY;
-      active = true;
-      if (!raf) raf = requestAnimationFrame(update);
+    function onMove(event) {
+      if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      if (!raf) raf = requestAnimationFrame(render);
     }
 
-    function update() {
+    function render() {
       raf = 0;
+      const rect = svg.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      // Convert screen cursor coordinates into the SVG's 500 x 420 viewBox.
+      const cursorX = (pointerX - rect.left) * 500 / rect.width;
+      const cursorY = (pointerY - rect.top) * 420 / rect.height;
       let moving = false;
-      eyes.forEach(eye => {
-        const matrix = eye.group.getScreenCTM();
-        if (matrix) {
-          try {
-            const pt = svg.createSVGPoint();
-            pt.x = pointer.x;
-            pt.y = pointer.y;
-            const local = pt.matrixTransform(matrix.inverse());
-            const dx = local.x - eye.baseX;
-            const dy = local.y - eye.baseY;
-            const distance = Math.hypot(dx, dy) || 1;
-            const amount = Math.min(eye.max, distance);
-            eye.tx = dx / distance * amount;
-            eye.ty = dy / distance * amount;
-          } catch (_) {}
-        }
-        eye.x += (eye.tx - eye.x) * 0.38;
-        eye.y += (eye.ty - eye.y) * 0.38;
-        eye.pupil.setAttribute('transform',
-          `translate(${eye.x.toFixed(2)} ${eye.y.toFixed(2)})`);
-        if (Math.abs(eye.tx-eye.x) > .06 || Math.abs(eye.ty-eye.y) > .06) moving = true;
+
+      pupils.forEach(p => {
+        const dx = cursorX - p.x;
+        const dy = cursorY - p.y;
+        const distance = Math.hypot(dx,dy) || 1;
+        const amount = Math.min(p.limit,distance);
+        const targetX = p.x + dx / distance * amount;
+        const targetY = p.y + dy / distance * amount;
+
+        p.cx += (targetX - p.cx) * .38;
+        p.cy += (targetY - p.cy) * .38;
+        p.el.setAttribute('cx',p.cx.toFixed(2));
+        p.el.setAttribute('cy',p.cy.toFixed(2));
+
+        if (Math.abs(targetX-p.cx)>.05 || Math.abs(targetY-p.cy)>.05) moving = true;
       });
-      if (moving && active) raf = requestAnimationFrame(update);
+
+      if (moving) raf = requestAnimationFrame(render);
     }
 
-    // Listen globally: cursor tracking continues over the form, buttons and illustration.
-    document.addEventListener('pointermove', onPointerMove, { passive: true, capture: true });
-    document.addEventListener('mousemove', onPointerMove, { passive: true, capture: true });
-    window.addEventListener('blur', () => {
-      pointer.x = window.innerWidth / 2;
-      pointer.y = window.innerHeight / 2;
-      active = true;
-      if (!raf) raf = requestAnimationFrame(update);
+    // One listener only; works over the full document, including form controls.
+    document.addEventListener('pointermove',onMove,{passive:true,capture:true});
+    document.addEventListener('mousemove',onMove,{passive:true,capture:true});
+    window.addEventListener('resize',() => { if (!raf) raf=requestAnimationFrame(render); },{passive:true});
+    window.addEventListener('blur',() => {
+      pointerX = rectCenterX();
+      pointerY = rectCenterY();
+      if (!raf) raf=requestAnimationFrame(render);
     });
-    window.addEventListener('resize', () => {
-      active = true;
-      if (!raf) raf = requestAnimationFrame(update);
-    }, { passive: true });
-    // Initial position keeps the characters' gaze alive before the first mouse movement.
-    if (!raf) raf = requestAnimationFrame(update);
+
+    function rectCenterX() {
+      const r=svg.getBoundingClientRect(); return r.left+r.width/2;
+    }
+    function rectCenterY() {
+      const r=svg.getBoundingClientRect(); return r.top+r.height/2;
+    }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApaAMouseEyes, { once: true });
+    document.addEventListener('DOMContentLoaded',init,{once:true});
   } else {
-    initApaAMouseEyes();
+    init();
   }
 })();
 </script>
 
 
-<style id="apaa-eye-tracking-visual-fix">
-/* Use SVG circle coordinates for gaze. This prevents CSS transform rules
-   used by the focus animation from locking the pupils in one position. */
-#character-svg .eye-pupil {
-  transform: none !important;
-  transition: cx .09s ease-out, cy .09s ease-out !important;
-}
+<div id="apaaClearRecordsPasswordModal" class="apaa-clear-password-overlay" hidden aria-hidden="true">
+  <section class="apaa-clear-password-card" role="dialog" aria-modal="true" aria-labelledby="apaaClearRecordsTitle">
+    <div class="apaa-clear-password-icon" aria-hidden="true">🔒</div>
+    <p class="apaa-clear-password-eyebrow">APAA • STUDENT LEDGER</p>
+    <h2 id="apaaClearRecordsTitle">Password required</h2>
+    <p class="apaa-clear-password-description">Enter the authorised password to clear all saved receipt records.</p>
+    <label class="apaa-clear-password-label" for="apaaClearRecordsPassword">Confirmation password</label>
+    <input id="apaaClearRecordsPassword" type="password" inputmode="numeric" autocomplete="off" placeholder="Enter password" maxlength="64">
+    <p id="apaaClearRecordsPasswordError" class="apaa-clear-password-error" role="alert" hidden></p>
+    <div class="apaa-clear-password-actions">
+      <button type="button" class="apaa-clear-cancel" id="apaaClearRecordsCancel">Cancel</button>
+      <button type="button" class="apaa-clear-confirm" id="apaaClearRecordsConfirm">Verify &amp; Clear</button>
+    </div>
+    <p class="apaa-clear-password-footnote">Records are cleared only after password verification and final confirmation.</p>
+  </section>
+</div>
+<style id="apaa-clear-records-password-style">
+.apaa-clear-password-overlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(12,27,45,.58);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);animation:apaaClearFadeIn .18s ease-out}
+.apaa-clear-password-overlay[hidden]{display:none!important}
+.apaa-clear-password-card{width:min(100%,430px);padding:30px;border-radius:20px;background:linear-gradient(155deg,#fff,#f8fafc);border:1px solid rgba(255,255,255,.8);box-shadow:0 24px 80px rgba(9,30,55,.28);animation:apaaClearCardIn .24s cubic-bezier(.2,.8,.2,1);font-family:inherit;color:#173b63}
+.apaa-clear-password-icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:#fff6df;margin-bottom:16px;font-size:22px}
+.apaa-clear-password-eyebrow{margin:0 0 7px;color:#b88917;font-size:10px;font-weight:800;letter-spacing:1.6px}
+.apaa-clear-password-card h2{margin:0 0 8px;font-family:Georgia,serif;font-size:25px;color:#153e68}
+.apaa-clear-password-description{margin:0 0 22px;color:#718096;font-size:13px;line-height:1.5}
+.apaa-clear-password-label{display:block;margin-bottom:7px;font-size:12px;font-weight:700;color:#38516d}
+#apaaClearRecordsPassword{display:block;width:100%;box-sizing:border-box;height:46px;padding:0 13px;border:1px solid #d5dfeb;border-radius:10px;background:#fff;color:#183b60;font:inherit;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+#apaaClearRecordsPassword:focus{border-color:#c99b25;box-shadow:0 0 0 4px rgba(201,155,37,.14)}
+.apaa-clear-password-error{margin:9px 0 0;color:#b42318;font-size:12px;font-weight:700}
+.apaa-clear-password-error[hidden]{display:none}
+.apaa-clear-password-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+.apaa-clear-password-actions button{min-height:42px;padding:0 17px;border:0;border-radius:9px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.apaa-clear-cancel{background:#edf2f7;color:#42566d}
+.apaa-clear-confirm{background:linear-gradient(110deg,#c99b25,#d9ae37);color:#fff;box-shadow:0 5px 14px rgba(174,132,22,.2)}
+.apaa-clear-password-actions button:hover{transform:translateY(-1px);filter:brightness(1.03)}
+.apaa-clear-password-footnote{margin:17px 0 0;color:#8996a6;font-size:10px;text-align:center}
+@keyframes apaaClearFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes apaaClearCardIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:480px){.apaa-clear-password-card{padding:23px 19px}.apaa-clear-password-card h2{font-size:22px}}
+@media(prefers-reduced-motion:reduce){.apaa-clear-password-overlay,.apaa-clear-password-card{animation:none}}
 </style>
-<script id="apaa-eye-tracking-coordinate-fix">
-(function () {
-  function start() {
-    const svg = document.getElementById('character-svg');
-    if (!svg || svg.dataset.gazeCoordinateFix === '1') return;
-    svg.dataset.gazeCoordinateFix = '1';
-
-    const data = [
-      ['purple-pupil-1',185,170,3.7], ['purple-pupil-2',215,170,3.7],
-      ['black-pupil-1',252,215,3.9], ['black-pupil-2',282,215,3.9],
-      ['yellow-pupil-1',326,254,2.1], ['yellow-pupil-2',351,254,2.1],
-      ['orange-pupil-1',126,329,2.5], ['orange-pupil-2',166,329,2.5]
-    ];
-    const pupils = data.map(([id,x,y,limit]) => {
-      const el = document.getElementById(id);
-      return el ? {el,x,y,limit,tx:0,ty:0,cx:x,cy:y} : null;
-    }).filter(Boolean);
-    if (!pupils.length) return;
-
-    let pointerX = innerWidth / 2;
-    let pointerY = innerHeight / 2;
-    let raf = 0;
-
-    function move(event) {
-      if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      if (!raf) raf = requestAnimationFrame(update);
-    }
-
-    function update() {
-      raf = 0;
-      let unsettled = false;
-      pupils.forEach(p => {
-        const parent = p.el.parentElement;
-        const matrix = parent && parent.getScreenCTM();
-        if (matrix) {
-          try {
-            const point = svg.createSVGPoint();
-            point.x = pointerX;
-            point.y = pointerY;
-            const local = point.matrixTransform(matrix.inverse());
-            const dx = local.x - p.x;
-            const dy = local.y - p.y;
-            const distance = Math.hypot(dx,dy) || 1;
-            const amount = Math.min(p.limit,distance);
-            p.tx = dx / distance * amount;
-            p.ty = dy / distance * amount;
-          } catch (_) {}
-        }
-        p.cx += (p.x + p.tx - p.cx) * .42;
-        p.cy += (p.y + p.ty - p.cy) * .42;
-        p.el.setAttribute('cx',p.cx.toFixed(2));
-        p.el.setAttribute('cy',p.cy.toFixed(2));
-        if (Math.abs(p.x+p.tx-p.cx) > .04 || Math.abs(p.y+p.ty-p.cy) > .04) unsettled = true;
-      });
-      if (unsettled) raf = requestAnimationFrame(update);
-    }
-
-    // Capture cursor movement anywhere on the login screen, including over form controls.
-    document.addEventListener('pointermove',move,{passive:true,capture:true});
-    document.addEventListener('mousemove',move,{passive:true,capture:true});
-    window.addEventListener('resize',() => {
-      if (!raf) raf = requestAnimationFrame(update);
-    },{passive:true});
-    window.addEventListener('blur',() => {
-      pointerX = innerWidth / 2;
-      pointerY = innerHeight / 2;
-      if (!raf) raf = requestAnimationFrame(update);
-    });
+<script id="apaa-clear-records-password-handler">
+(function(){
+  const ACCESS_PASSWORD='8939';
+  const modal=document.getElementById('apaaClearRecordsPasswordModal');
+  const input=document.getElementById('apaaClearRecordsPassword');
+  const error=document.getElementById('apaaClearRecordsPasswordError');
+  const cancel=document.getElementById('apaaClearRecordsCancel');
+  const verify=document.getElementById('apaaClearRecordsConfirm');
+  if(!modal||!input||!error||!cancel||!verify)return;
+  function closeModal(){modal.hidden=true;modal.setAttribute('aria-hidden','true');input.value='';error.textContent='';error.hidden=true}
+  function verifyAndClear(){
+    if(input.value!==ACCESS_PASSWORD){error.textContent='Incorrect password. Records have not been cleared.';error.hidden=false;input.value='';input.focus();return}
+    if(!window.confirm('Password verified. Permanently clear all saved student receipt records?')){closeModal();return}
+    try{localStorage.removeItem(STORAGE_KEY);updateSavedCount();renderLedger();closeModal();alert('All student receipt records have been cleared successfully.')}
+    catch(e){error.textContent='Unable to clear records. Please try again.';error.hidden=false;console.error('APAA clear records failed:',e)}
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded',start,{once:true});
-  } else {
-    start();
-  }
+  cancel.addEventListener('click',closeModal);
+  verify.addEventListener('click',verifyAndClear);
+  input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();verifyAndClear()}else if(event.key==='Escape')closeModal()});
+  modal.addEventListener('click',event=>{if(event.target===modal)closeModal()});
 })();
 </script>
 
