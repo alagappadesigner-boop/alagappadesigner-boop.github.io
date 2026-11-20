@@ -4833,6 +4833,168 @@ if (el('remarksInput')) {
   }
 }
 
+
+
+/* ===== APAA premium login motion refinement (additive; preserves layout) ===== */
+#apaaLoginGate {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(208,165,47,.20), transparent 31%),
+    radial-gradient(ellipse at 88% 82%, rgba(30,84,136,.13), transparent 34%),
+    linear-gradient(135deg,#edf2f8 0%,#faf9f5 50%,#e8eef6 100%);
+}
+#apaaLoginGate::before,
+#apaaLoginGate::after {
+  content:"";
+  position:fixed;
+  z-index:-1;
+  pointer-events:none;
+  border-radius:50%;
+}
+#apaaLoginGate::before {
+  width:min(52vw,620px); aspect-ratio:1;
+  top:-25%; left:-12%;
+  border:1px solid rgba(208,165,47,.16);
+  box-shadow:0 0 0 34px rgba(208,165,47,.025),0 0 0 78px rgba(208,165,47,.018);
+  animation:apaaAmbientOrbit 28s linear infinite;
+}
+#apaaLoginGate::after {
+  width:min(44vw,520px); aspect-ratio:1;
+  right:-13%; bottom:-30%;
+  border:1px solid rgba(18,59,104,.12);
+  box-shadow:0 0 0 28px rgba(18,59,104,.025),0 0 0 66px rgba(18,59,104,.018);
+  animation:apaaAmbientOrbit 34s linear infinite reverse;
+}
+@keyframes apaaAmbientOrbit { to { transform:rotate(360deg); } }
+
+.apaa-login-layout {
+  position:relative;
+  box-shadow:0 30px 95px rgba(17,43,73,.17),0 5px 18px rgba(17,43,73,.05);
+  transition:box-shadow .45s ease, transform .45s ease;
+}
+.apaa-login-layout::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:inherit;
+  pointer-events:none;
+}
+.apaa-login-layout:hover {
+  box-shadow:0 36px 105px rgba(17,43,73,.20),0 8px 24px rgba(17,43,73,.06);
+}
+.apaa-login-visual {
+  background:
+    radial-gradient(ellipse at 50% 52%,rgba(255,255,255,.98) 0 34%,rgba(246,244,250,.96) 70%),
+    linear-gradient(145deg,#f5f3f8,#eef2f8);
+}
+.apaa-login-visual::before { animation:apaaRingPulse 8s ease-in-out infinite; }
+.apaa-login-visual::after { animation:apaaRingPulse 8s 1.2s ease-in-out infinite reverse; }
+@keyframes apaaRingPulse {
+  0%,100% { opacity:.45; scale:.96; }
+  50% { opacity:1; scale:1.035; }
+}
+.apaa-login-brand {
+  animation:apaaBrandReveal .85s .18s cubic-bezier(.2,.8,.2,1) both;
+}
+.apaa-login-logo {
+  filter:drop-shadow(0 4px 5px rgba(18,59,104,.10));
+  animation:apaaLogoFloat 5s ease-in-out infinite;
+}
+@keyframes apaaBrandReveal {
+  from { opacity:0; transform:translateY(-12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes apaaLogoFloat {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-3px); }
+}
+.apaa-art-stage { animation:apaaArtAppear 1s .2s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes apaaArtAppear {
+  from { opacity:0; transform:translate(-50%,-46%) scale(.94); }
+  to { opacity:1; transform:translate(-50%,-50%) scale(1); }
+}
+.apaa-art-glow { filter:blur(1px); }
+.apaa-floating-dot { box-shadow:0 0 16px currentColor; }
+.apaa-login-caption {
+  animation:apaaCaptionIn .8s .65s ease both;
+}
+@keyframes apaaCaptionIn {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.apaa-login-title {
+  animation:apaaTitleReveal .75s .35s cubic-bezier(.2,.8,.2,1) both;
+}
+.apaa-login-subtitle { animation:apaaTitleReveal .75s .48s both; }
+.apaa-login-heading { animation:apaaTitleReveal .7s .58s both; }
+.apaa-login-intro { animation:apaaTitleReveal .7s .68s both; }
+@keyframes apaaTitleReveal {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.apaa-login-field {
+  animation:apaaFieldReveal .65s ease both;
+}
+.apaa-login-field:nth-of-type(1) { animation-delay:.72s; }
+.apaa-login-field:nth-of-type(2) { animation-delay:.84s; }
+@keyframes apaaFieldReveal {
+  from { opacity:0; transform:translateX(12px); }
+  to { opacity:1; transform:translateX(0); }
+}
+.apaa-login-field input {
+  transition:border-color .25s,box-shadow .25s,background .25s,transform .25s;
+}
+.apaa-login-field input:focus {
+  transform:translateY(-1px);
+  box-shadow:0 0 0 4px rgba(189,150,62,.12),0 6px 18px rgba(18,59,104,.06);
+}
+.apaa-input-icon { transition:stroke .2s,transform .2s; }
+.apaa-input-icon-wrap:focus-within .apaa-input-icon {
+  stroke:#bd963e;
+  transform:scale(1.08);
+}
+.apaa-login-submit {
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  animation:apaaButtonReveal .7s .95s ease both;
+}
+.apaa-login-submit::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  top:-60%; left:-75%;
+  width:45%; height:220%;
+  transform:rotate(22deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+  transition:left .7s ease;
+}
+.apaa-login-submit:hover::before { left:135%; }
+.apaa-login-submit:active { transform:translateY(0) scale(.985); }
+@keyframes apaaButtonReveal {
+  from { opacity:0; transform:translateY(9px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.apaa-login-foot { animation:apaaTitleReveal .7s 1.05s both; }
+.apaa-login-error:not(:empty) { animation:apaaLoginErrorShake .35s ease; }
+@keyframes apaaLoginErrorShake {
+  0%,100% { transform:translateX(0); }
+  25% { transform:translateX(-4px); }
+  75% { transform:translateX(4px); }
+}
+.apaa-login-submit:disabled { cursor:wait; filter:saturate(.85); }
+@media (prefers-reduced-motion: reduce) {
+  #apaaLoginGate::before,#apaaLoginGate::after,
+  .apaa-login-layout,.apaa-login-brand,.apaa-login-logo,
+  .apaa-art-stage,.apaa-art-glow,.apaa-floating-dot,
+  .apaa-login-caption,.apaa-login-title,.apaa-login-subtitle,
+  .apaa-login-heading,.apaa-login-intro,.apaa-login-field,
+  .apaa-login-submit,.apaa-login-foot,.apaa-login-error:not(:empty),
+  .apaa-login-visual::before,.apaa-login-visual::after,
+  .apaa-shape { animation:none !important; transition:none !important; }
+}
+
 </style>
 <script>
 (function protectVisibleReceiptFromCasualCopying() {
