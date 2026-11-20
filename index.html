@@ -5104,45 +5104,8 @@ if (el('remarksInput')) {
   </div>
 </div>
 
-<script id="apaa-cursor-eyes-and-receipt-welcome-script">
+<script id="apaa-receipt-welcome-script">
 (function () {
-  const svg = document.getElementById('character-svg');
-  const stage = document.querySelector('.apaa-art-stage');
-  if (svg && stage) {
-    const pupils = [
-      ['purple-pupil-1',185,170],['purple-pupil-2',215,170],
-      ['black-pupil-1',252,215],['black-pupil-2',282,215],
-      ['yellow-pupil-1',326,254],['yellow-pupil-2',351,254],
-      ['orange-pupil-1',126,329],['orange-pupil-2',166,329]
-    ].map(([id,x,y]) => ({el:document.getElementById(id),x,y})).filter(p => p.el);
-    let raf = 0;
-    function resetPupils() {
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
-      pupils.forEach(p => { p.el.setAttribute('cx',p.x); p.el.setAttribute('cy',p.y); });
-      svg.classList.remove('apaa-eyes-following');
-    }
-    stage.addEventListener('pointermove', function (event) {
-      if (event.pointerType === 'touch') return;
-      const point = svg.createSVGPoint(); point.x = event.clientX; point.y = event.clientY;
-      const matrix = svg.getScreenCTM(); if (!matrix) return;
-      const cursor = point.matrixTransform(matrix.inverse());
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        svg.classList.add('apaa-eyes-following');
-        pupils.forEach(p => {
-          const dx = cursor.x - p.x, dy = cursor.y - p.y;
-          const distance = Math.hypot(dx,dy) || 1;
-          const travel = Math.min(3.6,distance);
-          p.el.setAttribute('cx',(p.x + dx / distance * travel).toFixed(2));
-          p.el.setAttribute('cy',(p.y + dy / distance * travel).toFixed(2));
-        });
-      });
-    }, {passive:true});
-    stage.addEventListener('pointerleave',resetPupils,{passive:true});
-    window.addEventListener('blur',resetPupils);
-  }
-
   window.apaaPlayReceiptWelcome = async function () {
     const overlay = document.getElementById('apaaReceiptWelcome');
     if (!overlay) return;
@@ -5287,6 +5250,127 @@ if (el('remarksInput')) {
       }, {once:true});
     }, true);
   }
+})();
+</script>
+
+
+<style id="apaa-latest-eye-body-polish">
+/* Premium glossy eyes: crisp sclera, luminous pupils and gentle depth. */
+#character-svg #purple-eyes > circle:not(.eye-pupil),
+#character-svg #black-eyes > circle:not(.eye-pupil),
+#character-svg #orange-eyes > circle:not(.eye-pupil) {
+  filter:drop-shadow(0 2px 2px rgba(16,35,58,.16));
+}
+#character-svg .eye-pupil {
+  stroke:rgba(255,255,255,.92);
+  stroke-width:1.15;
+  paint-order:stroke fill;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.24));
+  transition:cx .12s cubic-bezier(.2,.8,.2,1),cy .12s cubic-bezier(.2,.8,.2,1);
+}
+#character-svg #yellow-eyes .eye-pupil {
+  stroke:rgba(255,255,255,.78);
+  stroke-width:.8;
+}
+/* A tiny specular shine makes each eye feel polished and dimensional. */
+#character-svg #purple-eyes,
+#character-svg #black-eyes,
+#character-svg #yellow-eyes,
+#character-svg #orange-eyes {
+  filter:drop-shadow(0 1px 1px rgba(18,40,65,.08));
+}
+/* More expressive, elastic body movement while preserving the original shapes. */
+#character-svg #purple-character { animation:apaaBodySwayPurple 4.8s ease-in-out infinite; }
+#character-svg #black-character { animation:apaaBodySwayBlack 4.15s ease-in-out infinite; }
+#character-svg #yellow-character { animation:apaaBodySwayYellow 4.55s ease-in-out infinite; }
+#character-svg #orange-character { animation:apaaBodySwayOrange 4.35s ease-in-out infinite; }
+@keyframes apaaBodySwayPurple {
+  0%,100% { translate:0 0; rotate:0deg; }
+  24% { translate:-1px -3px; rotate:-1.5deg; }
+  52% { translate:1px -10px; rotate:1.1deg; }
+  78% { translate:0 -4px; rotate:-.5deg; }
+}
+@keyframes apaaBodySwayBlack {
+  0%,100% { translate:0 0; rotate:0deg; }
+  30% { translate:1px -3px; rotate:1.1deg; }
+  58% { translate:0 -8px; rotate:-1.2deg; }
+  82% { translate:-1px -2px; rotate:.4deg; }
+}
+@keyframes apaaBodySwayYellow {
+  0%,100% { translate:0 0; rotate:0deg; }
+  28% { translate:1px -2px; rotate:2deg; }
+  55% { translate:0 -9px; rotate:-1.8deg; }
+  82% { translate:-1px -3px; rotate:1deg; }
+}
+@keyframes apaaBodySwayOrange {
+  0%,100% { translate:0 0; rotate:0deg; }
+  32% { translate:-1px -2px; rotate:-1.6deg; }
+  60% { translate:1px -6px; rotate:1.3deg; }
+  84% { translate:0 -2px; rotate:-.5deg; }
+}
+/* Small personality response when the pointer approaches the art. */
+.apaa-art-stage.is-pointer-near #character-svg .character-group {
+  transition:filter .25s ease;
+}
+.apaa-art-stage.is-pointer-near #purple-character { filter:drop-shadow(0 5px 7px rgba(108,92,231,.15)); }
+.apaa-art-stage.is-pointer-near #yellow-character { filter:drop-shadow(0 5px 7px rgba(251,191,36,.18)); }
+#character-svg.apaa-eyes-following .eye-pupil { transition-duration:.075s; }
+@media (prefers-reduced-motion:reduce) {
+  #character-svg #purple-character,#character-svg #black-character,
+  #character-svg #yellow-character,#character-svg #orange-character {
+    animation:none!important;
+  }
+  #character-svg .eye-pupil { transition:none!important; }
+}
+</style>
+<script id="apaa-global-cursor-eye-tracking">
+(function () {
+  const gate = document.getElementById('apaaLoginGate');
+  const stage = document.querySelector('.apaa-art-stage');
+  const svg = document.getElementById('character-svg');
+  if (!gate || !stage || !svg) return;
+  const pupilData = [
+    ['purple-pupil-1',185,170,3.9],['purple-pupil-2',215,170,3.9],
+    ['black-pupil-1',252,215,4.0],['black-pupil-2',282,215,4.0],
+    ['yellow-pupil-1',326,254,2.4],['yellow-pupil-2',351,254,2.4],
+    ['orange-pupil-1',126,329,2.8],['orange-pupil-2',166,329,2.8]
+  ];
+  const pupils = pupilData.map(([id,x,y,limit]) => ({
+    el:document.getElementById(id),x,y,limit
+  })).filter(p => p.el);
+  let raf = 0;
+  function reset() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    pupils.forEach(p => { p.el.setAttribute('cx',p.x); p.el.setAttribute('cy',p.y); });
+    svg.classList.remove('apaa-eyes-following');
+    stage.classList.remove('is-pointer-near');
+  }
+  gate.addEventListener('pointermove', event => {
+    if (event.pointerType === 'touch') return;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX; point.y = event.clientY;
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return;
+    const cursor = point.matrixTransform(matrix.inverse());
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      svg.classList.add('apaa-eyes-following');
+      const rect = stage.getBoundingClientRect();
+      const near = event.clientX >= rect.left - 90 && event.clientX <= rect.right + 90 &&
+                   event.clientY >= rect.top - 90 && event.clientY <= rect.bottom + 90;
+      stage.classList.toggle('is-pointer-near',near);
+      pupils.forEach(p => {
+        const dx = cursor.x - p.x, dy = cursor.y - p.y;
+        const distance = Math.hypot(dx,dy) || 1;
+        const travel = Math.min(p.limit,distance);
+        p.el.setAttribute('cx',(p.x + dx / distance * travel).toFixed(2));
+        p.el.setAttribute('cy',(p.y + dy / distance * travel).toFixed(2));
+      });
+    });
+  }, {passive:true});
+  gate.addEventListener('pointerleave',reset,{passive:true});
+  window.addEventListener('blur',reset);
 })();
 </script>
 
