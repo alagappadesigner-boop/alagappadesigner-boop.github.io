@@ -5332,54 +5332,102 @@ if (el('remarksInput')) {
   #character-svg .eye-pupil { transition:none!important; }
 }
 </style>
-<script id="apaa-global-cursor-eye-tracking">
+
+
+
+<script id="apaa-mouse-following-eyes-fix">
+/* Additive fix: robust global cursor tracking in each animated SVG eye's local coordinates. */
 (function () {
-  const gate = document.getElementById('apaaLoginGate');
-  const stage = document.querySelector('.apaa-art-stage');
-  const svg = document.getElementById('character-svg');
-  if (!gate || !stage || !svg) return;
-  const pupilData = [
-    ['purple-pupil-1',185,170,3.9],['purple-pupil-2',215,170,3.9],
-    ['black-pupil-1',252,215,4.0],['black-pupil-2',282,215,4.0],
-    ['yellow-pupil-1',326,254,2.4],['yellow-pupil-2',351,254,2.4],
-    ['orange-pupil-1',126,329,2.8],['orange-pupil-2',166,329,2.8]
-  ];
-  const pupils = pupilData.map(([id,x,y,limit]) => ({
-    el:document.getElementById(id),x,y,limit
-  })).filter(p => p.el);
-  let raf = 0;
-  function reset() {
-    if (raf) cancelAnimationFrame(raf);
-    raf = 0;
-    pupils.forEach(p => { p.el.setAttribute('cx',p.x); p.el.setAttribute('cy',p.y); });
-    svg.classList.remove('apaa-eyes-following');
-    stage.classList.remove('is-pointer-near');
-  }
-  gate.addEventListener('pointermove', event => {
-    if (event.pointerType === 'touch') return;
-    const point = svg.createSVGPoint();
-    point.x = event.clientX; point.y = event.clientY;
-    const matrix = svg.getScreenCTM();
-    if (!matrix) return;
-    const cursor = point.matrixTransform(matrix.inverse());
-    if (raf) cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => {
-      svg.classList.add('apaa-eyes-following');
-      const rect = stage.getBoundingClientRect();
-      const near = event.clientX >= rect.left - 90 && event.clientX <= rect.right + 90 &&
-                   event.clientY >= rect.top - 90 && event.clientY <= rect.bottom + 90;
-      stage.classList.toggle('is-pointer-near',near);
-      pupils.forEach(p => {
-        const dx = cursor.x - p.x, dy = cursor.y - p.y;
-        const distance = Math.hypot(dx,dy) || 1;
-        const travel = Math.min(p.limit,distance);
-        p.el.setAttribute('cx',(p.x + dx / distance * travel).toFixed(2));
-        p.el.setAttribute('cy',(p.y + dy / distance * travel).toFixed(2));
+  function initApaAMouseEyes() {
+    const svg = document.getElementById('character-svg');
+    if (!svg || svg.dataset.mouseEyesReady === '1') return;
+    svg.dataset.mouseEyesReady = '1';
+
+    const ids = [
+      'purple-pupil-1','purple-pupil-2',
+      'black-pupil-1','black-pupil-2',
+      'yellow-pupil-1','yellow-pupil-2',
+      'orange-pupil-1','orange-pupil-2'
+    ];
+    const eyes = ids.map(id => {
+      const pupil = document.getElementById(id);
+      if (!pupil) return null;
+      const group = pupil.parentElement;
+      const baseX = Number(pupil.getAttribute('cx'));
+      const baseY = Number(pupil.getAttribute('cy'));
+      const sclera = pupil.previousElementSibling;
+      const pr = Number(pupil.getAttribute('r')) || 2;
+      const er = sclera && Number(sclera.getAttribute('r')) || 9;
+      return {
+        pupil, group, baseX, baseY,
+        max: Math.max(1.4, er - pr - 1.2),
+        x: 0, y: 0, tx: 0, ty: 0
+      };
+    }).filter(Boolean);
+    if (!eyes.length) return;
+
+    let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let raf = 0;
+    let active = true;
+
+    function onPointerMove(event) {
+      if (typeof event.clientX !== 'number' || typeof event.clientY !== 'number') return;
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      active = true;
+      if (!raf) raf = requestAnimationFrame(update);
+    }
+
+    function update() {
+      raf = 0;
+      let moving = false;
+      eyes.forEach(eye => {
+        const matrix = eye.group.getScreenCTM();
+        if (matrix) {
+          try {
+            const pt = svg.createSVGPoint();
+            pt.x = pointer.x;
+            pt.y = pointer.y;
+            const local = pt.matrixTransform(matrix.inverse());
+            const dx = local.x - eye.baseX;
+            const dy = local.y - eye.baseY;
+            const distance = Math.hypot(dx, dy) || 1;
+            const amount = Math.min(eye.max, distance);
+            eye.tx = dx / distance * amount;
+            eye.ty = dy / distance * amount;
+          } catch (_) {}
+        }
+        eye.x += (eye.tx - eye.x) * 0.38;
+        eye.y += (eye.ty - eye.y) * 0.38;
+        eye.pupil.setAttribute('transform',
+          `translate(${eye.x.toFixed(2)} ${eye.y.toFixed(2)})`);
+        if (Math.abs(eye.tx-eye.x) > .06 || Math.abs(eye.ty-eye.y) > .06) moving = true;
       });
+      if (moving && active) raf = requestAnimationFrame(update);
+    }
+
+    // Listen globally: cursor tracking continues over the form, buttons and illustration.
+    document.addEventListener('pointermove', onPointerMove, { passive: true, capture: true });
+    document.addEventListener('mousemove', onPointerMove, { passive: true, capture: true });
+    window.addEventListener('blur', () => {
+      pointer.x = window.innerWidth / 2;
+      pointer.y = window.innerHeight / 2;
+      active = true;
+      if (!raf) raf = requestAnimationFrame(update);
     });
-  }, {passive:true});
-  gate.addEventListener('pointerleave',reset,{passive:true});
-  window.addEventListener('blur',reset);
+    window.addEventListener('resize', () => {
+      active = true;
+      if (!raf) raf = requestAnimationFrame(update);
+    }, { passive: true });
+    // Initial position keeps the characters' gaze alive before the first mouse movement.
+    if (!raf) raf = requestAnimationFrame(update);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApaAMouseEyes, { once: true });
+  } else {
+    initApaAMouseEyes();
+  }
 })();
 </script>
 
