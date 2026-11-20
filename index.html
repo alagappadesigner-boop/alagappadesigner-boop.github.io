@@ -5163,6 +5163,133 @@ if (el('remarksInput')) {
 })();
 </script>
 
+
+<style id="apaa-character-personality-motion">
+/* Character personality: gentle independent blinks, expressions and focus reactions. */
+#character-svg #purple-eyes,
+#character-svg #black-eyes,
+#character-svg #yellow-eyes,
+#character-svg #orange-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+#character-svg #purple-eyes { animation: apaaPurpleBlink 5.8s infinite; }
+#character-svg #black-eyes { animation: apaaBlackBlink 7.1s 1.2s infinite; }
+#character-svg #yellow-eyes { animation: apaaYellowBlink 6.4s 2.1s infinite; }
+#character-svg #orange-eyes { animation: apaaOrangeBlink 4.9s .8s infinite; }
+@keyframes apaaPurpleBlink {
+  0%, 43%, 45%, 100% { transform:scaleY(1); }
+  44% { transform:scaleY(.10); }
+}
+@keyframes apaaBlackBlink {
+  0%, 58%, 60%, 100% { transform:scaleY(1); }
+  59% { transform:scaleY(.12); }
+}
+@keyframes apaaYellowBlink {
+  0%, 34%, 36%, 100% { transform:scaleY(1); }
+  35% { transform:scaleY(.12); }
+}
+@keyframes apaaOrangeBlink {
+  0%, 68%, 70%, 100% { transform:scaleY(1); }
+  69% { transform:scaleY(.10); }
+}
+/* Username focus: characters become attentive and glance toward the form. */
+.apaa-art-stage.is-username-focus #character-svg .eye-pupil {
+  transform:translate(2.5px,-.3px);
+}
+.apaa-art-stage.is-username-focus #purple-character { filter:drop-shadow(0 4px 5px rgba(108,92,231,.12)); }
+/* Password focus: yellow character playfully closes its eyes and peeks sideways. */
+.apaa-art-stage.is-password-focus #character-svg #yellow-eyes {
+  animation:none;
+  transform:scaleY(.08);
+  transition:transform .22s ease;
+}
+.apaa-art-stage.is-password-focus #yellow-character {
+  transform:translateX(5px) rotate(2deg);
+}
+.apaa-art-stage.is-password-focus #character-svg #purple-eyes,
+.apaa-art-stage.is-password-focus #character-svg #black-eyes,
+.apaa-art-stage.is-password-focus #character-svg #orange-eyes {
+  animation-play-state:paused;
+}
+/* Small smile response while typing. */
+.apaa-art-stage.is-typing #black-mouth,
+.apaa-art-stage.is-typing #orange-mouth {
+  transform-box:fill-box;
+  transform-origin:center;
+  transform:scale(1.12,1.18);
+  transition:transform .2s ease;
+}
+.apaa-art-stage.is-login-success #character-svg .character-group {
+  animation:apaaCharacterCelebrate .62s ease-in-out 2;
+}
+#character-svg #purple-character,
+#character-svg #black-character,
+#character-svg #yellow-character,
+#character-svg #orange-character { will-change:translate,transform; }
+@media (prefers-reduced-motion:reduce) {
+  #character-svg #purple-eyes,#character-svg #black-eyes,
+  #character-svg #yellow-eyes,#character-svg #orange-eyes {
+    animation:none!important;
+  }
+  .apaa-art-stage.is-password-focus #character-svg #yellow-eyes { transition:none; }
+}
+</style>
+<script id="apaa-character-personality-script">
+(function () {
+  const stage = document.querySelector('.apaa-art-stage');
+  const svg = document.getElementById('character-svg');
+  const username = document.getElementById('apaaLoginUsername');
+  const password = document.getElementById('apaaLoginPassword');
+  const form = document.getElementById('apaaLoginForm');
+  if (!stage || !svg) return;
+
+  function clearFocusStates() {
+    stage.classList.remove('is-username-focus','is-password-focus','is-typing','is-login-success');
+  }
+  if (username) {
+    username.addEventListener('focus', () => {
+      stage.classList.remove('is-password-focus');
+      stage.classList.add('is-username-focus');
+    });
+    username.addEventListener('input', () => stage.classList.toggle('is-typing', !!username.value));
+    username.addEventListener('blur', () => {
+      stage.classList.remove('is-username-focus','is-typing');
+    });
+  }
+  if (password) {
+    password.addEventListener('focus', () => {
+      stage.classList.remove('is-username-focus','is-typing');
+      stage.classList.add('is-password-focus');
+    });
+    password.addEventListener('input', () => stage.classList.toggle('is-typing', !!password.value));
+    password.addEventListener('blur', () => {
+      stage.classList.remove('is-password-focus','is-typing');
+    });
+  }
+  if (form) {
+    form.addEventListener('submit', () => {
+      // Brief success choreography is only played after the existing credential check succeeds.
+      const submit = form.querySelector('.apaa-login-submit');
+      if (submit) submit.addEventListener('click', function successCue() {
+        const error = document.getElementById('apaaLoginError');
+        window.setTimeout(() => {
+          if (error && !error.textContent.trim()) {
+            stage.classList.add('is-login-success');
+            svg.classList.add('apaa-login-celebrate');
+            window.setTimeout(() => {
+              stage.classList.remove('is-login-success');
+              svg.classList.remove('apaa-login-celebrate');
+              clearFocusStates();
+            }, 1450);
+          }
+        }, 560);
+      }, {once:true});
+    }, true);
+  }
+})();
+</script>
+
 </body>
 
 </html>
