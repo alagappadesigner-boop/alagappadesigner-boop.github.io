@@ -4563,6 +4563,8 @@ document.getElementById('apaaLoginForm').addEventListener('submit', async functi
   if (username.toLowerCase() === APAA_LOGIN_USERNAME.toLowerCase() && password === APAA_LOGIN_PASSWORD) {
     sessionStorage.setItem(APAA_LOGIN_SESSION_KEY, 'yes');
     errorMessage.textContent = '';
+    // Show the APAA receipt-printing welcome transition before opening the workspace.
+    await apaaPlayReceiptWelcome();
     const gate = document.getElementById('apaaLoginGate');
     if (gate) gate.classList.add('is-leaving');
     await new Promise(resolve => setTimeout(resolve, 380));
@@ -5021,6 +5023,143 @@ if (el('remarksInput')) {
   appRoot.addEventListener('selectstart', event => {
     if (!isFormControl(event.target)) event.preventDefault();
   });
+})();
+</script>
+
+
+
+<style id="apaa-cursor-eyes-and-receipt-welcome-styles">
+/* Cursor-responsive pupils: only pupils move; original character artwork remains unchanged. */
+#character-svg .eye-pupil { transition: cx .11s ease-out, cy .11s ease-out; }
+#character-svg.apaa-eyes-following .eye-pupil { transition-duration: .07s; }
+#character-svg.apaa-login-celebrate .character-group { animation: apaaCharacterCelebrate .62s ease-in-out 2; }
+@keyframes apaaCharacterCelebrate { 0%,100% { translate:0 0; } 35% { translate:0 -13px; } 65% { translate:0 2px; } }
+
+/* Receipt printing transition displayed only after valid login. */
+#apaaReceiptWelcome {
+  position:fixed; inset:0; z-index:100200; display:grid; place-items:center; padding:18px;
+  background:radial-gradient(circle at 50% 42%,rgba(208,165,47,.15),transparent 34%),rgba(10,29,50,.58);
+  backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px);
+  opacity:0; visibility:hidden; transition:opacity .25s ease,visibility .25s ease;
+}
+#apaaReceiptWelcome.is-active { opacity:1; visibility:visible; }
+#apaaReceiptWelcome[hidden] { display:none !important; }
+.apaa-welcome-card {
+  width:min(410px,100%); padding:30px 28px 27px; text-align:center; border-radius:22px;
+  border:1px solid rgba(208,165,47,.35); background:linear-gradient(145deg,#fff 0%,#f8fafc 100%);
+  box-shadow:0 30px 90px rgba(4,20,39,.32); color:#123b68;
+  transform:translateY(16px) scale(.97); transition:transform .42s cubic-bezier(.2,.8,.2,1);
+}
+#apaaReceiptWelcome.is-active .apaa-welcome-card { transform:translateY(0) scale(1); }
+.apaa-printer-scene { position:relative; width:174px; height:142px; margin:0 auto 17px; }
+.apaa-printer-machine {
+  position:absolute; left:18px; right:18px; bottom:12px; height:68px; border-radius:13px 13px 10px 10px;
+  background:linear-gradient(145deg,#1b4c7b,#12345a); box-shadow:0 12px 22px rgba(18,59,104,.2);
+}
+.apaa-printer-machine:before { content:""; position:absolute; left:17px; right:17px; top:12px; height:9px; border-radius:8px; background:#0b2948; box-shadow:0 19px 0 -2px rgba(255,255,255,.15); }
+.apaa-printer-slot { position:absolute; left:39px; right:39px; bottom:67px; height:8px; border-radius:8px; background:#091f37; z-index:2; }
+.apaa-paper {
+  position:absolute; z-index:1; left:49px; top:8px; width:76px; height:94px; padding:12px 9px 8px;
+  border-radius:5px; background:#fff; border:1px solid #dce4ed; box-shadow:0 5px 13px rgba(12,36,61,.13);
+  transform:translateY(58px); animation:apaaPaperPrint 1.15s .12s cubic-bezier(.22,.72,.25,1) forwards;
+}
+.apaa-paper-brand { font:800 8px Georgia,serif; letter-spacing:.7px; color:#123b68; }
+.apaa-paper-rule { height:2px; margin:5px 0 7px; background:#d0a52f; }
+.apaa-paper-line { height:3px; margin:5px 0; border-radius:3px; background:#dce4ed; }
+.apaa-paper-line.short { width:58%; }
+.apaa-paper-total { margin-top:7px; text-align:right; font-size:7px; font-weight:800; color:#123b68; }
+@keyframes apaaPaperPrint { 0% { transform:translateY(58px); } 72% { transform:translateY(-5px); } 86% { transform:translateY(2px); } 100% { transform:translateY(0); } }
+.apaa-printer-light { position:absolute; z-index:3; left:50%; bottom:42px; width:7px; height:7px; border-radius:50%; background:#e8bd49; box-shadow:0 0 0 5px rgba(232,189,73,.13),0 0 14px #e8bd49; animation:apaaPrinterBlink .7s ease-in-out infinite alternate; }
+@keyframes apaaPrinterBlink { to { opacity:.35; box-shadow:0 0 0 2px rgba(232,189,73,.08); } }
+.apaa-welcome-check { position:absolute; z-index:4; right:24px; top:4px; width:32px; height:32px; display:grid; place-items:center; border-radius:50%; color:#fff; background:#24835a; border:3px solid #fff; box-shadow:0 4px 12px rgba(36,131,90,.25); opacity:0; transform:scale(.35); animation:apaaWelcomeCheck .35s 1.05s ease-out forwards; }
+.apaa-welcome-check svg { width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round; }
+@keyframes apaaWelcomeCheck { 70% { transform:scale(1.16);opacity:1; } 100% { transform:scale(1);opacity:1; } }
+.apaa-welcome-eyebrow { margin:0 0 7px; color:#b58b32; font-size:10px; font-weight:800; letter-spacing:2px; }
+.apaa-welcome-card h2 { margin:0 0 7px; font:700 23px/1.2 'Playfair Display',Georgia,serif; color:#123b68; }
+.apaa-welcome-card p { margin:0; color:#718096; font-size:13px; line-height:1.5; }
+.apaa-welcome-progress { width:100%; height:4px; margin:20px 0 0; overflow:hidden; border-radius:8px; background:#e9eef4; }
+.apaa-welcome-progress span { display:block; width:0; height:100%; border-radius:8px; background:linear-gradient(90deg,#123b68,#d0a52f); animation:apaaWelcomeProgress 1.45s ease-out forwards; }
+@keyframes apaaWelcomeProgress { to { width:100%; } }
+@media(prefers-reduced-motion:reduce) {
+  #character-svg .eye-pupil { transition:none; }
+  #apaaReceiptWelcome *, #apaaReceiptWelcome *:before { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+</style>
+<div id="apaaReceiptWelcome" hidden aria-live="polite" aria-label="Preparing APAA receipt workspace">
+  <div class="apaa-welcome-card">
+    <div class="apaa-printer-scene" aria-hidden="true">
+      <div class="apaa-paper">
+        <div class="apaa-paper-brand">ALAGAPPA</div><div class="apaa-paper-rule"></div>
+        <div class="apaa-paper-line"></div><div class="apaa-paper-line short"></div>
+        <div class="apaa-paper-line"></div><div class="apaa-paper-line short"></div>
+        <div class="apaa-paper-total">FEE RECEIPT</div>
+      </div>
+      <div class="apaa-printer-slot"></div><div class="apaa-printer-machine"></div><div class="apaa-printer-light"></div>
+      <div class="apaa-welcome-check"><svg viewBox="0 0 20 20"><path d="m4 10 4 4 8-9"/></svg></div>
+    </div>
+    <p class="apaa-welcome-eyebrow">ALAGAPPA PERFORMING ARTS ACADEMY</p>
+    <h2>Preparing Your Workspace</h2>
+    <p>Your fee receipt desk is getting ready…</p>
+    <div class="apaa-welcome-progress"><span></span></div>
+  </div>
+</div>
+
+<script id="apaa-cursor-eyes-and-receipt-welcome-script">
+(function () {
+  const svg = document.getElementById('character-svg');
+  const stage = document.querySelector('.apaa-art-stage');
+  if (svg && stage) {
+    const pupils = [
+      ['purple-pupil-1',185,170],['purple-pupil-2',215,170],
+      ['black-pupil-1',252,215],['black-pupil-2',282,215],
+      ['yellow-pupil-1',326,254],['yellow-pupil-2',351,254],
+      ['orange-pupil-1',126,329],['orange-pupil-2',166,329]
+    ].map(([id,x,y]) => ({el:document.getElementById(id),x,y})).filter(p => p.el);
+    let raf = 0;
+    function resetPupils() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      pupils.forEach(p => { p.el.setAttribute('cx',p.x); p.el.setAttribute('cy',p.y); });
+      svg.classList.remove('apaa-eyes-following');
+    }
+    stage.addEventListener('pointermove', function (event) {
+      if (event.pointerType === 'touch') return;
+      const point = svg.createSVGPoint(); point.x = event.clientX; point.y = event.clientY;
+      const matrix = svg.getScreenCTM(); if (!matrix) return;
+      const cursor = point.matrixTransform(matrix.inverse());
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        svg.classList.add('apaa-eyes-following');
+        pupils.forEach(p => {
+          const dx = cursor.x - p.x, dy = cursor.y - p.y;
+          const distance = Math.hypot(dx,dy) || 1;
+          const travel = Math.min(3.6,distance);
+          p.el.setAttribute('cx',(p.x + dx / distance * travel).toFixed(2));
+          p.el.setAttribute('cy',(p.y + dy / distance * travel).toFixed(2));
+        });
+      });
+    }, {passive:true});
+    stage.addEventListener('pointerleave',resetPupils,{passive:true});
+    window.addEventListener('blur',resetPupils);
+  }
+
+  window.apaaPlayReceiptWelcome = async function () {
+    const overlay = document.getElementById('apaaReceiptWelcome');
+    if (!overlay) return;
+    const paper = overlay.querySelector('.apaa-paper');
+    const progress = overlay.querySelector('.apaa-welcome-progress span');
+    const check = overlay.querySelector('.apaa-welcome-check');
+    overlay.hidden = false;
+    // Restart the short print sequence on every successful login.
+    [paper,progress,check].forEach(el => { if (el) { el.style.animation='none'; void el.offsetWidth; el.style.animation=''; } });
+    void overlay.offsetWidth;
+    overlay.classList.add('is-active');
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    await new Promise(resolve => setTimeout(resolve,reduced ? 220 : 1550));
+    overlay.classList.remove('is-active');
+    await new Promise(resolve => setTimeout(resolve,260));
+    overlay.hidden = true;
+  };
 })();
 </script>
 
