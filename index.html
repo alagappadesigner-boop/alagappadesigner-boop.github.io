@@ -5378,6 +5378,93 @@ if (el('remarksInput')) {
 })();
 </script>
 
+
+<style id="apaa-dynamic-luxury-login-background">
+/* Additive APAA dynamic background: existing login layout and components remain untouched. */
+#apaaLoginGate {
+  isolation:isolate;
+  background:
+    radial-gradient(ellipse at 12% 14%,rgba(207,166,65,.22),transparent 34%),
+    radial-gradient(ellipse at 88% 82%,rgba(67,119,174,.20),transparent 38%),
+    linear-gradient(128deg,#f4f0e6 0%,#eef3f8 46%,#e8edf5 100%) !important;
+}
+#apaaLoginGate::before,
+#apaaLoginGate::after {
+  content:"";
+  position:absolute;
+  inset:-18%;
+  pointer-events:none;
+  border-radius:45%;
+}
+#apaaLoginGate::before {
+  z-index:0;
+  background:
+    radial-gradient(ellipse at 18% 28%,rgba(218,178,85,.22) 0%,rgba(218,178,85,.08) 18%,transparent 42%),
+    radial-gradient(ellipse at 78% 24%,rgba(113,151,190,.19) 0%,rgba(113,151,190,.07) 22%,transparent 45%),
+    radial-gradient(ellipse at 72% 78%,rgba(206,171,91,.16) 0%,transparent 38%),
+    radial-gradient(ellipse at 30% 82%,rgba(91,128,168,.13) 0%,transparent 40%);
+  filter:blur(20px);
+  animation:apaaAmbientAurora 19s ease-in-out infinite alternate;
+}
+#apaaLoginGate::after {
+  z-index:0;
+  inset:0;
+  border-radius:0;
+  opacity:.56;
+  background-image:
+    radial-gradient(circle,rgba(190,145,42,.52) 0 1.2px,transparent 1.8px),
+    radial-gradient(circle,rgba(255,255,255,.9) 0 1px,transparent 1.7px),
+    radial-gradient(circle,rgba(40,83,128,.25) 0 1px,transparent 1.8px);
+  background-size:137px 151px,191px 173px,227px 211px;
+  background-position:12px 22px,70px 90px,120px 35px;
+  mask-image:linear-gradient(110deg,rgba(0,0,0,.8),transparent 78%);
+  animation:apaaGoldDustDrift 32s linear infinite;
+}
+#apaaLoginGate .apaa-login-layout {
+  position:relative;
+  z-index:1;
+  box-shadow:0 28px 90px rgba(17,43,73,.16),0 0 0 1px rgba(255,255,255,.42);
+}
+#apaaLoginGate .apaa-login-art-panel {
+  position:relative;
+  overflow:hidden;
+}
+#apaaLoginGate .apaa-login-art-panel::before {
+  content:"";
+  position:absolute;
+  width:72%;
+  height:72%;
+  left:14%;
+  top:12%;
+  border-radius:50%;
+  pointer-events:none;
+  background:conic-gradient(from 0deg,transparent,rgba(208,165,47,.11),transparent,rgba(89,132,180,.10),transparent);
+  filter:blur(22px);
+  animation:apaaPanelHalo 24s linear infinite;
+}
+#apaaLoginGate .apaa-login-art-panel > * {
+  position:relative;
+  z-index:1;
+}
+@keyframes apaaAmbientAurora {
+  0% {transform:translate3d(-3%,1%,0) rotate(-4deg) scale(1)}
+  50% {transform:translate3d(3%,-2%,0) rotate(3deg) scale(1.08)}
+  100% {transform:translate3d(-1%,3%,0) rotate(7deg) scale(1.03)}
+}
+@keyframes apaaGoldDustDrift {
+  0% {background-position:12px 22px,70px 90px,120px 35px;transform:translate3d(0,0,0)}
+  100% {background-position:12px -180px,70px -120px,120px -220px;transform:translate3d(1.5%,0,0)}
+}
+@keyframes apaaPanelHalo {
+  from {transform:rotate(0deg) scale(.92);opacity:.55}
+  to {transform:rotate(360deg) scale(1.08);opacity:.9}
+}
+@media(prefers-reduced-motion:reduce) {
+  #apaaLoginGate::before,#apaaLoginGate::after,
+  #apaaLoginGate .apaa-login-art-panel::before {animation:none!important}
+}
+</style>
+
 </body>
 
 </html>
