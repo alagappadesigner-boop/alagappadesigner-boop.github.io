@@ -5431,6 +5431,95 @@ if (el('remarksInput')) {
 })();
 </script>
 
+
+<style id="apaa-eye-tracking-visual-fix">
+/* Use SVG circle coordinates for gaze. This prevents CSS transform rules
+   used by the focus animation from locking the pupils in one position. */
+#character-svg .eye-pupil {
+  transform: none !important;
+  transition: cx .09s ease-out, cy .09s ease-out !important;
+}
+</style>
+<script id="apaa-eye-tracking-coordinate-fix">
+(function () {
+  function start() {
+    const svg = document.getElementById('character-svg');
+    if (!svg || svg.dataset.gazeCoordinateFix === '1') return;
+    svg.dataset.gazeCoordinateFix = '1';
+
+    const data = [
+      ['purple-pupil-1',185,170,3.7], ['purple-pupil-2',215,170,3.7],
+      ['black-pupil-1',252,215,3.9], ['black-pupil-2',282,215,3.9],
+      ['yellow-pupil-1',326,254,2.1], ['yellow-pupil-2',351,254,2.1],
+      ['orange-pupil-1',126,329,2.5], ['orange-pupil-2',166,329,2.5]
+    ];
+    const pupils = data.map(([id,x,y,limit]) => {
+      const el = document.getElementById(id);
+      return el ? {el,x,y,limit,tx:0,ty:0,cx:x,cy:y} : null;
+    }).filter(Boolean);
+    if (!pupils.length) return;
+
+    let pointerX = innerWidth / 2;
+    let pointerY = innerHeight / 2;
+    let raf = 0;
+
+    function move(event) {
+      if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      if (!raf) raf = requestAnimationFrame(update);
+    }
+
+    function update() {
+      raf = 0;
+      let unsettled = false;
+      pupils.forEach(p => {
+        const parent = p.el.parentElement;
+        const matrix = parent && parent.getScreenCTM();
+        if (matrix) {
+          try {
+            const point = svg.createSVGPoint();
+            point.x = pointerX;
+            point.y = pointerY;
+            const local = point.matrixTransform(matrix.inverse());
+            const dx = local.x - p.x;
+            const dy = local.y - p.y;
+            const distance = Math.hypot(dx,dy) || 1;
+            const amount = Math.min(p.limit,distance);
+            p.tx = dx / distance * amount;
+            p.ty = dy / distance * amount;
+          } catch (_) {}
+        }
+        p.cx += (p.x + p.tx - p.cx) * .42;
+        p.cy += (p.y + p.ty - p.cy) * .42;
+        p.el.setAttribute('cx',p.cx.toFixed(2));
+        p.el.setAttribute('cy',p.cy.toFixed(2));
+        if (Math.abs(p.x+p.tx-p.cx) > .04 || Math.abs(p.y+p.ty-p.cy) > .04) unsettled = true;
+      });
+      if (unsettled) raf = requestAnimationFrame(update);
+    }
+
+    // Capture cursor movement anywhere on the login screen, including over form controls.
+    document.addEventListener('pointermove',move,{passive:true,capture:true});
+    document.addEventListener('mousemove',move,{passive:true,capture:true});
+    window.addEventListener('resize',() => {
+      if (!raf) raf = requestAnimationFrame(update);
+    },{passive:true});
+    window.addEventListener('blur',() => {
+      pointerX = innerWidth / 2;
+      pointerY = innerHeight / 2;
+      if (!raf) raf = requestAnimationFrame(update);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded',start,{once:true});
+  } else {
+    start();
+  }
+})();
+</script>
+
 </body>
 
 </html>
