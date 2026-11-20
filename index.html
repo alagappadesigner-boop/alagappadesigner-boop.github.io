@@ -6,6 +6,7 @@ dashboard, ledger and all existing functionality must remain exactly as they are
 Do not remove, rewrite, rename, reorder, or modify existing HTML, CSS, JavaScript,
 login validation, receipt generation, saved records, dashboard, ledger, or data logic.
 For future enhancements, add isolated code only; do not alter existing implementation.
+The Admin Activity Log, Automatic Backup and Restore are additive features.
 -->
 
 <html lang="en">
@@ -2988,6 +2989,37 @@ body.apaa-view-ledger .ledger-header{margin-top:0}
       </div>
     </div>
     <div id="ledgerList" class="ledger-list"></div>
+    <!-- APAA ADMINISTRATION CENTRE: additive features; existing receipt and ledger implementation is preserved. -->
+    <section class="apaa-admin-centre" id="apaaAdminCentre" aria-label="Administration centre">
+      <div class="apaa-admin-heading">
+        <div><span class="apaa-admin-kicker">CONTROL ROOM · APAA</span><h2>Administration Centre</h2><p>Activity history, automatic safety backups and controlled restore.</p></div>
+        <span class="apaa-admin-live"><i></i> LOCAL PROTECTION ACTIVE</span>
+      </div>
+      <div class="apaa-admin-tools">
+        <article class="apaa-admin-tool">
+          <div class="apaa-admin-tool-icon">◈</div><div class="apaa-admin-tool-copy">
+            <h3>Automatic Backup</h3><p id="apaaBackupStatus">Backup will be created automatically when records change.</p><small id="apaaBackupCount">0 backup snapshots stored on this device</small>
+          </div><div class="apaa-admin-actions">
+            <button type="button" class="apaa-admin-btn primary" onclick="apaaCreateManualBackup()">Backup Now</button>
+            <button type="button" class="apaa-admin-btn" onclick="apaaDownloadBackup()">Download Backup</button>
+          </div>
+        </article>
+        <article class="apaa-admin-tool">
+          <div class="apaa-admin-tool-icon">↻</div><div class="apaa-admin-tool-copy">
+            <h3>Restore Records</h3><p>Restore receipt records from an APAA JSON backup file.</p><small>Current records are backed up before a restore.</small>
+          </div><div class="apaa-admin-actions">
+            <label class="apaa-admin-btn primary apaa-file-label" for="apaaRestoreFile">Choose Backup File</label>
+            <input id="apaaRestoreFile" type="file" accept=".json,application/json" hidden>
+          </div>
+        </article>
+      </div>
+      <div class="apaa-admin-log-head">
+        <div><span class="apaa-admin-kicker">SECURITY TIMELINE</span><h3>Admin Activity Log</h3></div>
+        <div class="apaa-admin-log-controls"><label class="apaa-sound-toggle"><input id="apaaSoundToggle" type="checkbox" checked> Sound effects</label><button type="button" class="apaa-admin-btn" onclick="apaaExportActivityLog()">Export Log</button></div>
+      </div>
+      <div class="apaa-admin-log" id="apaaActivityLog" aria-live="polite"><div class="apaa-admin-empty">Activity history will appear here.</div></div>
+      <div class="apaa-admin-footnote">Backups and activity history are stored in this browser on this device. Download a backup regularly for off-device protection. This is not a shared cloud database.</div>
+    </section>
   </section>
 </div>
 
@@ -5464,6 +5496,151 @@ if (el('remarksInput')) {
   #apaaLoginGate .apaa-login-art-panel::before {animation:none!important}
 }
 </style>
+
+<style id="apaa-admin-centre-style">
+.apaa-admin-centre{margin:30px 0 8px;padding:25px;border:1px solid #dfe7f0;border-radius:20px;background:linear-gradient(145deg,#fbfdff,#f2f6fb);box-shadow:0 14px 38px rgba(24,55,88,.07);color:#173b60;position:relative;overflow:hidden}
+.apaa-admin-centre:before{content:"";position:absolute;width:300px;height:300px;right:-130px;top:-170px;border-radius:50%;background:radial-gradient(circle,rgba(211,172,77,.14),transparent 68%);pointer-events:none}
+.apaa-admin-heading,.apaa-admin-log-head{display:flex;align-items:center;justify-content:space-between;gap:16px;position:relative}
+.apaa-admin-kicker{font-size:9px;font-weight:900;letter-spacing:1.8px;color:#b18a2d}
+.apaa-admin-heading h2,.apaa-admin-log-head h3{margin:5px 0;color:#183d64;font-family:Georgia,serif}
+.apaa-admin-heading h2{font-size:25px}.apaa-admin-heading p{margin:5px 0 0;color:#718198;font-size:12px}
+.apaa-admin-live{font-size:9px;font-weight:900;letter-spacing:1px;color:#31836b;white-space:nowrap}.apaa-admin-live i{display:inline-block;width:7px;height:7px;margin-right:6px;border-radius:50%;background:#36ad7c;box-shadow:0 0 0 4px rgba(54,173,124,.12);animation:apaaAdminPulse 1.8s infinite}
+.apaa-admin-tools{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:22px 0}
+.apaa-admin-tool{display:flex;align-items:flex-start;gap:13px;padding:17px;border:1px solid #e2e9f1;border-radius:15px;background:rgba(255,255,255,.88);box-shadow:0 5px 18px rgba(24,55,88,.035);min-width:0}
+.apaa-admin-tool-icon{flex:0 0 38px;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#f9f1db;color:#b18a2d;font-size:23px}
+.apaa-admin-tool-copy{flex:1;min-width:0}.apaa-admin-tool h3{margin:1px 0 5px;font-size:14px;color:#1b4168}.apaa-admin-tool p{margin:0 0 7px;font-size:11px;line-height:1.5;color:#718198}.apaa-admin-tool small{font-size:9px;color:#94a0af}
+.apaa-admin-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.apaa-admin-btn{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border:1px solid #d9e2ec;border-radius:8px;background:#fff;color:#35516f;font:700 10px Arial,sans-serif;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s}
+.apaa-admin-btn:hover{transform:translateY(-2px);border-color:#c6a34d;box-shadow:0 6px 16px rgba(31,63,94,.1)}.apaa-admin-btn.primary{background:linear-gradient(110deg,#173f69,#285b88);border-color:#173f69;color:#fff}.apaa-file-label{cursor:pointer}
+.apaa-admin-log-head{margin-top:25px;padding-bottom:12px;border-bottom:1px solid #e1e8f0}.apaa-admin-log-head h3{font-size:19px}
+.apaa-admin-log-controls{display:flex;align-items:center;gap:12px}.apaa-sound-toggle{display:flex;align-items:center;gap:5px;color:#708197;font-size:10px;white-space:nowrap}
+.apaa-admin-log{max-height:300px;overflow:auto;padding:5px 2px}.apaa-admin-event{display:grid;grid-template-columns:27px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px 7px;border-bottom:1px solid #eaf0f5;animation:apaaAdminEventIn .35s ease both}
+.apaa-admin-event-icon{width:26px;height:26px;display:grid;place-items:center;border-radius:9px;background:#edf3f9;color:#315d84;font-size:13px}
+.apaa-admin-event strong{display:block;color:#304c6b;font-size:11px}.apaa-admin-event small{display:block;margin-top:3px;color:#93a0ae;font-size:9px}.apaa-admin-event time{color:#8492a3;font-size:9px;white-space:nowrap}
+.apaa-admin-empty{text-align:center;padding:25px 10px;color:#96a3b1;font-size:11px}.apaa-admin-footnote{margin-top:12px;color:#9aa6b3;font-size:9px;line-height:1.5}
+#apaaAdminFxToast{position:fixed;right:22px;bottom:22px;z-index:100300;display:flex;align-items:center;gap:11px;max-width:min(390px,calc(100vw - 30px));padding:13px 17px;border:1px solid rgba(255,255,255,.55);border-radius:13px;background:rgba(18,48,78,.94);color:#fff;box-shadow:0 16px 45px rgba(10,30,52,.28);backdrop-filter:blur(12px);font:600 12px Arial,sans-serif;opacity:0;transform:translateY(15px) scale(.97);pointer-events:none;transition:opacity .25s,transform .25s}
+#apaaAdminFxToast.show{opacity:1;transform:translateY(0) scale(1)}#apaaAdminFxToast b{color:#e8c66e;font-size:17px}.apaa-admin-flash{animation:apaaAdminFlash .7s ease}
+@keyframes apaaAdminPulse{50%{box-shadow:0 0 0 7px rgba(54,173,124,.04);opacity:.65}}
+@keyframes apaaAdminEventIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes apaaAdminFlash{0%,100%{box-shadow:0 14px 38px rgba(24,55,88,.07)}35%{box-shadow:0 0 0 5px rgba(207,169,78,.16),0 14px 38px rgba(24,55,88,.07)}}
+@media(max-width:760px){.apaa-admin-centre{padding:17px}.apaa-admin-tools{grid-template-columns:1fr}.apaa-admin-heading,.apaa-admin-log-head{align-items:flex-start;flex-direction:column}.apaa-admin-event{grid-template-columns:27px minmax(0,1fr)}.apaa-admin-event time{grid-column:2}.apaa-admin-tool{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.apaa-admin-centre *{animation:none!important;transition:none!important}}
+</style>
+<div id="apaaAdminFxToast" role="status" aria-live="polite"><b>✦</b><span id="apaaAdminFxToastText">APAA protection active</span></div>
+
+<script id="apaa-admin-backup-activity-engine">
+(function(){
+  'use strict';
+  const BACKUP_KEY='apaa_receipt_backups_v1', ACTIVITY_KEY='apaa_admin_activity_v1';
+  const MAX_BACKUPS=10, MAX_EVENTS=300;
+  let toastTimer=null, audioContext=null;
+  const $=id=>document.getElementById(id);
+  const read=(key,fallback)=>{try{const value=JSON.parse(localStorage.getItem(key)||'null');return value??fallback}catch(error){return fallback}};
+  const write=(key,value)=>localStorage.setItem(key,JSON.stringify(value));
+  function safe(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+  function sound(type){
+    if(!$('apaaSoundToggle')||!$('apaaSoundToggle').checked)return;
+    try{
+      const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return;
+      if(!audioContext)audioContext=new AudioCtor();if(audioContext.state==='suspended')audioContext.resume();
+      const now=audioContext.currentTime;
+      let notes=[587,740];if(type==='backup')notes=[660,880];if(type==='restore')notes=[523,659,784];if(type==='error')notes=[220,165];
+      notes.forEach((hz,index)=>{
+        const oscillator=audioContext.createOscillator(),gain=audioContext.createGain(),start=now+index*.085;
+        oscillator.type='sine';oscillator.frequency.setValueAtTime(hz,start);
+        gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.075,start+.018);gain.gain.exponentialRampToValueAtTime(.0001,start+.16);
+        oscillator.connect(gain);gain.connect(audioContext.destination);oscillator.start(start);oscillator.stop(start+.18);
+      });
+    }catch(error){/* Audio may be blocked until the first user interaction. */}
+  }
+  function toast(message,type){
+    const node=$('apaaAdminFxToast');if(!node)return;
+    $('apaaAdminFxToastText').textContent=message;node.classList.add('show');
+    clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove('show'),2800);sound(type||'success');
+  }
+  function log(action,detail,icon){
+    try{const events=read(ACTIVITY_KEY,[]);events.unshift({action,detail:detail||'',icon:icon||'•',time:new Date().toISOString()});write(ACTIVITY_KEY,events.slice(0,MAX_EVENTS));renderLog();}
+    catch(error){console.warn('APAA activity log could not be saved',error);}
+  }
+  function renderLog(){
+    const host=$('apaaActivityLog');if(!host)return;const events=read(ACTIVITY_KEY,[]);
+    if(!events.length){host.innerHTML='<div class="apaa-admin-empty">No admin activity recorded yet.</div>';return;}
+    host.innerHTML=events.slice(0,100).map(ev=>{
+      const date=new Date(ev.time),when=isNaN(date)?'Time unavailable':date.toLocaleString();
+      return `<div class="apaa-admin-event"><span class="apaa-admin-event-icon">${safe(ev.icon)}</span><div><strong>${safe(ev.action)}</strong><small>${safe(ev.detail)}</small></div><time>${safe(when)}</time></div>`;
+    }).join('');
+  }
+  function makeSnapshot(reason){
+    const records=typeof getSaved==='function'?getSaved():[];
+    const snapshot={app:'APAA Fee Receipt Generator',formatVersion:1,createdAt:new Date().toISOString(),reason,recordCount:records.length,records};
+    const backups=read(BACKUP_KEY,[]);backups.unshift(snapshot);write(BACKUP_KEY,backups.slice(0,MAX_BACKUPS));updateBackupStatus();return snapshot;
+  }
+  function updateBackupStatus(){
+    const backups=read(BACKUP_KEY,[]);
+    if($('apaaBackupCount'))$('apaaBackupCount').textContent=`${backups.length} backup snapshot${backups.length===1?'':'s'} stored on this device`;
+    if($('apaaBackupStatus'))$('apaaBackupStatus').textContent=backups[0]?`Last backup: ${new Date(backups[0].createdAt).toLocaleString()} · ${backups[0].recordCount} receipt record(s)`:'No backup created yet.';
+  }
+  function downloadJSON(data,filename){
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download=filename;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);
+  }
+  window.apaaCreateManualBackup=function(){
+    try{const snap=makeSnapshot('Manual backup');log('Manual backup created',`${snap.recordCount} receipt record(s) included`,'⬇');toast('Backup snapshot created','backup');$('apaaAdminCentre')?.classList.add('apaa-admin-flash');setTimeout(()=>$('apaaAdminCentre')?.classList.remove('apaa-admin-flash'),750);}
+    catch(error){console.error(error);toast('Backup could not be created','error');alert('Unable to create a backup. Check available browser storage.');}
+  };
+  window.apaaDownloadBackup=function(){
+    try{const snap=makeSnapshot('Download backup');downloadJSON(snap,`APAA_Receipt_Backup_${new Date().toISOString().slice(0,10)}.json`);log('Backup downloaded',`${snap.recordCount} receipt record(s) exported`,'⇩');toast('Backup file downloaded','backup');}
+    catch(error){console.error(error);toast('Backup download failed','error');alert('Could not prepare the backup file.');}
+  };
+  window.apaaExportActivityLog=function(){
+    const events=read(ACTIVITY_KEY,[]);if(!events.length){toast('There is no activity log to export','error');return;}
+    downloadJSON({app:'APAA Admin Activity Log',exportedAt:new Date().toISOString(),events},`APAA_Admin_Activity_Log_${new Date().toISOString().slice(0,10)}.json`);
+    log('Activity log exported',`${events.length} event(s)`,'⇩');toast('Activity log exported');
+  };
+  function validateBackup(data){
+    if(!data||!Array.isArray(data.records))throw new Error('This is not a valid APAA backup. The records list is missing.');
+    if(data.records.length>100000)throw new Error('The backup contains too many records.');
+    if(!data.records.every(record=>record&&typeof record==='object'&&!Array.isArray(record)&&record.receiptNo!==undefined&&record.studentName!==undefined))throw new Error('The backup contains an invalid receipt record. No data was changed.');
+    return data.records;
+  }
+  $('apaaRestoreFile')?.addEventListener('change',async event=>{
+    const file=event.target.files?.[0];if(!file)return;
+    try{
+      const data=JSON.parse(await file.text()),records=validateBackup(data);
+      const created=data.createdAt?new Date(data.createdAt).toLocaleString():'Unknown date';
+      if(!confirm(`APAA BACKUP RESTORE\n\nFile: ${file.name}\nCreated: ${created}\nRecords to restore: ${records.length}\n\nCurrent records will be replaced. A safety backup will be created first.\n\nContinue?`)){toast('Restore cancelled','error');return;}
+      makeSnapshot('Safety backup before restore');
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(records));
+      if(typeof updateSavedCount==='function')updateSavedCount();if(typeof renderLedger==='function')renderLedger();
+      log('Records restored from backup',`${records.length} receipt record(s) restored from ${file.name}`,'↻');toast('Records restored successfully','restore');
+    }catch(error){console.error('APAA restore failed:',error);toast('Restore failed — records unchanged','error');alert(error.message||'Unable to restore this backup file.');}
+    finally{event.target.value='';}
+  });
+  const originalSave=window.saveReceiptToLedger;
+  if(typeof originalSave==='function')window.saveReceiptToLedger=function(data){
+    try{makeSnapshot('Automatic backup before receipt save');}catch(error){console.warn('Pre-save backup skipped',error);}
+    const result=originalSave.apply(this,arguments);
+    log('Receipt saved',`${data.studentName||'Student'} · Receipt ${data.receiptNo||'—'} · ₹${data.amount||'0'}`,'✓');toast('Receipt safely saved to the ledger');return result;
+  };
+  const originalClear=window.clearAllRecords;
+  if(typeof originalClear==='function')window.clearAllRecords=function(){
+    try{makeSnapshot('Safety backup before clear records');}catch(error){console.warn('Pre-clear backup failed',error);}
+    log('Clear records requested','Password verification is required before deletion','⚑');return originalClear.apply(this,arguments);
+  };
+  document.addEventListener('click',event=>{
+    if(!event.target.closest('#apaaClearRecordsConfirm'))return;
+    setTimeout(()=>{if(!localStorage.getItem(STORAGE_KEY))log('Ledger cleared','All receipt records were removed after password confirmation','⌫');},400);
+  });
+  function init(){
+    renderLog();updateBackupStatus();
+    if(!read(BACKUP_KEY,[]).length){try{makeSnapshot('Initial automatic backup');}catch(error){}}
+    log('Admin centre opened','Activity monitoring and local backup protection initialised','◈');
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+  setInterval(()=>{try{makeSnapshot('Scheduled automatic backup');}catch(error){}},5*60*1000);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){try{makeSnapshot('Automatic backup on page hide');}catch(error){}}});
+})();
+</script>
 
 </body>
 
