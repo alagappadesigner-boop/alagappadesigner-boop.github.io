@@ -2845,11 +2845,7 @@ body.apaa-view-ledger .ledger-header{margin-top:0}
             <label for="date">Payment Date *</label>
             <div class="date-picker-wrap">
               <input id="date" type="hidden" required>
-              <input id="dateDisplay" type="text" class="date-display-input" placeholder="Select payment date" readonly aria-label="Payment date">
-              <button type="button" class="calendar-toggle" aria-label="Open calendar" onclick="togglePaymentCalendar()">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
-              </button>
-              <div id="paymentCalendar" class="payment-calendar" hidden></div>
+              <input id="dateDisplay" type="text" class="date-display-input" placeholder="DD/MM/YYYY (e.g. 22/12/2026)" aria-label="Payment date in DD/MM/YYYY format" inputmode="numeric" maxlength="10" autocomplete="off" required oninput="handleTypedPaymentDate()" onblur="finalizeTypedPaymentDate()">
             </div>
           </div>
 
@@ -4507,18 +4503,54 @@ function renderPaymentCalendar() {
     </div>`;
 }
 
+function parseTypedPaymentDate(value) {
+  const match = String(value || '').trim().match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if (!match) return null;
+  const day = Number(match[1]), month = Number(match[2]), year = Number(match[3]);
+  const parsed = new Date(year, month - 1, day);
+  if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
+  return parsed;
+}
+function handleTypedPaymentDate() {
+  const input = el('dateDisplay');
+  const hidden = el('date');
+  if (!input || !hidden) return;
+  const raw = input.value.trim();
+  const parsed = parseTypedPaymentDate(raw);
+  if (parsed) {
+    hidden.value = dateToISO(parsed);
+    input.setCustomValidity('');
+    if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(hidden.value);
+    hidden.dispatchEvent(new Event('change', {bubbles:true}));
+  } else {
+    hidden.value = '';
+    if (raw.length) input.setCustomValidity('Enter a valid date as DD/MM/YYYY, for example 22/12/2026.');
+    else input.setCustomValidity('Please enter the payment date.');
+  }
+}
+function finalizeTypedPaymentDate() {
+  const input = el('dateDisplay');
+  if (!input) return;
+  const parsed = parseTypedPaymentDate(input.value);
+  if (parsed) {
+    const dd = String(parsed.getDate()).padStart(2,'0');
+    const mm = String(parsed.getMonth()+1).padStart(2,'0');
+    input.value = `${dd}/${mm}/${parsed.getFullYear()}`;
+    handleTypedPaymentDate();
+  }
+}
 function selectPaymentDate(iso) {
   el('date').value = iso;
   el('dateDisplay').value = formatDateForDisplay(iso);
   el('displayDate').textContent = formatDateForDisplay(iso);
-  el('paymentCalendar').hidden = true;
+  if (el('paymentCalendar')) el('paymentCalendar').hidden = true;
   el('date').dispatchEvent(new Event('change', {bubbles:true}));
 }
 function clearPaymentDate() {
   el('date').value = '';
   el('dateDisplay').value = '';
   el('displayDate').textContent = '';
-  el('paymentCalendar').hidden = true;
+  if (el('paymentCalendar')) el('paymentCalendar').hidden = true;
 }
 document.addEventListener('click', (event) => {
   const wrap = document.querySelector('.date-picker-wrap');
@@ -5825,6 +5857,34 @@ if (el('remarksInput')) {
 @media (prefers-reduced-motion: reduce) {
   .payment-calendar:not([hidden]) { animation:none; }
   .payment-calendar *, .payment-calendar *::before, .payment-calendar *::after { transition:none !important; }
+}
+
+
+/* APAA typed payment date field: calendar popup removed */
+.date-picker-wrap #dateDisplay {
+  width:100%;
+  min-height:38px;
+  padding:8px 12px;
+  border:1px solid #d8e1eb;
+  border-radius:8px;
+  background:#fff;
+  color:#123b68;
+  text-align:left;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.2px;
+  cursor:text;
+  transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+.date-picker-wrap #dateDisplay:focus {
+  outline:none;
+  border-color:#c69a2b;
+  box-shadow:0 0 0 3px rgba(198,154,43,.14);
+  transform:translateY(-1px);
+}
+.date-picker-wrap #dateDisplay::placeholder {
+  color:#8796a8;
+  font-weight:400;
 }
 
 </style>
