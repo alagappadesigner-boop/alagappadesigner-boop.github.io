@@ -4441,6 +4441,20 @@ function changePaymentCalendarMonth(delta) {
   requestAnimationFrame(positionPaymentCalendar);
 }
 
+function setPaymentCalendarMonth(monthValue) {
+  const year = paymentCalendarMonth.getFullYear();
+  paymentCalendarMonth = new Date(year, Number(monthValue), 1);
+  renderPaymentCalendar();
+  requestAnimationFrame(positionPaymentCalendar);
+}
+
+function setPaymentCalendarYear(yearValue) {
+  const month = paymentCalendarMonth.getMonth();
+  paymentCalendarMonth = new Date(Number(yearValue), month, 1);
+  renderPaymentCalendar();
+  requestAnimationFrame(positionPaymentCalendar);
+}
+
 function renderPaymentCalendar() {
   const panel = el('paymentCalendar');
   if (!panel) return;
@@ -4462,9 +4476,22 @@ function renderPaymentCalendar() {
     if (iso === selectedISO) classes.push('selected');
     days += `<button type="button" class="${classes.join(' ')}" onclick="selectPaymentDate('${iso}')">${d.getDate()}</button>`;
   }
+  const monthOptions = Array.from({length:12}, (_, i) =>
+    `<option value="${i}" ${i === month ? 'selected' : ''}>${new Date(2000, i, 1).toLocaleDateString('en-IN', {month:'long'})}</option>`
+  ).join('');
+  const currentYear = new Date().getFullYear();
+  const yearStart = Math.min(1990, currentYear - 15);
+  const yearEnd = Math.max(currentYear + 15, year);
+  let yearOptions = '';
+  for (let y = yearStart; y <= yearEnd; y++) {
+    yearOptions += `<option value="${y}" ${y === year ? 'selected' : ''}>${y}</option>`;
+  }
   panel.innerHTML = `
     <div class="calendar-head">
-      <div class="calendar-month-label">${paymentCalendarMonth.toLocaleDateString('en-IN', {month:'long', year:'numeric'})}</div>
+      <div class="calendar-selectors">
+        <select class="calendar-month-select" aria-label="Select month" onchange="setPaymentCalendarMonth(this.value)">${monthOptions}</select>
+        <select class="calendar-year-select" aria-label="Select year" onchange="setPaymentCalendarYear(this.value)">${yearOptions}</select>
+      </div>
       <div class="calendar-nav">
         <button type="button" aria-label="Previous month" onclick="changePaymentCalendarMonth(-1)">‹</button>
         <button type="button" aria-label="Next month" onclick="changePaymentCalendarMonth(1)">›</button>
@@ -5722,6 +5749,84 @@ if (el('remarksInput')) {
 @keyframes apaaRecoveryPop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:480px){.apaa-recovery-card{padding:29px 22px 22px}}
 @media(prefers-reduced-motion:reduce){.apaa-recovery-overlay,.apaa-recovery-card{animation:none}}
+
+/* APAA calendar: direct month/year selection and restrained 3D motion */
+.payment-calendar {
+  transform-origin: top right;
+  perspective: 900px;
+  transition: box-shadow .22s ease, border-color .22s ease;
+  box-shadow: 0 18px 42px rgba(18,59,104,.19), 0 5px 12px rgba(18,59,104,.08);
+}
+.payment-calendar:not([hidden]) {
+  animation: apaaCalendarEnter .34s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes apaaCalendarEnter {
+  from { opacity:0; transform:translateY(10px) rotateX(-9deg) scale(.96); }
+  to { opacity:1; transform:translateY(0) rotateX(0) scale(1); }
+}
+.calendar-selectors {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+.payment-calendar .calendar-month-select,
+.payment-calendar .calendar-year-select {
+  height:30px;
+  min-width:0;
+  padding:0 22px 0 8px;
+  border:1px solid #e1e8ef;
+  border-radius:7px;
+  color:#123b68;
+  background:linear-gradient(180deg,#fff,#f7f9fc);
+  font:700 12px inherit;
+  font-size:12px;
+  font-weight:800;
+  outline:none;
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.payment-calendar .calendar-month-select { width:112px; }
+.payment-calendar .calendar-year-select { width:76px; }
+.payment-calendar .calendar-month-select:hover,
+.payment-calendar .calendar-year-select:hover {
+  transform:translateY(-2px);
+  border-color:#d0a52f;
+  box-shadow:0 5px 10px rgba(18,59,104,.12);
+}
+.payment-calendar .calendar-month-select:focus,
+.payment-calendar .calendar-year-select:focus {
+  border-color:#c69a2b;
+  box-shadow:0 0 0 3px rgba(208,165,47,.16);
+}
+.payment-calendar .calendar-nav button {
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.payment-calendar .calendar-nav button:hover {
+  transform:translateY(-2px) rotateY(-8deg);
+  box-shadow:0 5px 10px rgba(18,59,104,.13);
+}
+.payment-calendar .calendar-day {
+  transform:translateZ(0);
+  transition:transform .16s ease, background .16s ease, box-shadow .16s ease;
+}
+.payment-calendar .calendar-day:hover {
+  transform:translateY(-3px) scale(1.06);
+  box-shadow:0 5px 10px rgba(18,59,104,.13);
+  background:#fff4d8;
+}
+.payment-calendar .calendar-day.selected {
+  box-shadow:0 4px 10px rgba(18,59,104,.24);
+}
+.payment-calendar .calendar-foot button {
+  transition:transform .16s ease, background .16s ease;
+}
+.payment-calendar .calendar-foot button:hover { transform:translateY(-1px); }
+@media (prefers-reduced-motion: reduce) {
+  .payment-calendar:not([hidden]) { animation:none; }
+  .payment-calendar *, .payment-calendar *::before, .payment-calendar *::after { transition:none !important; }
+}
+
 </style>
 
 <script id="apaa-offline-password-recovery-engine">
