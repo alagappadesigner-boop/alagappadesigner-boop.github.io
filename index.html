@@ -2845,7 +2845,7 @@ body.apaa-view-ledger .ledger-header{margin-top:0}
             <label for="date">Payment Date *</label>
             <div class="date-picker-wrap">
               <input id="date" type="hidden" required>
-              <input id="dateDisplay" type="text" class="date-display-input" placeholder="DD/MM/YYYY (e.g. 22/12/2026)" aria-label="Payment date in DD/MM/YYYY format" inputmode="numeric" maxlength="10" autocomplete="off" required oninput="handleTypedPaymentDate()" onblur="finalizeTypedPaymentDate()">
+              <input id="dateDisplay" type="text" class="date-display-input" placeholder="DD/MM/YYYY" aria-label="Payment date in DD/MM/YYYY format" inputmode="numeric" maxlength="10" autocomplete="off" required oninput="handleTypedPaymentDate()" onblur="finalizeTypedPaymentDate()">
             </div>
           </div>
 
@@ -4504,9 +4504,10 @@ function renderPaymentCalendar() {
 }
 
 function parseTypedPaymentDate(value) {
-  const match = String(value || '').trim().match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  const match = String(value || '').trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (!match) return null;
   const day = Number(match[1]), month = Number(match[2]), year = Number(match[3]);
+  if (year < 1900 || year > 9999 || month < 1 || month > 12 || day < 1 || day > 31) return null;
   const parsed = new Date(year, month - 1, day);
   if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
   return parsed;
@@ -4515,28 +4516,41 @@ function handleTypedPaymentDate() {
   const input = el('dateDisplay');
   const hidden = el('date');
   if (!input || !hidden) return;
-  const raw = input.value.trim();
-  const parsed = parseTypedPaymentDate(raw);
+
+  // Accept digits only and automatically format as DD/MM/YYYY.
+  const digits = input.value.replace(/\D/g, '').slice(0, 8);
+  let formatted = digits;
+  if (digits.length > 4) formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+  else if (digits.length > 2) formatted = digits.slice(0, 2) + '/' + digits.slice(2);
+  input.value = formatted;
+
+  const parsed = digits.length === 8 ? parseTypedPaymentDate(formatted) : null;
   if (parsed) {
     hidden.value = dateToISO(parsed);
     input.setCustomValidity('');
+    input.classList.remove('date-invalid');
     if (el('displayDate')) el('displayDate').textContent = formatDateForDisplay(hidden.value);
     hidden.dispatchEvent(new Event('change', {bubbles:true}));
   } else {
     hidden.value = '';
-    if (raw.length) input.setCustomValidity('Enter a valid date as DD/MM/YYYY, for example 22/12/2026.');
-    else input.setCustomValidity('Please enter the payment date.');
+    if (digits.length === 8) {
+      input.setCustomValidity('Invalid date. Enter a real date in DD/MM/YYYY format, for example 22/12/2026.');
+      input.classList.add('date-invalid');
+    } else {
+      input.setCustomValidity('');
+      input.classList.remove('date-invalid');
+      if (el('displayDate')) el('displayDate').textContent = '';
+    }
   }
 }
 function finalizeTypedPaymentDate() {
   const input = el('dateDisplay');
   if (!input) return;
-  const parsed = parseTypedPaymentDate(input.value);
-  if (parsed) {
-    const dd = String(parsed.getDate()).padStart(2,'0');
-    const mm = String(parsed.getMonth()+1).padStart(2,'0');
-    input.value = `${dd}/${mm}/${parsed.getFullYear()}`;
-    handleTypedPaymentDate();
+  handleTypedPaymentDate();
+  const digits = input.value.replace(/\D/g, '');
+  if (digits.length !== 8) {
+    input.setCustomValidity('Enter the complete payment date as DD/MM/YYYY, for example 22/12/2026.');
+    input.classList.add('date-invalid');
   }
 }
 function selectPaymentDate(iso) {
@@ -5885,6 +5899,16 @@ if (el('remarksInput')) {
 .date-picker-wrap #dateDisplay::placeholder {
   color:#8796a8;
   font-weight:400;
+}
+
+
+/* Typed date validation states */
+.date-picker-wrap #dateDisplay.date-invalid {
+  border-color:#dc5353 !important;
+  box-shadow:0 0 0 3px rgba(220,83,83,.12) !important;
+}
+.date-picker-wrap #dateDisplay:not(.date-invalid):valid {
+  border-color:#d8e1eb;
 }
 
 </style>
